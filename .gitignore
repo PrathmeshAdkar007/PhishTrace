@@ -1,0 +1,63 @@
+# ==============================
+# PhishTrace - Git Ignore
+# ==============================
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Flask
+instance/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node / React
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Build output
+dist/
+build/
+
+# IDE / editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local database / temporary files
+*.db
+*.sqlite
+*.sqlite3
+
+# Investigation temporary files
+evidence/temp/
+data/temp/
+
+# Logs
+*.log
+
+# Python distribution
+*.egg-info/
