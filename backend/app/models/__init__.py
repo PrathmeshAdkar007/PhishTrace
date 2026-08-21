@@ -7,6 +7,8 @@ from app.models.finding import Finding
 from app.models.affected_user import AffectedUser
 from app.models.containment_action import ContainmentAction
 from app.models.mitre_attack_mapping import MitreAttackMapping
+from app.models.user import User
+
 
 __all__ = [
     "Case",
@@ -17,5 +19,6 @@ __all__ = [
     "Finding",
     "AffectedUser",
     "ContainmentAction",
-    "MitreAttackMapping"
+    "MitreAttackMapping",
+    "User",
 ]

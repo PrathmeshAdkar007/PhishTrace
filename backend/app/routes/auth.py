@@ -1,0 +1,179 @@
+from flask import Blueprint, jsonify, request, session
+
+from app import db
+from app.models.user import User
+
+
+auth = Blueprint("auth", __name__)
+
+
+# =========================================================
+# REGISTER
+# =========================================================
+
+@auth.post("/api/auth/register")
+def register():
+    data = request.get_json(silent=True) or {}
+
+    username = data.get("username", "").strip()
+    email = data.get("email", "").strip().lower()
+    password = data.get("password", "")
+
+    if not username:
+        return jsonify({
+            "error": "Username is required"
+        }), 400
+
+    if not email:
+        return jsonify({
+            "error": "Email is required"
+        }), 400
+
+    if not password:
+        return jsonify({
+            "error": "Password is required"
+        }), 400
+
+    if len(password) < 8:
+        return jsonify({
+            "error": "Password must be at least 8 characters long"
+        }), 400
+
+    existing_username = User.query.filter_by(
+        username=username
+    ).first()
+
+    if existing_username:
+        return jsonify({
+            "error": "Username already exists"
+        }), 409
+
+    existing_email = User.query.filter_by(
+        email=email
+    ).first()
+
+    if existing_email:
+        return jsonify({
+            "error": "Email already exists"
+        }), 409
+
+    user = User(
+        username=username,
+        email=email,
+        role="analyst",
+        is_active=True
+    )
+
+    user.set_password(password)
+
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({
+        "message": "User registered successfully",
+        "user": user.to_dict()
+    }), 201
+
+
+# =========================================================
+# LOGIN
+# =========================================================
+
+@auth.post("/api/auth/login")
+def login():
+    data = request.get_json(silent=True) or {}
+
+    username = data.get("username", "").strip()
+    password = data.get("password", "")
+
+    if not username:
+        return jsonify({
+            "error": "Username is required"
+        }), 400
+
+    if not password:
+        return jsonify({
+            "error": "Password is required"
+        }), 400
+
+    user = User.query.filter_by(
+        username=username
+    ).first()
+
+    if not user:
+        return jsonify({
+            "error": "Invalid username or password"
+        }), 401
+
+    if not user.is_active:
+        return jsonify({
+            "error": "User account is inactive"
+        }), 403
+
+    if not user.check_password(password):
+        return jsonify({
+            "error": "Invalid username or password"
+        }), 401
+
+    session.clear()
+
+    session["user_id"] = user.id
+
+    return jsonify({
+        "message": "Login successful",
+        "user": user.to_dict()
+    }), 200
+
+
+# =========================================================
+# CURRENT USER
+# =========================================================
+
+@auth.get("/api/auth/me")
+def current_user():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({
+            "authenticated": False,
+            "user": None
+        }), 200
+
+    user = db.session.get(
+        User,
+        user_id
+    )
+
+    if not user:
+        session.clear()
+
+        return jsonify({
+            "authenticated": False,
+            "user": None
+        }), 200
+
+    if not user.is_active:
+        session.clear()
+
+        return jsonify({
+            "authenticated": False,
+            "user": None
+        }), 200
+
+    return jsonify({
+        "authenticated": True,
+        "user": user.to_dict()
+    }), 200
+
+
+# =========================================================
+# LOGOUT
+# =========================================================
+
+@auth.post("/api/auth/logout")
+def logout():
+    session.clear()
+
+    return jsonify({
+        "message": "Logout successful"
+    }), 200

@@ -1,8 +1,11 @@
+import { useEffect, useState } from "react";
+
 import {
   BrowserRouter,
   Routes,
   Route,
   NavLink,
+  Navigate,
 } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
@@ -12,22 +15,158 @@ import Emails from "./pages/Emails";
 import Findings from "./pages/Findings";
 import ThreatIntelligence from "./pages/ThreatIntelligence";
 import MitreAttack from "./pages/MitreAttack";
+import Login from "./pages/login";
 
 import "./App.css";
 
+
 function App() {
+
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+
+  // =================================================
+  // CHECK EXISTING LOGIN SESSION
+  // =================================================
+
+  useEffect(() => {
+
+    const checkAuthentication = async () => {
+
+      try {
+
+        const response = await fetch(
+          "http://127.0.0.1:5000/api/auth/me",
+          {
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+
+        if (data.authenticated) {
+          setUser(data.user);
+        } else {
+          setUser(null);
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Authentication check failed:",
+          error
+        );
+
+        setUser(null);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+
+    checkAuthentication();
+
+  }, []);
+
+
+  // =================================================
+  // LOADING
+  // =================================================
+
+  if (loading) {
+
+    return (
+      <div className="loading-screen">
+
+        <div className="brand-icon">
+          P
+        </div>
+
+        <h4>
+          Loading PhishTrace...
+        </h4>
+
+      </div>
+    );
+
+  }
+
+
+  // =================================================
+  // LOGIN
+  // =================================================
+
+  if (!user) {
+
+    return (
+      <Login
+        onLogin={(loggedInUser) => {
+          setUser(loggedInUser);
+        }}
+      />
+    );
+
+  }
+
+
+  // =================================================
+  // NAVIGATION
+  // =================================================
+
   const navClass = ({ isActive }) =>
     `nav-item ${isActive ? "active" : ""}`;
 
+
+  // =================================================
+  // LOGOUT
+  // =================================================
+
+  const handleLogout = async () => {
+
+    try {
+
+      await fetch(
+        "http://127.0.0.1:5000/api/auth/logout",
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Logout failed:",
+        error
+      );
+
+    } finally {
+
+      setUser(null);
+
+    }
+
+  };
+
+
   return (
+
     <BrowserRouter>
+
       <div className="app">
+
 
         {/* =================================================
             SIDEBAR
         ================================================= */}
 
         <aside className="sidebar">
+
 
           {/* BRAND */}
 
@@ -38,11 +177,15 @@ function App() {
             </div>
 
             <div>
-              <h4>PhishTrace</h4>
+
+              <h4>
+                PhishTrace
+              </h4>
 
               <small>
                 Security Operations
               </small>
+
             </div>
 
           </div>
@@ -57,6 +200,7 @@ function App() {
               end
               className={navClass}
             >
+
               <span className="nav-icon">
                 ▣
               </span>
@@ -64,6 +208,7 @@ function App() {
               <span>
                 Dashboard
               </span>
+
             </NavLink>
 
 
@@ -71,6 +216,7 @@ function App() {
               to="/cases"
               className={navClass}
             >
+
               <span className="nav-icon">
                 ◉
               </span>
@@ -78,6 +224,7 @@ function App() {
               <span>
                 Cases
               </span>
+
             </NavLink>
 
 
@@ -85,6 +232,7 @@ function App() {
               to="/emails"
               className={navClass}
             >
+
               <span className="nav-icon">
                 ✉
               </span>
@@ -92,6 +240,7 @@ function App() {
               <span>
                 Emails
               </span>
+
             </NavLink>
 
 
@@ -99,6 +248,7 @@ function App() {
               to="/findings"
               className={navClass}
             >
+
               <span className="nav-icon">
                 ⚠
               </span>
@@ -106,6 +256,7 @@ function App() {
               <span>
                 Findings
               </span>
+
             </NavLink>
 
 
@@ -113,6 +264,7 @@ function App() {
               to="/threat-intelligence"
               className={navClass}
             >
+
               <span className="nav-icon">
                 ⌁
               </span>
@@ -120,6 +272,7 @@ function App() {
               <span>
                 Threat Intelligence
               </span>
+
             </NavLink>
 
 
@@ -127,6 +280,7 @@ function App() {
               to="/mitre"
               className={navClass}
             >
+
               <span className="nav-icon">
                 ⚔
               </span>
@@ -134,6 +288,7 @@ function App() {
               <span>
                 MITRE ATT&CK
               </span>
+
             </NavLink>
 
           </nav>
@@ -148,9 +303,19 @@ function App() {
               System Online
             </div>
 
+
             <small>
-              PhishTrace SOC v1.0
+              {user.username} • {user.role}
             </small>
+
+
+            <button
+              type="button"
+              className="logout-button"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
 
           </div>
 
@@ -164,6 +329,7 @@ function App() {
         <main className="main-content">
 
           <Routes>
+
 
             {/* DASHBOARD */}
 
@@ -225,7 +391,12 @@ function App() {
 
             <Route
               path="*"
-              element={<Dashboard />}
+              element={
+                <Navigate
+                  to="/"
+                  replace
+                />
+              }
             />
 
           </Routes>
@@ -233,8 +404,12 @@ function App() {
         </main>
 
       </div>
+
     </BrowserRouter>
+
   );
+
 }
+
 
 export default App;
