@@ -52,7 +52,13 @@ def create_app():
 
     CORS(
         app,
-        origins=["http://localhost:5173"],
+        origins=["http://localhost:5173"
+                 , "http://localhost:5174"
+                 , "http://localhost:5175"
+                 , "http://localhost:5176"
+                 , "http://localhost:5177"
+                 , "http://localhost:5178"
+                 , "http://localhost:5179"],
         supports_credentials=True
     )
 

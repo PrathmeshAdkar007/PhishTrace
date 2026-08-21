@@ -1632,3 +1632,210 @@ footer {
 .logout-button:hover {
   background: #451b20;
 }
+
+/* =========================
+   CASE SEARCH & FILTERS
+========================= */
+
+.case-filters {
+  margin-bottom: 20px;
+}
+
+.case-filters-header {
+  margin-bottom: 22px;
+}
+
+.case-filters-header h3 {
+  margin: 0 0 6px;
+  font-size: 19px;
+  color: #e8edf5;
+}
+
+.case-filters-header p {
+  margin: 0;
+  color: #788397;
+  font-size: 14px;
+}
+
+.case-filters-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 16px;
+  align-items: end;
+}
+
+.case-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.case-filter-group label {
+  color: #aab4c4;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.case-filter-group input,
+.case-filter-group select {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  background: #101722;
+  border: 1px solid #263140;
+  border-radius: 7px;
+  color: #e8edf5;
+  font-size: 13px;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.case-filter-group input::placeholder {
+  color: #596679;
+}
+
+.case-filter-group input:focus,
+.case-filter-group select:focus {
+  border-color: #0dcaf0;
+  box-shadow: 0 0 0 2px rgba(13, 202, 240, 0.08);
+}
+
+.case-filter-group select {
+  cursor: pointer;
+}
+
+.case-filter-group select option {
+  background: #101722;
+  color: #e8edf5;
+}
+
+/* =========================
+   CASE FILTER RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .case-filters-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   CASE SEARCH & FILTERS
+========================================================= */
+
+.case-filters {
+  margin-bottom: 24px;
+}
+
+.case-filters .section-header {
+  margin-bottom: 22px;
+}
+
+.case-filters .section-header h3 {
+  margin-bottom: 6px;
+}
+
+.case-filters .section-header small {
+  color: #788397;
+  font-size: 14px;
+}
+
+/* FILTER GRID */
+
+.case-filter-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 2fr) minmax(160px, 1fr) minmax(160px, 1fr);
+  gap: 16px;
+  align-items: end;
+}
+
+/* INDIVIDUAL FILTER */
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.filter-field label {
+  color: #aab4c4;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* INPUT + SELECT */
+
+.filter-field input,
+.filter-field select {
+  width: 100%;
+  height: 42px;
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  background: #101722;
+  border: 1px solid #263140;
+  border-radius: 7px;
+
+  color: #e8edf5;
+  font-family: inherit;
+  font-size: 13px;
+
+  outline: none;
+  transition: border-color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+/* PLACEHOLDER */
+
+.filter-field input::placeholder {
+  color: #596679;
+}
+
+/* FOCUS */
+
+.filter-field input:focus,
+.filter-field select:focus {
+  border-color: #0dcaf0;
+  box-shadow: 0 0 0 2px rgba(13, 202, 240, 0.08);
+}
+
+/* SELECT */
+
+.filter-field select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.filter-field select option {
+  background: #101722;
+  color: #e8edf5;
+}
+
+/* CLEAR FILTER BUTTON */
+
+.case-filters .secondary-button {
+  white-space: nowrap;
+}
+
+/* =========================================================
+   CASE FILTER RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+  .case-filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .case-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .case-filters .section-header {
+    align-items: flex-start;
+    gap: 12px;
+  }
+}

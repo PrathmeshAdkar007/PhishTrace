@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const API_BASE = "http://127.0.0.1:5000";
@@ -33,6 +33,14 @@ function Cases() {
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // =====================================================
+  // FILTER STATE
+  // =====================================================
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [severityFilter, setSeverityFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   /* =====================================================
      LOAD CASES
@@ -70,6 +78,76 @@ function Cases() {
   useEffect(() => {
     loadCases();
   }, []);
+
+  /* =====================================================
+     FILTER CASES
+  ===================================================== */
+
+  const filteredCases = useMemo(() => {
+    const search = searchTerm
+      .trim()
+      .toLowerCase();
+
+    return cases.filter((caseItem) => {
+      // -------------------------
+      // SEARCH
+      // -------------------------
+
+      const matchesSearch =
+        !search ||
+        String(caseItem.case_number || "")
+          .toLowerCase()
+          .includes(search) ||
+        String(caseItem.title || "")
+          .toLowerCase()
+          .includes(search) ||
+        String(caseItem.description || "")
+          .toLowerCase()
+          .includes(search);
+
+      // -------------------------
+      // SEVERITY
+      // -------------------------
+
+      const matchesSeverity =
+        severityFilter === "all" ||
+        caseItem.severity === severityFilter;
+
+      // -------------------------
+      // STATUS
+      // -------------------------
+
+      const matchesStatus =
+        statusFilter === "all" ||
+        caseItem.status === statusFilter;
+
+      return (
+        matchesSearch &&
+        matchesSeverity &&
+        matchesStatus
+      );
+    });
+  }, [
+    cases,
+    searchTerm,
+    severityFilter,
+    statusFilter,
+  ]);
+
+  /* =====================================================
+     CLEAR FILTERS
+  ===================================================== */
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSeverityFilter("all");
+    setStatusFilter("all");
+  };
+
+  const filtersActive =
+    searchTerm.trim() !== "" ||
+    severityFilter !== "all" ||
+    statusFilter !== "all";
 
   /* =====================================================
      VIEW CASE
@@ -190,6 +268,143 @@ function Cases() {
 
 
       {/* =================================================
+          SEARCH & FILTERS
+      ================================================= */}
+
+      <div className="card-dark case-filters">
+
+        <div className="section-header">
+
+          <div>
+            <h3>
+              Search & Filter Cases
+            </h3>
+
+            <small>
+              Find investigations by case details,
+              severity, or status
+            </small>
+          </div>
+
+          {filtersActive && (
+            <button
+              className="secondary-button"
+              onClick={clearFilters}
+            >
+              Clear Filters
+            </button>
+          )}
+
+        </div>
+
+
+        <div className="case-filter-grid">
+
+          {/* SEARCH */}
+
+          <div className="filter-field filter-search">
+
+            <label htmlFor="case-search">
+              Search
+            </label>
+
+            <input
+              id="case-search"
+              type="text"
+              placeholder="Case number, title, or description..."
+              value={searchTerm}
+              onChange={(event) =>
+                setSearchTerm(event.target.value)
+              }
+            />
+
+          </div>
+
+
+          {/* SEVERITY */}
+
+          <div className="filter-field">
+
+            <label htmlFor="severity-filter">
+              Severity
+            </label>
+
+            <select
+              id="severity-filter"
+              value={severityFilter}
+              onChange={(event) =>
+                setSeverityFilter(event.target.value)
+              }
+            >
+              <option value="all">
+                All Severities
+              </option>
+
+              <option value="critical">
+                Critical
+              </option>
+
+              <option value="high">
+                High
+              </option>
+
+              <option value="medium">
+                Medium
+              </option>
+
+              <option value="low">
+                Low
+              </option>
+            </select>
+
+          </div>
+
+
+          {/* STATUS */}
+
+          <div className="filter-field">
+
+            <label htmlFor="status-filter">
+              Status
+            </label>
+
+            <select
+              id="status-filter"
+              value={statusFilter}
+              onChange={(event) =>
+                setStatusFilter(event.target.value)
+              }
+            >
+              <option value="all">
+                All Statuses
+              </option>
+
+              <option value="open">
+                Open
+              </option>
+
+              <option value="closed">
+                Closed
+              </option>
+
+              <option value="investigating">
+                Investigating
+              </option>
+
+              <option value="contained">
+                Contained
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================================
           CASE LIST
       ================================================= */}
 
@@ -203,12 +418,15 @@ function Cases() {
             </h3>
 
             <small>
-              All PhishTrace investigations
+              {filtersActive
+                ? `Showing ${filteredCases.length} of ${cases.length} cases`
+                : "All PhishTrace investigations"}
             </small>
           </div>
 
           <small>
-            {cases.length} total
+            {filteredCases.length} result
+            {filteredCases.length !== 1 ? "s" : ""}
           </small>
 
         </div>
@@ -229,11 +447,33 @@ function Cases() {
 
           </div>
 
+        ) : filteredCases.length === 0 ? (
+
+          <div className="empty-state">
+
+            <h3>
+              No matching cases
+            </h3>
+
+            <p>
+              No investigation cases match your
+              current search and filters.
+            </p>
+
+            <button
+              className="secondary-button"
+              onClick={clearFilters}
+            >
+              Clear Filters
+            </button>
+
+          </div>
+
         ) : (
 
           <div className="cases-list">
 
-            {cases.map((caseItem) => (
+            {filteredCases.map((caseItem) => (
 
               <div
                 className="case-list-item"
