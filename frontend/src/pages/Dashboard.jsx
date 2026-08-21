@@ -1,68 +1,108 @@
 import { useEffect, useState } from "react";
 
-const API_URL =
-  "http://127.0.0.1:5000/api/cases/1/summary";
+function StatCard({ label, value, icon }) {
+  return (
+    <div className="stat-card">
+      <div className="stat-icon">
+        {icon}
+      </div>
+
+      <div>
+        <div className="stat-value">
+          {value}
+        </div>
+
+        <div className="stat-label">
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const CASE_ID = 1;
+
+  /* =========================
+     LOAD CASE SUMMARY
+  ========================= */
+
   useEffect(() => {
-    fetch(API_URL)
-      .then((response) => {
+    async function loadDashboard() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch(
+          `http://127.0.0.1:5000/api/cases/${CASE_ID}/summary`
+        );
+
         if (!response.ok) {
           throw new Error(
-            `Backend returned ${response.status}`
+            `API request failed with status ${response.status}`
           );
         }
 
-        return response.json();
-      })
-      .then((result) => {
-        console.log("PhishTrace summary:", result);
+        const result = await response.json();
+
         setData(result);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Dashboard error:", err);
+      } catch (err) {
+        console.error("Dashboard API error:", err);
         setError(err.message);
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+
+    loadDashboard();
   }, []);
 
-  /* LOADING */
+  /* =========================
+     LOADING
+  ========================= */
+
   if (loading) {
     return (
       <div className="loading-screen">
-        <div
-          className="spinner-border text-info"
-          role="status"
-        />
+        <div>
+          <h2>Loading PhishTrace...</h2>
 
-        <h4 className="mt-3">
-          Loading PhishTrace...
-        </h4>
+          <p>
+            Fetching investigation data from the backend.
+          </p>
+        </div>
       </div>
     );
   }
 
-  /* ERROR */
+  /* =========================
+     ERROR
+  ========================= */
+
   if (error) {
     return (
       <div className="error-screen">
-        <div className="alert alert-danger">
+        <div className="card-dark">
 
-          <h4>
-            Unable to load PhishTrace
-          </h4>
+          <h2>
+            Unable to load dashboard
+          </h2>
 
-          <p>{error}</p>
+          <p>
+            The PhishTrace frontend could not connect
+            to the Flask backend.
+          </p>
 
-          <hr />
+          <p className="danger-text">
+            {error}
+          </p>
 
-          <p className="mb-0">
-            Make sure the Flask backend is running on:
+          <p>
+            Make sure your Flask backend is running on:
           </p>
 
           <code>
@@ -74,48 +114,149 @@ function Dashboard() {
     );
   }
 
-  /* SAFETY CHECK */
+  /* =========================
+     SAFETY CHECK
+  ========================= */
+
   if (!data || !data.case) {
     return (
       <div className="error-screen">
-        <div className="alert alert-warning">
-          Backend returned unexpected data.
+        <div className="card-dark">
+
+          <h2>
+            No investigation data
+          </h2>
+
+          <p>
+            The backend returned an empty case summary.
+          </p>
+
         </div>
       </div>
     );
   }
 
+  /* =========================
+     DATA
+  ========================= */
+
   const caseData = data.case;
 
-  const counts = data.counts || {
-    emails: data.emails?.length || 0,
-    indicators: data.indicators?.length || 0,
-    threat_intelligence:
-      data.threat_intelligence?.length || 0,
-    findings: data.findings?.length || 0,
-    affected_users:
-      data.affected_users?.length || 0,
-    mitre_mappings:
-      data.mitre_mappings?.length || 0,
-  };
+  const counts = data.counts || {};
+
+  const emails = data.emails || [];
+
+  const indicators = data.indicators || [];
 
   const findings = data.findings || [];
+
   const threatIntel =
     data.threat_intelligence || [];
+
   const affectedUsers =
     data.affected_users || [];
+
   const containmentActions =
     data.containment_actions || [];
+
   const mitreMappings =
     data.mitre_mappings || [];
 
-  return (
-    <>
 
-      {/* HEADER */}
-      <header className="topbar">
+  /* =========================
+     THREAT INTELLIGENCE
+     BACKEND DATA IS NESTED
+     INSIDE raw_response
+  ========================= */
+
+  const getThreatIndicator = (result) => {
+    return (
+      result.raw_response?.indicator ||
+      result.indicator ||
+      result.value ||
+      "Unknown"
+    );
+  };
+
+  const getThreatIndicatorType = (result) => {
+    return (
+      result.raw_response?.indicator_type ||
+      result.indicator_type ||
+      "Unknown"
+    );
+  };
+
+
+  /* =========================
+     CALCULATIONS
+  ========================= */
+
+  const maliciousThreatIntel =
+    threatIntel.filter(
+      (result) =>
+        String(result.verdict || "").toLowerCase() ===
+        "malicious"
+    );
+
+  const criticalFindings =
+    findings.filter(
+      (finding) =>
+        String(finding.severity || "").toLowerCase() ===
+        "critical"
+    );
+
+  const highFindings =
+    findings.filter(
+      (finding) =>
+        String(finding.severity || "").toLowerCase() ===
+        "high"
+    );
+
+  const mediumFindings =
+    findings.filter(
+      (finding) =>
+        String(finding.severity || "").toLowerCase() ===
+        "medium"
+    );
+
+  const lowFindings =
+    findings.filter(
+      (finding) =>
+        String(finding.severity || "").toLowerCase() ===
+        "low"
+    );
+
+  const completedActions =
+    containmentActions.filter(
+      (action) =>
+        String(action.status || "").toLowerCase() ===
+        "completed"
+    );
+
+
+  /* =========================
+     RISK LEVEL
+  ========================= */
+
+  const riskLevel =
+    String(caseData.severity || "unknown").toUpperCase();
+
+
+  /* =========================
+     PAGE
+  ========================= */
+
+  return (
+    <div className="page">
+
+      {/* =========================
+          TOP BAR
+      ========================= */}
+
+      <div className="topbar">
 
         <div>
+
           <h2>
             Security Dashboard
           </h2>
@@ -123,22 +264,31 @@ function Dashboard() {
           <p>
             Phishing investigation overview
           </p>
+
         </div>
 
         <div className="case-badge">
           CASE {caseData.case_number}
         </div>
 
-      </header>
+      </div>
 
 
-      {/* CASE HEADER */}
-      <section className="case-header card-dark">
+      {/* =========================
+          CASE HEADER
+      ========================= */}
+
+      <div className="card-dark case-header">
 
         <div>
 
           <div className="small-label">
-            ACTIVE INVESTIGATION
+
+            {String(caseData.status).toLowerCase() ===
+            "closed"
+              ? "CLOSED INVESTIGATION"
+              : "ACTIVE INVESTIGATION"}
+
           </div>
 
           <h1>
@@ -146,26 +296,33 @@ function Dashboard() {
           </h1>
 
           <p>
-            {caseData.description}
+            {caseData.description ||
+              "No case description available."}
           </p>
 
           <div className="case-meta">
 
-            <span>
-              Case ID:{" "}
+            <div>
+              Case ID:
+
               <strong>
+                {" "}
                 {caseData.case_number}
               </strong>
-            </span>
+            </div>
 
-            <span>
-              Created:{" "}
+            <div>
+              Created:
+
               <strong>
-                {new Date(
-                  caseData.created_at
-                ).toLocaleString()}
+                {" "}
+                {caseData.created_at
+                  ? new Date(
+                      caseData.created_at
+                    ).toLocaleString()
+                  : "Unknown"}
               </strong>
-            </span>
+            </div>
 
           </div>
 
@@ -174,10 +331,15 @@ function Dashboard() {
 
         <div className="case-status">
 
-          <span className="severity critical">
-            {String(
-              caseData.severity || "unknown"
-            ).toUpperCase()}
+          <span
+            className={`severity ${
+              String(caseData.severity).toLowerCase() ===
+              "critical"
+                ? "critical"
+                : ""
+            }`}
+          >
+            {riskLevel}
           </span>
 
           <span className="status">
@@ -188,60 +350,86 @@ function Dashboard() {
 
         </div>
 
-      </section>
+      </div>
 
 
-      {/* STATISTICS */}
-      <section className="stats-grid">
+      {/* =========================
+          STATISTICS
+      ========================= */}
+
+      <div className="stats-grid">
 
         <StatCard
-          label="Emails"
-          value={counts.emails}
           icon="✉"
+          value={
+            counts.emails ??
+            emails.length
+          }
+          label="Emails"
         />
 
         <StatCard
-          label="Indicators"
-          value={counts.indicators}
           icon="⌁"
+          value={
+            counts.indicators ??
+            indicators.length
+          }
+          label="Indicators"
         />
 
         <StatCard
-          label="Threat Intel"
-          value={counts.threat_intelligence}
           icon="◉"
+          value={
+            counts.threat_intelligence ??
+            threatIntel.length
+          }
+          label="Threat Intel"
         />
 
         <StatCard
-          label="Findings"
-          value={counts.findings}
           icon="⚠"
+          value={
+            counts.findings ??
+            findings.length
+          }
+          label="Findings"
         />
 
         <StatCard
-          label="Affected Users"
-          value={counts.affected_users}
           icon="♟"
+          value={
+            counts.affected_users ??
+            affectedUsers.length
+          }
+          label="Affected Users"
         />
 
         <StatCard
-          label="MITRE Mappings"
-          value={counts.mitre_mappings}
           icon="⚔"
+          value={
+            counts.mitre_mappings ??
+            mitreMappings.length
+          }
+          label="MITRE Mappings"
         />
 
-      </section>
+      </div>
 
 
-      {/* FINDINGS + RISK */}
-      <section className="dashboard-grid">
+      {/* =========================
+          FINDINGS + RISK
+      ========================= */}
+
+      <div className="dashboard-grid">
 
         {/* FINDINGS */}
+
         <div className="card-dark">
 
           <div className="section-header">
 
             <div>
+
               <h3>
                 Investigation Findings
               </h3>
@@ -249,6 +437,7 @@ function Dashboard() {
               <small>
                 {findings.length} findings identified
               </small>
+
             </div>
 
           </div>
@@ -257,9 +446,12 @@ function Dashboard() {
           <div className="findings-list">
 
             {findings.length === 0 ? (
-              <p className="empty-state">
-                No findings available.
+
+              <p className="page-description">
+                No findings have been recorded for
+                this case.
               </p>
+
             ) : (
 
               findings.map((finding) => (
@@ -280,22 +472,22 @@ function Dashboard() {
                     </h5>
 
                     <p>
-                      {finding.description}
+                      {finding.description ||
+                        "No description available."}
                     </p>
 
                     <div className="finding-tags">
 
-                      <span className="tag">
-                        {finding.finding_type}
-                      </span>
-
                       <span className="tag severity-tag">
-                        {finding.severity}
+                        {String(
+                          finding.severity ||
+                          "unknown"
+                        ).toUpperCase()}
                       </span>
 
                       <span className="tag">
-                        {finding.confidence}
-                        {" "}confidence
+                        {finding.finding_type ||
+                          "Finding"}
                       </span>
 
                     </div>
@@ -314,11 +506,13 @@ function Dashboard() {
 
 
         {/* RISK */}
+
         <div className="card-dark risk-card">
 
           <div className="section-header">
 
             <div>
+
               <h3>
                 Risk Assessment
               </h3>
@@ -326,6 +520,7 @@ function Dashboard() {
               <small>
                 Current case risk
               </small>
+
             </div>
 
           </div>
@@ -334,11 +529,7 @@ function Dashboard() {
           <div className="risk-score">
 
             <div className="score">
-              100
-            </div>
-
-            <div className="score-label">
-              CRITICAL RISK
+              {riskLevel}
             </div>
 
           </div>
@@ -347,63 +538,107 @@ function Dashboard() {
           <div className="risk-breakdown">
 
             <div>
-              <span>Critical</span>
-              <strong>1</strong>
+              <span>
+                Critical
+              </span>
+
+              <strong>
+                {criticalFindings.length}
+              </strong>
             </div>
 
             <div>
-              <span>High</span>
-              <strong>3</strong>
+              <span>
+                High
+              </span>
+
+              <strong>
+                {highFindings.length}
+              </strong>
             </div>
 
             <div>
-              <span>Medium</span>
-              <strong>0</strong>
+              <span>
+                Medium
+              </span>
+
+              <strong>
+                {mediumFindings.length}
+              </strong>
             </div>
 
             <div>
-              <span>Low</span>
-              <strong>0</strong>
+              <span>
+                Low
+              </span>
+
+              <strong>
+                {lowFindings.length}
+              </strong>
             </div>
 
           </div>
 
         </div>
 
-      </section>
+      </div>
 
 
-      {/* THREAT INTELLIGENCE */}
-      <section className="card-dark">
+      {/* =========================
+          THREAT INTELLIGENCE
+      ========================= */}
+
+      <div className="card-dark">
 
         <div className="section-header">
 
           <div>
+
             <h3>
               Threat Intelligence
             </h3>
 
             <small>
-              Indicators analysed by PhishTrace
+              Indicator analysis results
             </small>
+
           </div>
+
+          <span className="tag severity-tag">
+            {maliciousThreatIntel.length} MALICIOUS
+          </span>
 
         </div>
 
 
-        <div className="table-responsive">
+        <div className="threat-table-wrapper">
 
-          <table className="table threat-table">
+          <table className="threat-table">
 
             <thead>
 
               <tr>
-                <th>Indicator</th>
-                <th>Type</th>
-                <th>Provider</th>
-                <th>Verdict</th>
-                <th>Score</th>
-                <th>Confidence</th>
+
+                <th>
+                  Indicator
+                </th>
+
+                <th>
+                  Type
+                </th>
+
+                <th>
+                  Verdict
+                </th>
+
+                <th>
+                  Score
+                </th>
+
+                <th>
+                  Confidence
+                </th>
+
               </tr>
 
             </thead>
@@ -414,9 +649,11 @@ function Dashboard() {
               {threatIntel.length === 0 ? (
 
                 <tr>
-                  <td colSpan="6">
-                    No threat intelligence available.
+
+                  <td colSpan="5">
+                    No threat intelligence results.
                   </td>
+
                 </tr>
 
               ) : (
@@ -426,35 +663,43 @@ function Dashboard() {
                   <tr key={result.id}>
 
                     <td>
+
                       <code>
-                        {result.indicator}
+                        {getThreatIndicator(result)}
                       </code>
+
                     </td>
 
                     <td>
-                      {result.indicator_type}
-                    </td>
-
-                    <td>
-                      {result.provider}
+                      {getThreatIndicatorType(result)}
                     </td>
 
                     <td>
 
-                      <span className="verdict malicious">
-                        {result.verdict}
+                      <span
+                        className={`verdict ${
+                          String(
+                            result.verdict || ""
+                          ).toLowerCase() ===
+                          "malicious"
+                            ? "malicious"
+                            : ""
+                        }`}
+                      >
+                        {String(
+                          result.verdict ||
+                          "unknown"
+                        ).toUpperCase()}
                       </span>
 
                     </td>
 
                     <td>
-                      <strong>
-                        {result.score}
-                      </strong>
+                      {result.score ?? "—"}
                     </td>
 
                     <td>
-                      {result.confidence}
+                      {result.confidence || "—"}
                     </td>
 
                   </tr>
@@ -469,175 +714,245 @@ function Dashboard() {
 
         </div>
 
-      </section>
+      </div>
 
 
-      {/* USERS + CONTAINMENT */}
-      <section className="dashboard-grid">
+      {/* =========================
+          AFFECTED USERS
+      ========================= */}
 
-
-        {/* AFFECTED USERS */}
-        <div className="card-dark">
-
-          <div className="section-header">
-
-            <div>
-              <h3>
-                Affected Users
-              </h3>
-
-              <small>
-                Users targeted by the campaign
-              </small>
-            </div>
-
-          </div>
-
-
-          {affectedUsers.length === 0 ? (
-
-            <p className="empty-state">
-              No affected users recorded.
-            </p>
-
-          ) : (
-
-            affectedUsers.map((user) => (
-
-              <div
-                className="user-card"
-                key={user.id}
-              >
-
-                <div className="user-avatar">
-                  {user.display_name
-                    ? user.display_name.charAt(0)
-                    : "U"}
-                </div>
-
-                <div>
-
-                  <h5>
-                    {user.display_name}
-                  </h5>
-
-                  <p>
-                    {user.user_email}
-                  </p>
-
-                  <span className="tag">
-                    {user.department}
-                  </span>
-
-                </div>
-
-                <div className="user-status">
-                  {user.impact_status}
-                </div>
-
-              </div>
-
-            ))
-
-          )}
-
-        </div>
-
-
-        {/* CONTAINMENT */}
-        <div className="card-dark">
-
-          <div className="section-header">
-
-            <div>
-              <h3>
-                Containment Actions
-              </h3>
-
-              <small>
-                Actions taken by security
-              </small>
-            </div>
-
-          </div>
-
-
-          {containmentActions.length === 0 ? (
-
-            <p className="empty-state">
-              No containment actions recorded.
-            </p>
-
-          ) : (
-
-            containmentActions.map((action) => (
-
-              <div
-                className="containment"
-                key={action.id}
-              >
-
-                <div className="containment-icon">
-                  ✓
-                </div>
-
-                <div>
-
-                  <h5>
-                    {action.action_type}
-                  </h5>
-
-                  <p>
-                    Target:{" "}
-                    <code>
-                      {action.target}
-                    </code>
-                  </p>
-
-                  <small>
-                    Performed by:{" "}
-                    {action.performed_by}
-                  </small>
-
-                </div>
-
-                <span className="completed">
-                  {action.status}
-                </span>
-
-              </div>
-
-            ))
-
-          )}
-
-        </div>
-
-      </section>
-
-
-      {/* MITRE ATT&CK */}
-      <section className="card-dark">
+      <div className="card-dark">
 
         <div className="section-header">
 
           <div>
+
             <h3>
-              MITRE ATT&CK Mapping
+              Affected Users
             </h3>
 
             <small>
-              Techniques associated with this investigation
+              Users associated with this investigation
             </small>
+
           </div>
+
+          <span>
+            {affectedUsers.length} affected user
+            {affectedUsers.length !== 1 ? "s" : ""}
+          </span>
+
+        </div>
+
+
+        {affectedUsers.length === 0 ? (
+
+          <p className="page-description">
+            No affected users have been recorded.
+          </p>
+
+        ) : (
+
+          affectedUsers.map((user) => (
+
+            <div
+              className="user-card"
+              key={user.id}
+            >
+
+              <div className="user-avatar">
+
+                {String(
+                  user.display_name ||
+                  user.user_email ||
+                  "U"
+                )
+                  .split(" ")
+                  .map(
+                    (name) =>
+                      name.charAt(0)
+                  )
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
+
+              </div>
+
+
+              <div>
+
+                <h5>
+                  {user.display_name ||
+                    "Unknown User"}
+                </h5>
+
+                <p>
+                  {user.user_email ||
+                    "No email available"}
+                </p>
+
+                <div className="finding-tags">
+
+                  {user.department && (
+                    <span className="tag">
+                      {user.department}
+                    </span>
+                  )}
+
+                  {user.impact_status && (
+                    <span className="tag">
+                      {user.impact_status}
+                    </span>
+                  )}
+
+                </div>
+
+              </div>
+
+
+              <div className="user-status">
+                {String(
+                  user.impact_status ||
+                  "UNKNOWN"
+                ).toUpperCase()}
+              </div>
+
+            </div>
+
+          ))
+
+        )}
+
+      </div>
+
+
+      {/* =========================
+          CONTAINMENT ACTIONS
+      ========================= */}
+
+      <div className="card-dark">
+
+        <div className="section-header">
+
+          <div>
+
+            <h3>
+              Containment Actions
+            </h3>
+
+            <small>
+              Response actions performed during investigation
+            </small>
+
+          </div>
+
+          <span className="success-text">
+            {completedActions.length} COMPLETED
+          </span>
+
+        </div>
+
+
+        {containmentActions.length === 0 ? (
+
+          <p className="page-description">
+            No containment actions recorded.
+          </p>
+
+        ) : (
+
+          containmentActions.map((action) => (
+
+            <div
+              className="containment"
+              key={action.id}
+            >
+
+              <div className="containment-icon">
+                ✓
+              </div>
+
+
+              <div>
+
+                <h5>
+                  {action.action_type ||
+                    "Containment Action"}
+                </h5>
+
+                <p>
+                  {action.notes ||
+                    "No additional notes."}
+                </p>
+
+                {action.target && (
+                  <code>
+                    {action.target}
+                  </code>
+                )}
+
+                {action.performed_by && (
+                  <>
+                    <br />
+
+                    <small>
+                      Performed by{" "}
+                      {action.performed_by}
+                    </small>
+                  </>
+                )}
+
+              </div>
+
+
+              <div className="completed">
+                {String(
+                  action.status ||
+                  "pending"
+                ).toUpperCase()}
+              </div>
+
+            </div>
+
+          ))
+
+        )}
+
+      </div>
+
+
+      {/* =========================
+          MITRE ATT&CK
+      ========================= */}
+
+      <div className="card-dark">
+
+        <div className="section-header">
+
+          <div>
+
+            <h3>
+              MITRE ATT&CK
+            </h3>
+
+            <small>
+              Attack technique mappings
+            </small>
+
+          </div>
+
+          <span>
+            {mitreMappings.length} mapping
+            {mitreMappings.length !== 1 ? "s" : ""}
+          </span>
 
         </div>
 
 
         {mitreMappings.length === 0 ? (
 
-          <p className="empty-state">
-            No MITRE ATT&CK mappings available.
+          <p className="page-description">
+            No MITRE ATT&CK mappings recorded.
           </p>
 
         ) : (
@@ -652,20 +967,38 @@ function Dashboard() {
               >
 
                 <div className="technique-id">
-                  {mapping.technique_id}
+                  {mapping.technique_id ||
+                    "Unknown"}
                 </div>
 
                 <h4>
-                  {mapping.technique_name}
+                  {mapping.technique_name ||
+                    "Unknown Technique"}
                 </h4>
 
-                <span className="tactic">
-                  {mapping.tactic}
-                </span>
+                <div className="tactic">
+                  {mapping.tactic ||
+                    "Tactic not specified"}
+                </div>
 
                 <p>
-                  {mapping.description}
+                  {mapping.description ||
+                    "No description available."}
                 </p>
+
+                <div className="finding-tags">
+
+                  <span className="tag">
+                    {mapping.technique_id}
+                  </span>
+
+                  {mapping.tactic && (
+                    <span className="tag">
+                      {mapping.tactic}
+                    </span>
+                  )}
+
+                </div>
 
               </div>
 
@@ -675,54 +1008,27 @@ function Dashboard() {
 
         )}
 
-      </section>
+      </div>
 
 
-      {/* FOOTER */}
+      {/* =========================
+          FOOTER
+      ========================= */}
+
       <footer>
 
         <span>
-          PhishTrace Security Operations Platform
+          PhishTrace SOC v1.0
         </span>
 
         <span>
-          Backend: Flask + PostgreSQL
+          Case {caseData.case_number}
         </span>
 
       </footer>
 
-    </>
-  );
-}
-
-
-function StatCard({
-  label,
-  value,
-  icon,
-}) {
-  return (
-    <div className="stat-card">
-
-      <div className="stat-icon">
-        {icon}
-      </div>
-
-      <div>
-
-        <div className="stat-value">
-          {value}
-        </div>
-
-        <div className="stat-label">
-          {label}
-        </div>
-
-      </div>
-
     </div>
   );
 }
-
 
 export default Dashboard;

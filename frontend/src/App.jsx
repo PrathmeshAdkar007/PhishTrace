@@ -6,161 +6,226 @@ import {
 } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
+import Cases from "./pages/Cases";
+import CaseDetails from "./pages/CaseDetails";
+import Emails from "./pages/Emails";
+import Findings from "./pages/Findings";
+import ThreatIntelligence from "./pages/ThreatIntelligence";
+import MitreAttack from "./pages/MitreAttack";
 
 import "./App.css";
 
-function Placeholder({ title }) {
-  return (
-    <div>
-      <div className="topbar">
-        <div>
-          <h2>{title}</h2>
-          <p>PhishTrace Security Operations Platform</p>
-        </div>
-      </div>
-
-      <div className="card-dark placeholder-page">
-        <h3>{title}</h3>
-        <p>
-          This module is ready to be connected to the PhishTrace backend.
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function App() {
+  const navClass = ({ isActive }) =>
+    `nav-item ${isActive ? "active" : ""}`;
+
   return (
     <BrowserRouter>
       <div className="app">
 
-        {/* SIDEBAR */}
+        {/* =================================================
+            SIDEBAR
+        ================================================= */}
+
         <aside className="sidebar">
 
+          {/* BRAND */}
+
           <div className="brand">
-            <div className="brand-icon">P</div>
+
+            <div className="brand-icon">
+              P
+            </div>
 
             <div>
               <h4>PhishTrace</h4>
-              <small>Security Operations</small>
+
+              <small>
+                Security Operations
+              </small>
             </div>
+
           </div>
+
+
+          {/* NAVIGATION */}
 
           <nav className="navigation">
 
             <NavLink
               to="/"
               end
-              className={({ isActive }) =>
-                `nav-item ${isActive ? "active" : ""}`
-              }
+              className={navClass}
             >
-              <span>▣</span>
-              Dashboard
+              <span className="nav-icon">
+                ▣
+              </span>
+
+              <span>
+                Dashboard
+              </span>
             </NavLink>
+
 
             <NavLink
               to="/cases"
-              className={({ isActive }) =>
-                `nav-item ${isActive ? "active" : ""}`
-              }
+              className={navClass}
             >
-              <span>◉</span>
-              Cases
+              <span className="nav-icon">
+                ◉
+              </span>
+
+              <span>
+                Cases
+              </span>
             </NavLink>
+
 
             <NavLink
               to="/emails"
-              className={({ isActive }) =>
-                `nav-item ${isActive ? "active" : ""}`
-              }
+              className={navClass}
             >
-              <span>✉</span>
-              Emails
+              <span className="nav-icon">
+                ✉
+              </span>
+
+              <span>
+                Emails
+              </span>
             </NavLink>
+
 
             <NavLink
               to="/findings"
-              className={({ isActive }) =>
-                `nav-item ${isActive ? "active" : ""}`
-              }
+              className={navClass}
             >
-              <span>⚠</span>
-              Findings
+              <span className="nav-icon">
+                ⚠
+              </span>
+
+              <span>
+                Findings
+              </span>
             </NavLink>
+
 
             <NavLink
               to="/threat-intelligence"
-              className={({ isActive }) =>
-                `nav-item ${isActive ? "active" : ""}`
-              }
+              className={navClass}
             >
-              <span>⌁</span>
-              Threat Intelligence
+              <span className="nav-icon">
+                ⌁
+              </span>
+
+              <span>
+                Threat Intelligence
+              </span>
             </NavLink>
+
 
             <NavLink
               to="/mitre"
-              className={({ isActive }) =>
-                `nav-item ${isActive ? "active" : ""}`
-              }
+              className={navClass}
             >
-              <span>⚔</span>
-              MITRE ATT&CK
+              <span className="nav-icon">
+                ⚔
+              </span>
+
+              <span>
+                MITRE ATT&CK
+              </span>
             </NavLink>
 
           </nav>
 
+
+          {/* SIDEBAR FOOTER */}
+
           <div className="sidebar-bottom">
-            <div>● System Online</div>
-            <small>PhishTrace SOC v1.0</small>
+
+            <div className="system-online">
+              <span>●</span>{" "}
+              System Online
+            </div>
+
+            <small>
+              PhishTrace SOC v1.0
+            </small>
+
           </div>
 
         </aside>
 
-        {/* MAIN */}
+
+        {/* =================================================
+            MAIN CONTENT
+        ================================================= */}
+
         <main className="main-content">
 
           <Routes>
+
+            {/* DASHBOARD */}
 
             <Route
               path="/"
               element={<Dashboard />}
             />
 
+
+            {/* CASE LIST */}
+
             <Route
               path="/cases"
-              element={
-                <Placeholder title="Cases" />
-              }
+              element={<Cases />}
             />
+
+
+            {/* CASE DETAILS */}
+
+            <Route
+              path="/cases/:caseId"
+              element={<CaseDetails />}
+            />
+
+
+            {/* EMAILS */}
 
             <Route
               path="/emails"
-              element={
-                <Placeholder title="Emails" />
-              }
+              element={<Emails />}
             />
+
+
+            {/* FINDINGS */}
 
             <Route
               path="/findings"
-              element={
-                <Placeholder title="Findings" />
-              }
+              element={<Findings />}
             />
+
+
+            {/* THREAT INTELLIGENCE */}
 
             <Route
               path="/threat-intelligence"
-              element={
-                <Placeholder title="Threat Intelligence" />
-              }
+              element={<ThreatIntelligence />}
             />
+
+
+            {/* MITRE ATT&CK */}
 
             <Route
               path="/mitre"
-              element={
-                <Placeholder title="MITRE ATT&CK" />
-              }
+              element={<MitreAttack />}
+            />
+
+
+            {/* FALLBACK */}
+
+            <Route
+              path="*"
+              element={<Dashboard />}
             />
 
           </Routes>

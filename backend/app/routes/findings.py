@@ -14,6 +14,7 @@ findings = Blueprint("findings", __name__)
 
 @findings.post("/api/cases/<int:case_id>/generate-findings")
 def generate_findings(case_id):
+
     case = db.session.get(Case, case_id)
 
     if not case:
@@ -34,9 +35,9 @@ def generate_findings(case_id):
 
     for email in emails:
 
-        # -------------------------------------------------
-        # 1. Email Authentication Findings
-        # -------------------------------------------------
+        # ==================================================
+        # 1. EMAIL AUTHENTICATION FINDINGS
+        # ==================================================
 
         authentication = EmailAuthentication.query.filter_by(
             email_id=email.id
@@ -99,9 +100,9 @@ def generate_findings(case_id):
                         finding.to_dict()
                     )
 
-        # -------------------------------------------------
-        # 2. Threat Intelligence Findings
-        # -------------------------------------------------
+        # ==================================================
+        # 2. THREAT INTELLIGENCE FINDINGS
+        # ==================================================
 
         indicators_list = Indicator.query.filter_by(
             email_id=email.id
@@ -171,6 +172,7 @@ def generate_findings(case_id):
 
 @findings.get("/api/cases/<int:case_id>/findings")
 def get_case_findings(case_id):
+
     case = db.session.get(Case, case_id)
 
     if not case:

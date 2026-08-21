@@ -407,8 +407,11 @@ textarea {
   text-align: center;
 }
 
-.risk-score {
-  margin: 25px auto;
+.risk-score .score {
+  font-size: 42px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.1;
 }
 
 .score {
@@ -847,6 +850,617 @@ footer {
   }
 
   footer {
+    flex-direction: column;
+  }
+}
+
+/* =========================
+   PAGE HELPERS
+========================= */
+
+.page {
+  width: 100%;
+}
+
+.nav-icon {
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.system-online {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.system-online span {
+  color: #4dd68c;
+}
+
+.page-description {
+  color: #8994a5;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+/* =========================
+   CASE DETAILS
+========================= */
+
+.case-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.detail-box {
+  background: #101722;
+  border: 1px solid #1d2734;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.detail-box span {
+  display: block;
+  color: #687589;
+  font-size: 11px;
+  margin-bottom: 7px;
+  text-transform: uppercase;
+}
+
+.detail-box strong {
+  font-size: 14px;
+  color: #d9e0ea;
+}
+
+.danger-text {
+  color: #ff6672 !important;
+}
+
+.success-text {
+  color: #4dd68c !important;
+}
+
+/* =========================
+   EMAILS
+========================= */
+
+.email-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: #1d2734;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.email-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 15px;
+  background: #101722;
+}
+
+.email-row span {
+  color: #748196;
+  font-size: 13px;
+}
+
+.email-row strong {
+  color: #dce3ed;
+  font-size: 13px;
+  text-align: right;
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.auth-card {
+  background: #101722;
+  border: 1px solid #1d2734;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.auth-name {
+  color: #8e99aa;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.auth-result {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* =========================
+   FINDINGS
+========================= */
+
+.finding-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* =========================
+   THREAT INTELLIGENCE
+========================= */
+
+.threat-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.threat-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.threat-table th,
+.threat-table td {
+  padding: 13px 14px;
+  text-align: left;
+}
+
+.threat-table th {
+  white-space: nowrap;
+}
+
+.threat-table td code {
+  font-family: Consolas, monospace;
+  font-size: 12px;
+}
+
+.verdict {
+  display: inline-block;
+}
+
+/* =========================
+   RESPONSIVE PAGE ELEMENTS
+========================= */
+
+@media (max-width: 900px) {
+
+  .case-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .email-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .email-row strong {
+    text-align: left;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .case-badge {
+    align-self: flex-start;
+  }
+/* =========================
+   PAGE HELPERS
+========================= */
+
+.page {
+  width: 100%;
+}
+
+.nav-icon {
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.system-online {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.system-online span {
+  color: #4dd68c;
+}
+
+.page-description {
+  color: #8994a5;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+/* =========================
+   CASE DETAILS
+========================= */
+
+.case-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.detail-box {
+  background: #101722;
+  border: 1px solid #1d2734;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.detail-box span {
+  display: block;
+  color: #687589;
+  font-size: 11px;
+  margin-bottom: 7px;
+  text-transform: uppercase;
+}
+
+.detail-box strong {
+  font-size: 14px;
+  color: #d9e0ea;
+}
+
+.danger-text {
+  color: #ff6672 !important;
+}
+
+.success-text {
+  color: #4dd68c !important;
+}
+
+/* =========================
+   EMAILS
+========================= */
+
+.email-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: #1d2734;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.email-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 15px;
+  background: #101722;
+}
+
+.email-row span {
+  color: #748196;
+  font-size: 13px;
+}
+
+.email-row strong {
+  color: #dce3ed;
+  font-size: 13px;
+  text-align: right;
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.auth-card {
+  background: #101722;
+  border: 1px solid #1d2734;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.auth-name {
+  color: #8e99aa;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.auth-result {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* =========================
+   FINDINGS
+========================= */
+
+.finding-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* =========================
+   THREAT INTELLIGENCE
+========================= */
+
+.threat-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.threat-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.threat-table th,
+.threat-table td {
+  padding: 13px 14px;
+  text-align: left;
+}
+
+.threat-table th {
+  white-space: nowrap;
+}
+
+.threat-table td code {
+  font-family: Consolas, monospace;
+  font-size: 12px;
+}
+
+.verdict {
+  display: inline-block;
+}
+
+/* =========================
+   RESPONSIVE PAGE ELEMENTS
+========================= */
+
+@media (max-width: 900px) {
+
+  .case-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .email-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .email-row strong {
+    text-align: left;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .case-badge {
+    align-self: flex-start;
+  }
+
+}
+}
+
+/* =========================
+   CASES PAGE
+========================= */
+
+.cases-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.case-list-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 20px;
+  align-items: center;
+  padding: 18px;
+  background: #101722;
+  border: 1px solid #1d2734;
+  border-radius: 9px;
+}
+
+.case-list-main {
+  min-width: 0;
+}
+
+.case-number {
+  color: #0dcaf0;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+.case-list-main h3 {
+  margin: 0 0 7px;
+  font-size: 16px;
+}
+
+.case-list-main p {
+  margin: 0;
+  color: #7d899b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.case-list-meta {
+  margin-top: 10px;
+  color: #596679;
+  font-size: 11px;
+}
+
+.case-list-status {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.case-open {
+  background: #17251d;
+  color: #ffc857;
+  border-color: #4c3c1d;
+}
+
+.case-list-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.secondary-button,
+.danger-button {
+  border-radius: 6px;
+  padding: 8px 13px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.secondary-button {
+  background: #14202c;
+  color: #0dcaf0;
+  border: 1px solid #263849;
+}
+
+.secondary-button:hover {
+  background: #1a2b3a;
+}
+
+.danger-button {
+  background: #35161a;
+  color: #ff6672;
+  border: 1px solid #5d252c;
+}
+
+.danger-button:hover {
+  background: #451b20;
+}
+
+.error-message {
+  border-color: #5d252c;
+}
+
+.error-message strong {
+  color: #ff6672;
+}
+
+.error-message p {
+  color: #8994a5;
+  margin-bottom: 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  color: #748196;
+}
+
+.case-details {
+  border-color: #263849;
+}
+
+.case-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.case-detail-grid div {
+  background: #101722;
+  border: 1px solid #1d2734;
+  border-radius: 7px;
+  padding: 14px;
+}
+
+.case-detail-grid span,
+.case-description > span {
+  display: block;
+  color: #687589;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 7px;
+}
+
+.case-detail-grid strong {
+  color: #d8e0eb;
+  font-size: 13px;
+}
+
+.case-description {
+  margin-bottom: 20px;
+}
+
+.case-description h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.case-description p {
+  color: #8994a5;
+  line-height: 1.6;
+}
+
+@media (max-width: 1000px) {
+  .case-list-item {
+    grid-template-columns: 1fr;
+  }
+
+  .case-list-status {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .case-list-actions {
+    flex-direction: row;
+  }
+
+  .case-detail-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .case-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .case-list-actions {
     flex-direction: column;
   }
 }
