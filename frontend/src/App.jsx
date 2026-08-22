@@ -13,6 +13,7 @@ import Cases from "./pages/Cases";
 import CaseDetails from "./pages/CaseDetails";
 import Emails from "./pages/Emails";
 import Findings from "./pages/Findings";
+import FindingDetails from "./pages/FindingDetails";
 import ThreatIntelligence from "./pages/ThreatIntelligence";
 import MitreAttack from "./pages/MitreAttack";
 import Login from "./pages/login";
@@ -154,6 +155,10 @@ function App() {
   };
 
 
+  // =================================================
+  // APPLICATION
+  // =================================================
+
   return (
 
     <BrowserRouter>
@@ -191,9 +196,13 @@ function App() {
           </div>
 
 
-          {/* NAVIGATION */}
+          {/* =================================================
+              NAVIGATION
+          ================================================= */}
 
           <nav className="navigation">
+
+            {/* DASHBOARD */}
 
             <NavLink
               to="/"
@@ -212,6 +221,8 @@ function App() {
             </NavLink>
 
 
+            {/* CASES */}
+
             <NavLink
               to="/cases"
               className={navClass}
@@ -227,6 +238,8 @@ function App() {
 
             </NavLink>
 
+
+            {/* EMAILS */}
 
             <NavLink
               to="/emails"
@@ -244,6 +257,8 @@ function App() {
             </NavLink>
 
 
+            {/* FINDINGS */}
+
             <NavLink
               to="/findings"
               className={navClass}
@@ -260,6 +275,8 @@ function App() {
             </NavLink>
 
 
+            {/* THREAT INTELLIGENCE */}
+
             <NavLink
               to="/threat-intelligence"
               className={navClass}
@@ -275,6 +292,8 @@ function App() {
 
             </NavLink>
 
+
+            {/* MITRE ATT&CK */}
 
             <NavLink
               to="/mitre"
@@ -294,13 +313,21 @@ function App() {
           </nav>
 
 
-          {/* SIDEBAR FOOTER */}
+          {/* =================================================
+              SIDEBAR FOOTER
+          ================================================= */}
 
           <div className="sidebar-bottom">
 
             <div className="system-online">
-              <span>●</span>{" "}
+
+              <span>
+                ●
+              </span>
+
+              {" "}
               System Online
+
             </div>
 
 
@@ -314,7 +341,9 @@ function App() {
               className="logout-button"
               onClick={handleLogout}
             >
+
               Logout
+
             </button>
 
           </div>
@@ -331,7 +360,9 @@ function App() {
           <Routes>
 
 
-            {/* DASHBOARD */}
+            {/* =================================================
+                DASHBOARD
+            ================================================= */}
 
             <Route
               path="/"
@@ -339,7 +370,9 @@ function App() {
             />
 
 
-            {/* CASE LIST */}
+            {/* =================================================
+                CASE LIST
+            ================================================= */}
 
             <Route
               path="/cases"
@@ -347,7 +380,9 @@ function App() {
             />
 
 
-            {/* CASE DETAILS */}
+            {/* =================================================
+                CASE DETAILS
+            ================================================= */}
 
             <Route
               path="/cases/:caseId"
@@ -355,7 +390,9 @@ function App() {
             />
 
 
-            {/* EMAILS */}
+            {/* =================================================
+                EMAILS
+            ================================================= */}
 
             <Route
               path="/emails"
@@ -363,7 +400,9 @@ function App() {
             />
 
 
-            {/* FINDINGS */}
+            {/* =================================================
+                FINDINGS
+            ================================================= */}
 
             <Route
               path="/findings"
@@ -371,7 +410,19 @@ function App() {
             />
 
 
-            {/* THREAT INTELLIGENCE */}
+            {/* =================================================
+                FINDING DETAILS
+            ================================================= */}
+
+            <Route
+              path="/findings/:findingId"
+              element={<FindingDetails />}
+            />
+
+
+            {/* =================================================
+                THREAT INTELLIGENCE
+            ================================================= */}
 
             <Route
               path="/threat-intelligence"
@@ -379,7 +430,9 @@ function App() {
             />
 
 
-            {/* MITRE ATT&CK */}
+            {/* =================================================
+                MITRE ATT&CK
+            ================================================= */}
 
             <Route
               path="/mitre"
@@ -387,7 +440,9 @@ function App() {
             />
 
 
-            {/* FALLBACK */}
+            {/* =================================================
+                FALLBACK
+            ================================================= */}
 
             <Route
               path="*"

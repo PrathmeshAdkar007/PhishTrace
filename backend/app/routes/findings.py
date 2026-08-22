@@ -12,10 +12,59 @@ from app.models.threat_intel_result import ThreatIntelResult
 findings = Blueprint("findings", __name__)
 
 
+# =========================================================
+# GET ALL FINDINGS
+# =========================================================
+
+@findings.get("/api/findings")
+def get_all_findings():
+
+    findings_list = Finding.query.order_by(
+        Finding.created_at.desc()
+    ).all()
+
+    return jsonify({
+        "count": len(findings_list),
+        "findings": [
+            finding.to_dict()
+            for finding in findings_list
+        ]
+    })
+
+
+# =========================================================
+# GET SINGLE FINDING
+# =========================================================
+
+@findings.get("/api/findings/<int:finding_id>")
+def get_finding(finding_id):
+
+    finding = db.session.get(
+        Finding,
+        finding_id
+    )
+
+    if not finding:
+        return jsonify({
+            "error": "Finding not found"
+        }), 404
+
+    return jsonify({
+        "finding": finding.to_dict()
+    })
+
+
+# =========================================================
+# GENERATE FINDINGS FOR A CASE
+# =========================================================
+
 @findings.post("/api/cases/<int:case_id>/generate-findings")
 def generate_findings(case_id):
 
-    case = db.session.get(Case, case_id)
+    case = db.session.get(
+        Case,
+        case_id
+    )
 
     if not case:
         return jsonify({
@@ -170,10 +219,17 @@ def generate_findings(case_id):
     }), 201
 
 
+# =========================================================
+# GET FINDINGS FOR A CASE
+# =========================================================
+
 @findings.get("/api/cases/<int:case_id>/findings")
 def get_case_findings(case_id):
 
-    case = db.session.get(Case, case_id)
+    case = db.session.get(
+        Case,
+        case_id
+    )
 
     if not case:
         return jsonify({

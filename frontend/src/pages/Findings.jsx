@@ -1,121 +1,409 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const API_BASE = "http://127.0.0.1:5000";
+
+
+// =====================================================
+// FORMAT TEXT
+// =====================================================
+
+function upper(value) {
+  if (!value) {
+    return "N/A";
+  }
+
+  return String(value)
+    .replaceAll("_", " ")
+    .toUpperCase();
+}
+
+
+// =====================================================
+// FINDINGS COMPONENT
+// =====================================================
+
 function Findings() {
-  const findings = [
-    {
-      title: "Malicious Indicator",
-      description:
-        "Domain uses a suspicious lookalike pattern associated with phishing.",
-      severity: "CRITICAL",
-      type: "Threat Intelligence",
-    },
-    {
-      title: "DMARC Authentication Failure",
-      description:
-        "DMARC authentication failed for this email.",
-      severity: "HIGH",
-      type: "Email Authentication",
-    },
-    {
-      title: "DKIM Authentication Failure",
-      description:
-        "DKIM authentication failed during email analysis.",
-      severity: "HIGH",
-      type: "Email Authentication",
-    },
-    {
-      title: "Phishing Lookalike Domain",
-      description:
-        "The phishing email used a suspicious lookalike domain to impersonate a legitimate Microsoft service.",
-      severity: "HIGH",
-      type: "Phishing",
-    },
-  ];
 
-  return (
-    <div className="page">
+  const navigate = useNavigate();
 
-      <div className="topbar">
+  const [findings, setFindings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+
+  // ===================================================
+  // LOAD FINDINGS
+  // ===================================================
+
+  const loadFindings = async () => {
+
+    try {
+
+      setLoading(true);
+      setError("");
+
+      const response = await fetch(
+        `${API_BASE}/api/findings`
+      );
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          `Failed to load findings (${response.status})`
+        );
+
+      }
+
+
+      const data = await response.json();
+
+
+      setFindings(
+        data.findings || []
+      );
+
+
+    } catch (err) {
+
+      console.error(
+        "Findings API error:",
+        err
+      );
+
+
+      setError(
+        err.message ||
+        "Failed to load findings."
+      );
+
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+  // ===================================================
+  // LOAD WHEN PAGE OPENS
+  // ===================================================
+
+  useEffect(() => {
+
+    loadFindings();
+
+  }, []);
+
+
+  // ===================================================
+  // VIEW FINDING
+  // ===================================================
+
+  const viewFinding = (findingId) => {
+
+    navigate(
+      `/findings/${findingId}`
+    );
+
+  };
+
+
+  // ===================================================
+  // LOADING
+  // ===================================================
+
+  if (loading) {
+
+    return (
+
+      <div className="loading-screen">
 
         <div>
-          <h2>Findings</h2>
+
+          <div className="brand-icon">
+            P
+          </div>
+
+          <h2>
+            Loading Findings...
+          </h2>
 
           <p>
-            Security findings identified during investigation
+            Fetching security findings from
+            the PhishTrace backend.
           </p>
-        </div>
 
-        <div className="case-badge">
-          4 FINDINGS
         </div>
 
       </div>
 
+    );
+
+  }
+
+
+  // ===================================================
+  // PAGE
+  // ===================================================
+
+  return (
+
+    <div className="page">
+
+
+      {/* =================================================
+          TOP BAR
+      ================================================= */}
+
+      <div className="topbar">
+
+        <div>
+
+          <h2>
+            Findings
+          </h2>
+
+          <p>
+            Security findings identified during investigation
+          </p>
+
+        </div>
+
+
+        <div className="case-badge">
+
+          {findings.length} FINDING
+          {findings.length !== 1 ? "S" : ""}
+
+        </div>
+
+      </div>
+
+
+
+      {/* =================================================
+          ERROR
+      ================================================= */}
+
+      {error && (
+
+        <div className="card-dark error-message">
+
+          <strong>
+            Error
+          </strong>
+
+          <p>
+            {error}
+          </p>
+
+        </div>
+
+      )}
+
+
+
+      {/* =================================================
+          FINDINGS CARD
+      ================================================= */}
+
       <div className="card-dark">
+
+
+        {/* =================================================
+            SECTION HEADER
+        ================================================= */}
 
         <div className="section-header">
 
           <div>
+
             <h3>
               Investigation Findings
             </h3>
 
             <small>
-              Case PH-2026-0001
+              Findings generated by PhishTrace analysis
             </small>
+
           </div>
 
+
           <span>
-            4 identified
+            {findings.length} identified
           </span>
 
         </div>
 
-        <div className="findings-list">
 
-          {findings.map((finding, index) => (
 
-            <div
-              className="finding"
-              key={index}
-            >
+        {/* =================================================
+            EMPTY STATE
+        ================================================= */}
 
-              <div className="finding-indicator">
-                !
-              </div>
+        {findings.length === 0 ? (
 
-              <div className="finding-content">
+          <div className="empty-state">
 
-                <h5>
-                  {finding.title}
-                </h5>
+            <h3>
+              No findings found
+            </h3>
 
-                <p>
-                  {finding.description}
-                </p>
+            <p>
+              There are currently no security
+              findings in the database.
+            </p>
 
-                <div className="finding-tags">
+          </div>
 
-                  <span className="tag severity-tag">
-                    {finding.severity}
-                  </span>
+        ) : (
 
-                  <span className="tag">
-                    {finding.type}
-                  </span>
+
+          /* =================================================
+             FINDINGS LIST
+          ================================================= */
+
+          <div className="findings-list">
+
+
+            {findings.map((finding) => (
+
+              <div
+                className="finding"
+                key={finding.id}
+                onClick={() =>
+                  viewFinding(finding.id)
+                }
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+
+                  if (
+                    event.key === "Enter" ||
+                    event.key === " "
+                  ) {
+
+                    viewFinding(
+                      finding.id
+                    );
+
+                  }
+
+                }}
+              >
+
+
+                {/* =========================================
+                    FINDING INDICATOR
+                ========================================= */}
+
+                <div className="finding-indicator">
+                  !
+                </div>
+
+
+
+                {/* =========================================
+                    FINDING CONTENT
+                ========================================= */}
+
+                <div className="finding-content">
+
+
+                  <h5>
+                    {finding.title}
+                  </h5>
+
+
+                  <p>
+                    {finding.description ||
+                      "No description available."}
+                  </p>
+
+
+
+                  {/* =======================================
+                      FINDING TAGS
+                  ======================================= */}
+
+                  <div className="finding-tags">
+
+
+                    <span className="tag severity-tag">
+
+                      {upper(
+                        finding.severity
+                      )}
+
+                    </span>
+
+
+                    <span className="tag">
+
+                      {upper(
+                        finding.finding_type
+                      )}
+
+                    </span>
+
+
+                    <span className="tag">
+
+                      {upper(
+                        finding.confidence
+                      )}
+
+                      {" "}
+                      CONFIDENCE
+
+                    </span>
+
+
+                  </div>
+
 
                 </div>
 
+
               </div>
 
-            </div>
+            ))}
 
-          ))}
 
-        </div>
+          </div>
+
+        )}
 
       </div>
 
+
+
+      {/* =================================================
+          FOOTER
+      ================================================= */}
+
+      <footer>
+
+        <span>
+          PhishTrace SOC v1.0
+        </span>
+
+        <span>
+          Security Findings
+        </span>
+
+      </footer>
+
+
     </div>
+
   );
+
 }
+
 
 export default Findings;
