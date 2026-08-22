@@ -1,56 +1,82 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const API_BASE = "http://127.0.0.1:5000";
+
+function formatDate(value) {
+  if (!value) {
+    return "N/A";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString();
+}
 
 function MitreAttack() {
+  const navigate = useNavigate();
+
   const [mappings, setMappings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Current investigation case
-  const CASE_ID = 1;
-
-  /* =========================
-     LOAD MITRE MAPPINGS
-  ========================= */
-
-  const loadMitreMappings = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const response = await fetch(
-        `http://127.0.0.1:5000/api/cases/${CASE_ID}/summary`
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to load MITRE mappings (${response.status})`
-        );
-      }
-
-      const data = await response.json();
-
-      setMappings(data.mitre_mappings || []);
-    } catch (err) {
-      console.error("MITRE ATT&CK API error:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // =========================================================
+  // LOAD MITRE MAPPINGS
+  // =========================================================
 
   useEffect(() => {
+    const loadMitreMappings = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch(
+          `${API_BASE}/api/mitre`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ||
+              `Failed to load MITRE mappings (${response.status})`
+          );
+        }
+
+        setMappings(data.mappings || []);
+      } catch (err) {
+        console.error(
+          "MITRE ATT&CK API error:",
+          err
+        );
+
+        setError(
+          err.message ||
+            "Failed to load MITRE ATT&CK mappings."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadMitreMappings();
   }, []);
 
-  /* =========================
-     LOADING
-  ========================= */
+  // =========================================================
+  // LOADING
+  // =========================================================
 
   if (loading) {
     return (
       <div className="loading-screen">
         <div>
-          <h2>Loading MITRE ATT&CK...</h2>
+          <h2>
+            Loading MITRE ATT&CK...
+          </h2>
 
           <p>
             Fetching technique mappings from the
@@ -61,16 +87,19 @@ function MitreAttack() {
     );
   }
 
-  /* =========================
-     CALCULATED VALUES
-  ========================= */
+  // =========================================================
+  // CALCULATED VALUES
+  // =========================================================
 
   const mappingCount = mappings.length;
 
   const techniques = [
     ...new Set(
       mappings
-        .map((mapping) => mapping.technique_id)
+        .map(
+          (mapping) =>
+            mapping.technique_id
+        )
         .filter(Boolean)
     ),
   ];
@@ -78,7 +107,10 @@ function MitreAttack() {
   const tactics = [
     ...new Set(
       mappings
-        .map((mapping) => mapping.tactic)
+        .map(
+          (mapping) =>
+            mapping.tactic
+        )
         .filter(Boolean)
     ),
   ];
@@ -93,16 +125,16 @@ function MitreAttack() {
       ? mappings[0].tactic || "—"
       : "—";
 
-  /* =========================
-     PAGE
-  ========================= */
+  // =========================================================
+  // PAGE
+  // =========================================================
 
   return (
     <div className="page">
 
-      {/* =========================
+      {/* =================================================
           TOP BAR
-      ========================= */}
+      ================================================= */}
 
       <div className="topbar">
 
@@ -112,7 +144,8 @@ function MitreAttack() {
           </h2>
 
           <p>
-            Attack technique mapping for the investigation
+            Attack technique mapping for the
+            investigation
           </p>
         </div>
 
@@ -124,9 +157,9 @@ function MitreAttack() {
       </div>
 
 
-      {/* =========================
+      {/* =================================================
           ERROR
-      ========================= */}
+      ================================================= */}
 
       {error && (
         <div className="card-dark error-message">
@@ -143,9 +176,9 @@ function MitreAttack() {
       )}
 
 
-      {/* =========================
-          SUMMARY
-      ========================= */}
+      {/* =================================================
+          SUMMARY STATS
+      ================================================= */}
 
       <div className="stats-grid">
 
@@ -220,9 +253,9 @@ function MitreAttack() {
       </div>
 
 
-      {/* =========================
+      {/* =================================================
           TECHNIQUE MAPPINGS
-      ========================= */}
+      ================================================= */}
 
       <div className="card-dark">
 
@@ -242,7 +275,9 @@ function MitreAttack() {
 
           <small>
             {techniques.length} unique technique
-            {techniques.length !== 1 ? "s" : ""}
+            {techniques.length !== 1
+              ? "s"
+              : ""}
           </small>
 
         </div>
@@ -259,8 +294,9 @@ function MitreAttack() {
             </h3>
 
             <p>
-              No MITRE ATT&CK techniques have been
-              mapped to the findings for this case yet.
+              No MITRE ATT&CK techniques have
+              been mapped to the investigation
+              yet.
             </p>
 
           </div>
@@ -272,14 +308,32 @@ function MitreAttack() {
             {mappings.map((mapping) => (
 
               <div
-                className="mitre-card"
+                className="mitre-card clickable-card"
                 key={mapping.id}
+                onClick={() =>
+                  navigate(
+                    `/mitre/${mapping.id}`
+                  )
+                }
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (
+                    event.key === "Enter" ||
+                    event.key === " "
+                  ) {
+                    navigate(
+                      `/mitre/${mapping.id}`
+                    );
+                  }
+                }}
               >
 
                 {/* TECHNIQUE ID */}
 
                 <div className="technique-id">
-                  {mapping.technique_id || "Unknown"}
+                  {mapping.technique_id ||
+                    "Unknown"}
                 </div>
 
 
@@ -310,6 +364,7 @@ function MitreAttack() {
                 {/* EVIDENCE */}
 
                 {mapping.evidence && (
+
                   <div className="case-description">
 
                     <span>
@@ -317,15 +372,11 @@ function MitreAttack() {
                     </span>
 
                     <p>
-                      {typeof mapping.evidence ===
-                      "string"
-                        ? mapping.evidence
-                        : JSON.stringify(
-                            mapping.evidence
-                          )}
+                      {mapping.evidence}
                     </p>
 
                   </div>
+
                 )}
 
 
@@ -338,9 +389,11 @@ function MitreAttack() {
                   </span>
 
                   {mapping.tactic && (
+
                     <span className="tag">
                       {mapping.tactic}
                     </span>
+
                   )}
 
                 </div>
@@ -355,18 +408,23 @@ function MitreAttack() {
                   </span>
 
                   {mapping.finding_id && (
+
                     <span>
-                      Finding ID: {mapping.finding_id}
+                      Finding ID:{" "}
+                      {mapping.finding_id}
                     </span>
+
                   )}
 
                   {mapping.created_at && (
+
                     <span>
                       Created{" "}
-                      {new Date(
+                      {formatDate(
                         mapping.created_at
-                      ).toLocaleString()}
+                      )}
                     </span>
+
                   )}
 
                 </div>
@@ -382,9 +440,9 @@ function MitreAttack() {
       </div>
 
 
-      {/* =========================
+      {/* =================================================
           ATT&CK OVERVIEW
-      ========================= */}
+      ================================================= */}
 
       {mappings.length > 0 && (
 
@@ -468,16 +526,18 @@ function MitreAttack() {
 
           <div className="finding-tags">
 
-            {techniques.map((technique) => (
+            {techniques.map(
+              (technique) => (
 
-              <span
-                className="tag"
-                key={technique}
-              >
-                {technique}
-              </span>
+                <span
+                  className="tag"
+                  key={technique}
+                >
+                  {technique}
+                </span>
 
-            ))}
+              )
+            )}
 
           </div>
 
@@ -486,9 +546,9 @@ function MitreAttack() {
       )}
 
 
-      {/* =========================
+      {/* =================================================
           FOOTER
-      ========================= */}
+      ================================================= */}
 
       <footer>
 

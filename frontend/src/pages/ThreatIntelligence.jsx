@@ -1,212 +1,223 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = "http://127.0.0.1:5000";
 
+function formatDate(value) {
+  if (!value) {
+    return "N/A";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString();
+}
+
+function upper(value) {
+  if (!value) {
+    return "N/A";
+  }
+
+  return String(value)
+    .replaceAll("_", " ")
+    .toUpperCase();
+}
+
 function ThreatIntelligence() {
-  const [indicators, setIndicators] = useState([]);
+
+  const navigate = useNavigate();
+
+  const [results, setResults] = useState([]);
+
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
 
-  /*
-   * Load indicators and their threat intelligence
-   */
+
+  // =====================================================
+  // LOAD THREAT INTELLIGENCE
+  // =====================================================
+
   const loadThreatIntelligence = async () => {
+
     try {
+
       setLoading(true);
+
       setError("");
 
-      // --------------------------------------------------
-      // Get indicators belonging to Email ID 3
-      // --------------------------------------------------
 
-      const indicatorsResponse = await fetch(
-        `${API_BASE_URL}/api/emails/3/indicators`
+      const response = await fetch(
+        `${API_BASE_URL}/api/threat-intelligence`
       );
 
-      if (!indicatorsResponse.ok) {
+
+      const data = await response.json();
+
+
+      if (!response.ok) {
+
         throw new Error(
-          `Failed to load indicators (${indicatorsResponse.status})`
+          data.error ||
+          `Failed to load threat intelligence (${response.status})`
         );
+
       }
 
-      const indicatorsData = await indicatorsResponse.json();
 
-      const indicatorList = indicatorsData.indicators || [];
-
-      // --------------------------------------------------
-      // Get threat intelligence for every indicator
-      // --------------------------------------------------
-
-      const enrichedIndicators = await Promise.all(
-        indicatorList.map(async (indicator) => {
-          try {
-            let response = await fetch(
-              `${API_BASE_URL}/api/indicators/${indicator.id}/threat-intel`
-            );
-
-            if (!response.ok) {
-              return {
-                ...indicator,
-                verdict: "unknown",
-                score: null,
-                confidence: "unknown",
-                provider: "local",
-                notes: "Threat intelligence result unavailable.",
-                checked_at: null,
-              };
-            }
-
-            let data = await response.json();
-
-            let results = data.results || [];
-
-            /*
-             * If no threat-intelligence result exists yet,
-             * run the local analysis automatically.
-             */
-            if (results.length === 0) {
-              const analysisResponse = await fetch(
-                `${API_BASE_URL}/api/indicators/${indicator.id}/threat-intel`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
-
-              if (analysisResponse.ok) {
-                const analysisData =
-                  await analysisResponse.json();
-
-                if (analysisData.result) {
-                  results = [analysisData.result];
-                }
-              }
-            }
-
-            const latestResult = results[0];
-
-            if (!latestResult) {
-              return {
-                ...indicator,
-                verdict: "unknown",
-                score: null,
-                confidence: "unknown",
-                provider: "local",
-                notes: "No threat intelligence result available.",
-                checked_at: null,
-              };
-            }
-
-            return {
-              ...indicator,
-
-              verdict:
-                latestResult.verdict || "unknown",
-
-              score:
-                latestResult.score ?? null,
-
-              confidence:
-                latestResult.confidence || "unknown",
-
-              provider:
-                latestResult.provider || "local",
-
-              notes:
-                latestResult.notes ||
-                "No analysis notes available.",
-
-              checked_at:
-                latestResult.checked_at || null,
-            };
-          } catch (indicatorError) {
-            console.error(
-              `Threat intelligence error for indicator ${indicator.id}:`,
-              indicatorError
-            );
-
-            return {
-              ...indicator,
-              verdict: "unknown",
-              score: null,
-              confidence: "unknown",
-              provider: "local",
-              notes: "Unable to retrieve threat intelligence.",
-              checked_at: null,
-            };
-          }
-        })
+      setResults(
+        data.results || []
       );
 
-      setIndicators(enrichedIndicators);
+
     } catch (err) {
+
       console.error(
         "Threat intelligence API error:",
         err
       );
 
-      setError(err.message);
+
+      setError(
+        err.message ||
+        "Failed to load threat intelligence."
+      );
+
+
     } finally {
+
       setLoading(false);
+
     }
+
   };
 
+
+  // =====================================================
+  // LOAD WHEN PAGE OPENS
+  // =====================================================
+
   useEffect(() => {
+
     loadThreatIntelligence();
+
   }, []);
 
-  // --------------------------------------------------
-  // Loading
-  // --------------------------------------------------
+
+  // =====================================================
+  // OPEN THREAT INTELLIGENCE DETAILS
+  // =====================================================
+
+  const viewResult = (resultId) => {
+
+    navigate(
+      `/threat-intelligence/${resultId}`
+    );
+
+  };
+
+
+  // =====================================================
+  // LOADING
+  // =====================================================
 
   if (loading) {
+
     return (
+
       <div className="loading-screen">
+
         <div>
-          <h2>Loading Threat Intelligence...</h2>
+
+          <div className="brand-icon">
+            P
+          </div>
+
+          <h2>
+            Loading Threat Intelligence...
+          </h2>
 
           <p>
-            Analyzing indicators using the PhishTrace
-            threat intelligence provider.
+            Fetching threat intelligence results
+            from the PhishTrace backend.
           </p>
+
         </div>
+
       </div>
+
     );
+
   }
 
-  // --------------------------------------------------
-  // Calculated statistics
-  // --------------------------------------------------
 
-  const maliciousCount = indicators.filter(
-    (indicator) =>
-      indicator.verdict?.toLowerCase() === "malicious"
+  // =====================================================
+  // STATISTICS
+  // =====================================================
+
+  const maliciousCount = results.filter(
+    (result) =>
+      result.verdict?.toLowerCase() === "malicious"
   ).length;
 
-  const suspiciousCount = indicators.filter(
-    (indicator) =>
-      indicator.verdict?.toLowerCase() === "suspicious"
+
+  const suspiciousCount = results.filter(
+    (result) =>
+      result.verdict?.toLowerCase() === "suspicious"
   ).length;
 
-  const highConfidenceCount = indicators.filter(
-    (indicator) =>
-      indicator.confidence?.toLowerCase() === "high"
+
+  const highConfidenceCount = results.filter(
+    (result) =>
+      result.confidence?.toLowerCase() === "high"
   ).length;
 
-  // --------------------------------------------------
-  // Page
-  // --------------------------------------------------
+
+  // =====================================================
+  // GET INDICATOR INFORMATION
+  // =====================================================
+
+  const getIndicatorValue = (result) => {
+
+    return (
+      result.raw_response?.indicator ||
+      "Unknown indicator"
+    );
+
+  };
+
+
+  const getIndicatorType = (result) => {
+
+    return (
+      result.raw_response?.indicator_type ||
+      "Unknown"
+    );
+
+  };
+
+
+  // =====================================================
+  // PAGE
+  // =====================================================
 
   return (
+
     <div className="page">
 
-      {/* TOP BAR */}
+
+      {/* =================================================
+          TOP BAR
+      ================================================= */}
 
       <div className="topbar">
 
         <div>
+
           <h2>
             Threat Intelligence
           </h2>
@@ -215,19 +226,26 @@ function ThreatIntelligence() {
             Indicator analysis and threat intelligence
             results
           </p>
+
         </div>
 
+
         <div className="case-badge">
-          {indicators.length} INDICATOR
-          {indicators.length !== 1 ? "S" : ""}
+
+          {results.length} RESULT
+          {results.length !== 1 ? "S" : ""}
+
         </div>
 
       </div>
 
 
-      {/* ERROR */}
+      {/* =================================================
+          ERROR
+      ================================================= */}
 
       {error && (
+
         <div className="card-dark error-message">
 
           <strong>
@@ -239,12 +257,16 @@ function ThreatIntelligence() {
           </p>
 
         </div>
+
       )}
 
 
-      {/* SUMMARY */}
+      {/* =================================================
+          SUMMARY
+      ================================================= */}
 
       <div className="stats-grid">
+
 
         {/* TOTAL */}
 
@@ -255,13 +277,15 @@ function ThreatIntelligence() {
           </div>
 
           <div>
+
             <div className="stat-value">
-              {indicators.length}
+              {results.length}
             </div>
 
             <div className="stat-label">
-              Indicators
+              Results
             </div>
+
           </div>
 
         </div>
@@ -276,6 +300,7 @@ function ThreatIntelligence() {
           </div>
 
           <div>
+
             <div className="stat-value">
               {maliciousCount}
             </div>
@@ -283,6 +308,7 @@ function ThreatIntelligence() {
             <div className="stat-label">
               Malicious
             </div>
+
           </div>
 
         </div>
@@ -297,6 +323,7 @@ function ThreatIntelligence() {
           </div>
 
           <div>
+
             <div className="stat-value">
               {highConfidenceCount}
             </div>
@@ -304,6 +331,7 @@ function ThreatIntelligence() {
             <div className="stat-label">
               High Confidence
             </div>
+
           </div>
 
         </div>
@@ -311,13 +339,17 @@ function ThreatIntelligence() {
       </div>
 
 
-      {/* THREAT INTELLIGENCE TABLE */}
+      {/* =================================================
+          THREAT INTELLIGENCE TABLE
+      ================================================= */}
 
       <div className="card-dark">
+
 
         <div className="section-header">
 
           <div>
+
             <h3>
               Threat Intelligence Results
             </h3>
@@ -325,7 +357,9 @@ function ThreatIntelligence() {
             <small>
               Local threat intelligence provider
             </small>
+
           </div>
+
 
           <small>
             {maliciousCount} malicious
@@ -334,17 +368,21 @@ function ThreatIntelligence() {
         </div>
 
 
-        {indicators.length === 0 ? (
+        {/* =================================================
+            EMPTY STATE
+        ================================================= */}
+
+        {results.length === 0 ? (
 
           <div className="empty-state">
 
             <h3>
-              No indicators found
+              No threat intelligence results
             </h3>
 
             <p>
-              No indicators are currently available
-              for threat intelligence analysis.
+              No threat intelligence analysis results
+              are currently available.
             </p>
 
           </div>
@@ -358,12 +396,31 @@ function ThreatIntelligence() {
               <thead>
 
                 <tr>
-                  <th>Indicator</th>
-                  <th>Type</th>
-                  <th>Verdict</th>
-                  <th>Score</th>
-                  <th>Confidence</th>
-                  <th>Provider</th>
+
+                  <th>
+                    Indicator
+                  </th>
+
+                  <th>
+                    Type
+                  </th>
+
+                  <th>
+                    Verdict
+                  </th>
+
+                  <th>
+                    Score
+                  </th>
+
+                  <th>
+                    Confidence
+                  </th>
+
+                  <th>
+                    Provider
+                  </th>
+
                 </tr>
 
               </thead>
@@ -371,52 +428,93 @@ function ThreatIntelligence() {
 
               <tbody>
 
-                {indicators.map((indicator) => (
+                {results.map((result) => (
 
-                  <tr key={indicator.id}>
+                  <tr
+                    key={result.id}
+                    className="threat-table-row"
+                    onClick={() =>
+                      viewResult(result.id)
+                    }
+                    onKeyDown={(event) => {
+
+                      if (
+                        event.key === "Enter" ||
+                        event.key === " "
+                      ) {
+
+                        viewResult(result.id);
+
+                      }
+
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    title="View threat intelligence details"
+                  >
 
                     <td>
+
                       <code>
-                        {indicator.value}
+                        {getIndicatorValue(result)}
                       </code>
+
                     </td>
 
+
                     <td>
-                      {indicator.indicator_type}
+
+                      {upper(
+                        getIndicatorType(result)
+                      )}
+
                     </td>
+
 
                     <td>
 
                       <span
                         className={`verdict ${
-                          indicator.verdict?.toLowerCase() ===
+                          result.verdict?.toLowerCase() ===
                           "malicious"
                             ? "malicious"
                             : ""
                         }`}
                       >
-                        {String(
-                          indicator.verdict || "unknown"
-                        ).toUpperCase()}
+
+                        {upper(
+                          result.verdict
+                        )}
+
                       </span>
 
                     </td>
 
+
                     <td>
-                      {indicator.score !== null &&
-                      indicator.score !== undefined
-                        ? indicator.score
+
+                      {result.score !== null &&
+                      result.score !== undefined
+                        ? result.score
                         : "—"}
+
                     </td>
 
-                    <td>
-                      {String(
-                        indicator.confidence || "unknown"
-                      ).toUpperCase()}
-                    </td>
 
                     <td>
-                      {indicator.provider || "local"}
+
+                      {upper(
+                        result.confidence
+                      )}
+
+                    </td>
+
+
+                    <td>
+
+                      {result.provider ||
+                        "local"}
+
                     </td>
 
                   </tr>
@@ -434,138 +532,201 @@ function ThreatIntelligence() {
       </div>
 
 
-      {/* DETAILED ANALYSIS */}
+      {/* =================================================
+          DETAILED ANALYSIS
+      ================================================= */}
 
       <div className="card-dark">
+
 
         <div className="section-header">
 
           <div>
+
             <h3>
               Analysis
             </h3>
 
             <small>
-              Threat intelligence reasoning for each
-              indicator
+              Threat intelligence reasoning for
+              each result
             </small>
+
           </div>
 
         </div>
 
 
-        <div className="findings-list">
+        {results.length === 0 ? (
 
-          {indicators.map((indicator) => (
+          <div className="empty-state">
 
-            <div
-              className="finding"
-              key={`finding-${indicator.id}`}
-            >
+            <p>
+              No analysis available.
+            </p>
+
+          </div>
+
+        ) : (
+
+          <div className="findings-list">
+
+            {results.map((result) => (
 
               <div
-                className={`finding-indicator ${
-                  indicator.verdict?.toLowerCase() ===
-                  "malicious"
-                    ? "danger"
-                    : ""
-                }`}
+                className="finding threat-analysis-card"
+                key={`analysis-${result.id}`}
+                onClick={() =>
+                  viewResult(result.id)
+                }
+                onKeyDown={(event) => {
+
+                  if (
+                    event.key === "Enter" ||
+                    event.key === " "
+                  ) {
+
+                    viewResult(result.id);
+
+                  }
+
+                }}
+                role="button"
+                tabIndex={0}
+                title="View threat intelligence details"
               >
-                !
-              </div>
 
 
-              <div>
+                {/* INDICATOR */}
 
-                <h5>
-                  {indicator.verdict?.toLowerCase() ===
-                  "malicious"
-                    ? "Malicious indicator detected"
-                    : "Indicator analysis completed"}
-                </h5>
-
-
-                <p>
-
-                  <strong>
-                    {indicator.value}
-                  </strong>
-
-                  {" — "}
-
-                  {indicator.notes ||
-                    "No analysis notes available."}
-
-                </p>
-
-
-                <div className="finding-tags">
-
-                  <span
-                    className={`tag ${
-                      indicator.verdict?.toLowerCase() ===
-                      "malicious"
-                        ? "severity-tag"
-                        : ""
-                    }`}
-                  >
-                    {String(
-                      indicator.verdict || "unknown"
-                    ).toUpperCase()}
-                  </span>
-
-
-                  {indicator.score !== null &&
-                    indicator.score !== undefined && (
-
-                    <span className="tag">
-                      SCORE {indicator.score}
-                    </span>
-
-                  )}
-
-
-                  <span className="tag">
-                    {String(
-                      indicator.confidence || "unknown"
-                    ).toUpperCase()}{" "}
-                    CONFIDENCE
-                  </span>
-
-
-                  <span className="tag">
-                    {indicator.provider || "local"}
-                  </span>
-
+                <div
+                  className={`finding-indicator ${
+                    result.verdict?.toLowerCase() ===
+                    "malicious"
+                      ? "danger"
+                      : ""
+                  }`}
+                >
+                  !
                 </div>
 
 
-                {indicator.checked_at && (
+                {/* CONTENT */}
 
-                  <small className="finding-time">
+                <div>
 
-                    Checked{" "}
+                  <h5>
 
-                    {new Date(
-                      indicator.checked_at
-                    ).toLocaleString()}
+                    {result.verdict?.toLowerCase() ===
+                    "malicious"
+                      ? "Malicious indicator detected"
+                      : "Threat intelligence analysis"}
 
-                  </small>
+                  </h5>
 
-                )}
+
+                  <p>
+
+                    <strong>
+                      {getIndicatorValue(result)}
+                    </strong>
+
+                    {" — "}
+
+                    {result.notes ||
+                      "No analysis notes available."}
+
+                  </p>
+
+
+                  {/* TAGS */}
+
+                  <div className="finding-tags">
+
+
+                    <span
+                      className={`tag ${
+                        result.verdict?.toLowerCase() ===
+                        "malicious"
+                          ? "severity-tag"
+                          : ""
+                      }`}
+                    >
+
+                      {upper(
+                        result.verdict
+                      )}
+
+                    </span>
+
+
+                    {result.score !== null &&
+                    result.score !== undefined && (
+
+                      <span className="tag">
+
+                        SCORE{" "}
+                        {result.score}
+
+                      </span>
+
+                    )}
+
+
+                    <span className="tag">
+
+                      {upper(
+                        result.confidence
+                      )}
+
+                      {" "}
+                      CONFIDENCE
+
+                    </span>
+
+
+                    <span className="tag">
+
+                      {result.provider ||
+                        "local"}
+
+                    </span>
+
+                  </div>
+
+
+                  {/* CHECKED TIME */}
+
+                  {result.checked_at && (
+
+                    <small className="finding-time">
+
+                      Checked{" "}
+
+                      {formatDate(
+                        result.checked_at
+                      )}
+
+                    </small>
+
+                  )}
+
+                </div>
 
               </div>
 
-            </div>
+            ))}
 
-          ))}
+          </div>
 
-        </div>
+        )}
 
       </div>
 
 
-      {/* FOOTER */}
+      {/* =================================================
+          FOOTER
+      ================================================= */}
 
       <footer>
 
@@ -580,7 +741,10 @@ function ThreatIntelligence() {
       </footer>
 
     </div>
+
   );
+
 }
+
 
 export default ThreatIntelligence;

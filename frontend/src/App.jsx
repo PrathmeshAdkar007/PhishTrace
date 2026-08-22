@@ -11,11 +11,23 @@ import {
 import Dashboard from "./pages/Dashboard";
 import Cases from "./pages/Cases";
 import CaseDetails from "./pages/CaseDetails";
+
 import Emails from "./pages/Emails";
+import EmailDetails from "./pages/EmailDetails";
+
 import Findings from "./pages/Findings";
 import FindingDetails from "./pages/FindingDetails";
+
+import AffectedUsers from "./pages/AffectedUsers";
+
 import ThreatIntelligence from "./pages/ThreatIntelligence";
+import ThreatIntelligenceDetails from "./pages/ThreatIntelligenceDetails";
+
 import MitreAttack from "./pages/MitreAttack";
+import MitreDetails from "./pages/MitreDetails";
+
+import ContainmentActions from "./pages/ContainmentActions";
+
 import Login from "./pages/login";
 
 import "./App.css";
@@ -47,9 +59,13 @@ function App() {
         const data = await response.json();
 
         if (data.authenticated) {
+
           setUser(data.user);
+
         } else {
+
           setUser(null);
+
         }
 
       } catch (error) {
@@ -82,6 +98,7 @@ function App() {
   if (loading) {
 
     return (
+
       <div className="loading-screen">
 
         <div className="brand-icon">
@@ -93,6 +110,7 @@ function App() {
         </h4>
 
       </div>
+
     );
 
   }
@@ -105,11 +123,13 @@ function App() {
   if (!user) {
 
     return (
+
       <Login
         onLogin={(loggedInUser) => {
           setUser(loggedInUser);
         }}
       />
+
     );
 
   }
@@ -202,6 +222,7 @@ function App() {
 
           <nav className="navigation">
 
+
             {/* DASHBOARD */}
 
             <NavLink
@@ -270,6 +291,42 @@ function App() {
 
               <span>
                 Findings
+              </span>
+
+            </NavLink>
+
+
+            {/* AFFECTED USERS */}
+
+            <NavLink
+              to="/affected-users"
+              className={navClass}
+            >
+
+              <span className="nav-icon">
+                ♟
+              </span>
+
+              <span>
+                Affected Users
+              </span>
+
+            </NavLink>
+
+
+            {/* CONTAINMENT ACTIONS */}
+
+            <NavLink
+              to="/containment-actions"
+              className={navClass}
+            >
+
+              <span className="nav-icon">
+                🛡
+              </span>
+
+              <span>
+                Containment
               </span>
 
             </NavLink>
@@ -401,6 +458,16 @@ function App() {
 
 
             {/* =================================================
+                EMAIL DETAILS
+            ================================================= */}
+
+            <Route
+              path="/emails/:emailId"
+              element={<EmailDetails />}
+            />
+
+
+            {/* =================================================
                 FINDINGS
             ================================================= */}
 
@@ -421,6 +488,26 @@ function App() {
 
 
             {/* =================================================
+                AFFECTED USERS
+            ================================================= */}
+
+            <Route
+              path="/affected-users"
+              element={<AffectedUsers />}
+            />
+
+
+            {/* =================================================
+                CONTAINMENT ACTIONS
+            ================================================= */}
+
+            <Route
+              path="/containment-actions"
+              element={<ContainmentActions />}
+            />
+
+
+            {/* =================================================
                 THREAT INTELLIGENCE
             ================================================= */}
 
@@ -431,12 +518,32 @@ function App() {
 
 
             {/* =================================================
+                THREAT INTELLIGENCE DETAILS
+            ================================================= */}
+
+            <Route
+              path="/threat-intelligence/:resultId"
+              element={<ThreatIntelligenceDetails />}
+            />
+
+
+            {/* =================================================
                 MITRE ATT&CK
             ================================================= */}
 
             <Route
               path="/mitre"
               element={<MitreAttack />}
+            />
+
+
+            {/* =================================================
+                MITRE ATT&CK DETAILS
+            ================================================= */}
+
+            <Route
+              path="/mitre/:mappingId"
+              element={<MitreDetails />}
             />
 
 

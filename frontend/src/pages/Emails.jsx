@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = "http://127.0.0.1:5000";
 
@@ -61,6 +62,8 @@ function resultClass(value) {
 ========================================================= */
 
 function Emails() {
+
+  const navigate = useNavigate();
 
   /* =======================================================
      STATE
@@ -387,7 +390,6 @@ function Emails() {
 
   /* =======================================================
      LOAD AUTH + INDICATORS
-     AFTER EMAILS ARE LOADED
   ======================================================= */
 
   useEffect(() => {
@@ -411,6 +413,17 @@ function Emails() {
     }
 
   }, [loading, emails]);
+
+
+  /* =======================================================
+     OPEN EMAIL DETAILS
+  ======================================================= */
+
+  const openEmailDetails = (emailId) => {
+
+    navigate(`/emails/${emailId}`);
+
+  };
 
 
   /* =======================================================
@@ -614,8 +627,6 @@ function Emails() {
       <div className="stats-grid">
 
 
-        {/* EMAILS */}
-
         <div className="stat-card">
 
           <div className="stat-icon">
@@ -636,8 +647,6 @@ function Emails() {
 
         </div>
 
-
-        {/* SUSPICIOUS */}
 
         <div className="stat-card">
 
@@ -668,8 +677,6 @@ function Emails() {
         </div>
 
 
-        {/* AUTH FAILURES */}
-
         <div className="stat-card">
 
           <div className="stat-icon">
@@ -690,8 +697,6 @@ function Emails() {
 
         </div>
 
-
-        {/* INDICATORS */}
 
         <div className="stat-card">
 
@@ -750,8 +755,32 @@ function Emails() {
           return (
 
             <div
-              className="card-dark"
+              className="card-dark email-clickable-card"
               key={email.id}
+
+              onClick={() =>
+                openEmailDetails(email.id)
+              }
+
+              onKeyDown={(event) => {
+
+                if (
+                  event.key === "Enter" ||
+                  event.key === " "
+                ) {
+
+                  event.preventDefault();
+
+                  openEmailDetails(email.id);
+
+                }
+
+              }}
+
+              role="button"
+              tabIndex={0}
+
+              title="Open email details"
             >
 
 
@@ -1009,13 +1038,8 @@ function Emails() {
 
                   <>
 
-
-                    {/* AUTH RESULTS */}
-
                     <div className="auth-grid">
 
-
-                      {/* SPF */}
 
                       <div className="auth-card">
 
@@ -1040,8 +1064,6 @@ function Emails() {
                       </div>
 
 
-                      {/* DKIM */}
-
                       <div className="auth-card">
 
                         <div className="auth-name">
@@ -1064,8 +1086,6 @@ function Emails() {
 
                       </div>
 
-
-                      {/* DMARC */}
 
                       <div className="auth-card">
 
@@ -1091,8 +1111,6 @@ function Emails() {
 
                     </div>
 
-
-                    {/* AUTH DETAILS */}
 
                     <div className="email-card">
 
@@ -1222,8 +1240,6 @@ function Emails() {
                     </div>
 
 
-                    {/* ANALYSIS */}
-
                     <div className="email-analysis">
 
                       <div className="section-header">
@@ -1325,9 +1341,6 @@ function Emails() {
                           key={indicator.id}
                         >
 
-
-                          {/* INDICATOR INFO */}
-
                           <div className="case-list-main">
 
                             <div className="case-number">
@@ -1340,17 +1353,13 @@ function Emails() {
 
 
                             <h3>
-
                               {indicator.value}
-
                             </h3>
 
 
                             <p>
-
                               {indicator.notes ||
                                 "No additional notes available."}
-
                             </p>
 
 
@@ -1378,13 +1387,9 @@ function Emails() {
                           </div>
 
 
-                          {/* INDICATOR STATUS */}
-
                           <div className="case-list-status">
 
-                            <span
-                              className="severity"
-                            >
+                            <span className="severity">
 
                               {formatResult(
                                 indicator.confidence
@@ -1441,7 +1446,6 @@ function Emails() {
 
 
                   <div className="auth-grid">
-
 
                     <div className="auth-card">
 
