@@ -2622,3 +2622,117 @@ footer {
   outline: 2px solid #00d9ff;
   outline-offset: 2px;
 }
+
+/* =========================================================
+   FINDINGS - CLICKABLE CARDS
+========================================================= */
+
+.finding-clickable {
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.finding-clickable:hover {
+  transform: translateY(-2px);
+
+  border-color: #00d9ff;
+
+  box-shadow:
+    0 8px 25px rgba(0, 217, 255, 0.08);
+}
+
+.finding-clickable:focus-visible {
+  outline: 2px solid #00d9ff;
+
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   FINDING ARROW
+========================================================= */
+
+.finding-arrow {
+  margin-left: auto;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 36px;
+
+  height: 36px;
+
+  border-radius: 50%;
+
+  color: #00d9ff;
+
+  font-size: 20px;
+
+  opacity: 0.6;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.finding-clickable:hover .finding-arrow {
+  opacity: 1;
+
+  transform: translateX(4px);
+}
+
+/* =========================================================
+   THREAT INTELLIGENCE - CLICKABLE RESULTS
+========================================================= */
+
+.threat-clickable-row {
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.threat-clickable-row:hover {
+  background-color: rgba(0, 217, 255, 0.05);
+}
+
+.threat-clickable-row:focus-visible {
+  outline: 2px solid #00d9ff;
+  outline-offset: -2px;
+}
+
+
+/* =========================================================
+   THREAT INTELLIGENCE - ANALYSIS CARDS
+========================================================= */
+
+.threat-clickable-card {
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.threat-clickable-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #00d9ff;
+
+  box-shadow:
+    0 8px 25px rgba(0, 217, 255, 0.08);
+}
+
+.threat-clickable-card:focus-visible {
+  outline: 2px solid #00d9ff;
+  outline-offset: 2px;
+}

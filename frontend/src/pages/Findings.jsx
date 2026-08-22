@@ -9,6 +9,7 @@ const API_BASE = "http://127.0.0.1:5000";
 // =====================================================
 
 function upper(value) {
+
   if (!value) {
     return "N/A";
   }
@@ -16,6 +17,7 @@ function upper(value) {
   return String(value)
     .replaceAll("_", " ")
     .toUpperCase();
+
 }
 
 
@@ -28,7 +30,9 @@ function Findings() {
   const navigate = useNavigate();
 
   const [findings, setFindings] = useState([]);
+
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
 
 
@@ -41,6 +45,7 @@ function Findings() {
     try {
 
       setLoading(true);
+
       setError("");
 
       const response = await fetch(
@@ -184,7 +189,6 @@ function Findings() {
       </div>
 
 
-
       {/* =================================================
           ERROR
       ================================================= */}
@@ -204,7 +208,6 @@ function Findings() {
         </div>
 
       )}
-
 
 
       {/* =================================================
@@ -240,7 +243,6 @@ function Findings() {
         </div>
 
 
-
         {/* =================================================
             EMPTY STATE
         ================================================= */}
@@ -273,19 +275,27 @@ function Findings() {
             {findings.map((finding) => (
 
               <div
-                className="finding"
+                className="finding finding-clickable"
                 key={finding.id}
+
                 onClick={() =>
                   viewFinding(finding.id)
                 }
+
                 role="button"
+
                 tabIndex={0}
+
+                title="Open finding details"
+
                 onKeyDown={(event) => {
 
                   if (
                     event.key === "Enter" ||
                     event.key === " "
                   ) {
+
+                    event.preventDefault();
 
                     viewFinding(
                       finding.id
@@ -306,7 +316,6 @@ function Findings() {
                 </div>
 
 
-
                 {/* =========================================
                     FINDING CONTENT
                 ========================================= */}
@@ -315,7 +324,8 @@ function Findings() {
 
 
                   <h5>
-                    {finding.title}
+                    {finding.title ||
+                      `Finding #${finding.id}`}
                   </h5>
 
 
@@ -323,7 +333,6 @@ function Findings() {
                     {finding.description ||
                       "No description available."}
                   </p>
-
 
 
                   {/* =======================================
@@ -369,6 +378,17 @@ function Findings() {
                 </div>
 
 
+                {/* =========================================
+                    VIEW INDICATOR
+                ========================================= */}
+
+                <div className="finding-arrow">
+
+                  →
+
+                </div>
+
+
               </div>
 
             ))}
@@ -379,7 +399,6 @@ function Findings() {
         )}
 
       </div>
-
 
 
       {/* =================================================

@@ -3,7 +3,13 @@ import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = "http://127.0.0.1:5000";
 
+
+// =====================================================
+// FORMAT DATE
+// =====================================================
+
 function formatDate(value) {
+
   if (!value) {
     return "N/A";
   }
@@ -15,9 +21,16 @@ function formatDate(value) {
   }
 
   return date.toLocaleString();
+
 }
 
+
+// =====================================================
+// FORMAT TEXT
+// =====================================================
+
 function upper(value) {
+
   if (!value) {
     return "N/A";
   }
@@ -25,7 +38,13 @@ function upper(value) {
   return String(value)
     .replaceAll("_", " ")
     .toUpperCase();
+
 }
+
+
+// =====================================================
+// THREAT INTELLIGENCE COMPONENT
+// =====================================================
 
 function ThreatIntelligence() {
 
@@ -117,6 +136,29 @@ function ThreatIntelligence() {
     navigate(
       `/threat-intelligence/${resultId}`
     );
+
+  };
+
+
+  // =====================================================
+  // KEYBOARD NAVIGATION
+  // =====================================================
+
+  const handleResultKeyDown = (
+    event,
+    resultId
+  ) => {
+
+    if (
+      event.key === "Enter" ||
+      event.key === " "
+    ) {
+
+      event.preventDefault();
+
+      viewResult(resultId);
+
+    }
 
   };
 
@@ -432,24 +474,24 @@ function ThreatIntelligence() {
 
                   <tr
                     key={result.id}
-                    className="threat-table-row"
+
+                    className="threat-table-row threat-clickable-row"
+
                     onClick={() =>
                       viewResult(result.id)
                     }
-                    onKeyDown={(event) => {
 
-                      if (
-                        event.key === "Enter" ||
-                        event.key === " "
-                      ) {
+                    onKeyDown={(event) =>
+                      handleResultKeyDown(
+                        event,
+                        result.id
+                      )
+                    }
 
-                        viewResult(result.id);
-
-                      }
-
-                    }}
                     role="button"
+
                     tabIndex={0}
+
                     title="View threat intelligence details"
                   >
 
@@ -574,25 +616,25 @@ function ThreatIntelligence() {
             {results.map((result) => (
 
               <div
-                className="finding threat-analysis-card"
+                className="finding threat-analysis-card threat-clickable-card"
+
                 key={`analysis-${result.id}`}
+
                 onClick={() =>
                   viewResult(result.id)
                 }
-                onKeyDown={(event) => {
 
-                  if (
-                    event.key === "Enter" ||
-                    event.key === " "
-                  ) {
+                onKeyDown={(event) =>
+                  handleResultKeyDown(
+                    event,
+                    result.id
+                  )
+                }
 
-                    viewResult(result.id);
-
-                  }
-
-                }}
                 role="button"
+
                 tabIndex={0}
+
                 title="View threat intelligence details"
               >
 
@@ -607,7 +649,9 @@ function ThreatIntelligence() {
                       : ""
                   }`}
                 >
+
                   !
+
                 </div>
 
 
@@ -710,6 +754,15 @@ function ThreatIntelligence() {
                     </small>
 
                   )}
+
+                </div>
+
+
+                {/* VIEW ARROW */}
+
+                <div className="finding-arrow">
+
+                  →
 
                 </div>
 
