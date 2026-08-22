@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
+// =====================================================
+// STAT CARD
+// =====================================================
+
 function StatCard({
   label,
   value,
@@ -75,6 +79,10 @@ function StatCard({
 }
 
 
+// =====================================================
+// DASHBOARD
+// =====================================================
+
 function Dashboard() {
 
   const navigate = useNavigate();
@@ -93,9 +101,9 @@ function Dashboard() {
   const CASE_ID = 1;
 
 
-  /* =================================================
-     LOAD CASE SUMMARY
-  ================================================= */
+  // ===================================================
+  // LOAD CASE SUMMARY
+  // ===================================================
 
   useEffect(() => {
 
@@ -151,9 +159,9 @@ function Dashboard() {
   }, []);
 
 
-  /* =================================================
-     LOADING
-  ================================================= */
+  // ===================================================
+  // LOADING
+  // ===================================================
 
   if (loading) {
 
@@ -182,9 +190,9 @@ function Dashboard() {
   }
 
 
-  /* =================================================
-     ERROR
-  ================================================= */
+  // ===================================================
+  // ERROR
+  // ===================================================
 
   if (error) {
 
@@ -229,9 +237,9 @@ function Dashboard() {
   }
 
 
-  /* =================================================
-     SAFETY CHECK
-  ================================================= */
+  // ===================================================
+  // SAFETY CHECK
+  // ===================================================
 
   if (
     !data ||
@@ -263,9 +271,9 @@ function Dashboard() {
   }
 
 
-  /* =================================================
-     DATA
-  ================================================= */
+  // ===================================================
+  // DATA
+  // ===================================================
 
   const caseData =
     data.case;
@@ -303,9 +311,9 @@ function Dashboard() {
     data.mitre_mappings || [];
 
 
-  /* =================================================
-     THREAT INTELLIGENCE HELPERS
-  ================================================= */
+  // ===================================================
+  // THREAT INTELLIGENCE HELPERS
+  // ===================================================
 
   const getThreatIndicator = (
     result
@@ -334,9 +342,9 @@ function Dashboard() {
   };
 
 
-  /* =================================================
-     CALCULATIONS
-  ================================================= */
+  // ===================================================
+  // CALCULATIONS
+  // ===================================================
 
   const maliciousThreatIntel =
     threatIntel.filter(
@@ -398,9 +406,9 @@ function Dashboard() {
     );
 
 
-  /* =================================================
-     RISK LEVEL
-  ================================================= */
+  // ===================================================
+  // RISK LEVEL
+  // ===================================================
 
   const riskLevel =
     String(
@@ -409,9 +417,9 @@ function Dashboard() {
     ).toUpperCase();
 
 
-  /* =================================================
-     PAGE
-  ================================================= */
+  // ===================================================
+  // PAGE
+  // ===================================================
 
   return (
 
@@ -747,8 +755,43 @@ function Dashboard() {
                   (finding) => (
 
                     <div
-                      className="finding"
+                      className="finding dashboard-item-clickable"
                       key={finding.id}
+
+                      onClick={(event) => {
+
+                        event.stopPropagation();
+
+                        navigate(
+                          `/findings/${finding.id}`
+                        );
+
+                      }}
+
+                      role="button"
+
+                      tabIndex={0}
+
+                      onKeyDown={(event) => {
+
+                        if (
+                          event.key === "Enter" ||
+                          event.key === " "
+                        ) {
+
+                          event.preventDefault();
+
+                          event.stopPropagation();
+
+                          navigate(
+                            `/findings/${finding.id}`
+                          );
+
+                        }
+
+                      }}
+
+                      title="Open finding details"
                     >
 
                       <div className="finding-indicator">
@@ -798,6 +841,11 @@ function Dashboard() {
 
                         </div>
 
+                      </div>
+
+
+                      <div className="dashboard-item-arrow">
+                        →
                       </div>
 
                     </div>
@@ -912,8 +960,43 @@ function Dashboard() {
                   (result) => (
 
                     <div
-                      className="finding"
+                      className="finding dashboard-item-clickable"
                       key={result.id}
+
+                      onClick={(event) => {
+
+                        event.stopPropagation();
+
+                        navigate(
+                          `/threat-intelligence/${result.id}`
+                        );
+
+                      }}
+
+                      role="button"
+
+                      tabIndex={0}
+
+                      onKeyDown={(event) => {
+
+                        if (
+                          event.key === "Enter" ||
+                          event.key === " "
+                        ) {
+
+                          event.preventDefault();
+
+                          event.stopPropagation();
+
+                          navigate(
+                            `/threat-intelligence/${result.id}`
+                          );
+
+                        }
+
+                      }}
+
+                      title="Open threat intelligence details"
                     >
 
                       <div className="finding-indicator">
@@ -984,6 +1067,11 @@ function Dashboard() {
 
                       </div>
 
+
+                      <div className="dashboard-item-arrow">
+                        →
+                      </div>
+
                     </div>
 
                   )
@@ -1047,8 +1135,43 @@ function Dashboard() {
                 (action) => (
 
                   <div
-                    className="containment"
+                    className="containment dashboard-item-clickable"
                     key={action.id}
+
+                    onClick={(event) => {
+
+                      event.stopPropagation();
+
+                      navigate(
+                        "/containment-actions"
+                      );
+
+                    }}
+
+                    role="button"
+
+                    tabIndex={0}
+
+                    onKeyDown={(event) => {
+
+                      if (
+                        event.key === "Enter" ||
+                        event.key === " "
+                      ) {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+                        navigate(
+                          "/containment-actions"
+                        );
+
+                      }
+
+                    }}
+
+                    title="Open containment actions"
                   >
 
                     <div className="containment-icon">
@@ -1107,6 +1230,11 @@ function Dashboard() {
                         "pending"
                       ).toUpperCase()}
 
+                    </div>
+
+
+                    <div className="dashboard-item-arrow">
+                      →
                     </div>
 
                   </div>
@@ -1236,9 +1364,7 @@ function Dashboard() {
               AFFECTED USERS
           ================================================= */}
 
-          <div
-            className="card-dark"
-          >
+          <div className="card-dark">
 
             <div className="section-header">
 
@@ -1303,8 +1429,37 @@ function Dashboard() {
                   (user) => (
 
                     <div
-                      className="finding"
+                      className="finding dashboard-item-clickable"
                       key={user.id}
+
+                      onClick={() =>
+                        navigate(
+                          "/affected-users"
+                        )
+                      }
+
+                      role="button"
+
+                      tabIndex={0}
+
+                      onKeyDown={(event) => {
+
+                        if (
+                          event.key === "Enter" ||
+                          event.key === " "
+                        ) {
+
+                          event.preventDefault();
+
+                          navigate(
+                            "/affected-users"
+                          );
+
+                        }
+
+                      }}
+
+                      title="Manage affected users"
                     >
 
                       <div className="finding-indicator">
@@ -1353,6 +1508,11 @@ function Dashboard() {
 
                         </div>
 
+                      </div>
+
+
+                      <div className="dashboard-item-arrow">
+                        →
                       </div>
 
                     </div>
@@ -1424,8 +1584,43 @@ function Dashboard() {
                   (mapping) => (
 
                     <div
-                      className="mitre-card"
+                      className="mitre-card dashboard-item-clickable"
                       key={mapping.id}
+
+                      onClick={(event) => {
+
+                        event.stopPropagation();
+
+                        navigate(
+                          `/mitre/${mapping.id}`
+                        );
+
+                      }}
+
+                      role="button"
+
+                      tabIndex={0}
+
+                      onKeyDown={(event) => {
+
+                        if (
+                          event.key === "Enter" ||
+                          event.key === " "
+                        ) {
+
+                          event.preventDefault();
+
+                          event.stopPropagation();
+
+                          navigate(
+                            `/mitre/${mapping.id}`
+                          );
+
+                        }
+
+                      }}
+
+                      title="Open MITRE mapping details"
                     >
 
                       <div className="technique-id">
@@ -1479,6 +1674,11 @@ function Dashboard() {
 
                         )}
 
+                      </div>
+
+
+                      <div className="dashboard-item-arrow">
+                        →
                       </div>
 
                     </div>

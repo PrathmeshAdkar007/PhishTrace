@@ -2736,3 +2736,66 @@ footer {
   outline: 2px solid #00d9ff;
   outline-offset: 2px;
 }
+
+/* =========================================================
+   DASHBOARD INDIVIDUAL ITEMS
+========================================================= */
+
+.dashboard-item-clickable {
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.dashboard-item-clickable:hover {
+  transform: translateY(-2px);
+
+  border-color: #00d9ff;
+
+  box-shadow:
+    0 8px 25px rgba(0, 217, 255, 0.08);
+}
+
+.dashboard-item-clickable:focus-visible {
+  outline: 2px solid #00d9ff;
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   DASHBOARD ITEM ARROW
+========================================================= */
+
+.dashboard-item-arrow {
+  margin-left: auto;
+
+  min-width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  color: #00d9ff;
+
+  font-size: 20px;
+
+  opacity: 0.55;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.dashboard-item-clickable:hover
+.dashboard-item-arrow {
+  opacity: 1;
+
+  transform: translateX(4px);
+}
