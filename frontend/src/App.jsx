@@ -33,6 +33,9 @@ import Login from "./pages/login";
 import "./App.css";
 
 
+const API_BASE = "http://localhost:5000";
+
+
 function App() {
 
   const [user, setUser] = useState(null);
@@ -50,13 +53,15 @@ function App() {
       try {
 
         const response = await fetch(
-          "http://127.0.0.1:5000/api/auth/me",
+          `${API_BASE}/api/auth/me`,
           {
             credentials: "include",
           }
         );
 
+
         const data = await response.json();
+
 
         if (data.authenticated) {
 
@@ -68,6 +73,7 @@ function App() {
 
         }
 
+
       } catch (error) {
 
         console.error(
@@ -76,6 +82,7 @@ function App() {
         );
 
         setUser(null);
+
 
       } finally {
 
@@ -126,7 +133,9 @@ function App() {
 
       <Login
         onLogin={(loggedInUser) => {
+
           setUser(loggedInUser);
+
         }}
       />
 
@@ -151,13 +160,23 @@ function App() {
 
     try {
 
-      await fetch(
-        "http://127.0.0.1:5000/api/auth/logout",
+      const response = await fetch(
+        `${API_BASE}/api/auth/logout`,
         {
           method: "POST",
           credentials: "include",
         }
       );
+
+
+      if (!response.ok) {
+
+        console.error(
+          "Logout request failed:",
+          response.status
+        );
+
+      }
 
     } catch (error) {
 
@@ -168,6 +187,7 @@ function App() {
 
     } finally {
 
+      // Always clear frontend authentication state
       setUser(null);
 
     }
@@ -367,6 +387,7 @@ function App() {
 
             </NavLink>
 
+
           </nav>
 
 
@@ -404,6 +425,7 @@ function App() {
             </button>
 
           </div>
+
 
         </aside>
 
@@ -561,9 +583,11 @@ function App() {
               }
             />
 
+
           </Routes>
 
         </main>
+
 
       </div>
 

@@ -6,6 +6,7 @@ from app import db
 from app.models.case import Case
 from app.models.affected_user import AffectedUser
 from app.models.containment_action import ContainmentAction
+from app.routes.auth import login_required
 
 
 containment_actions = Blueprint(
@@ -21,6 +22,7 @@ containment_actions = Blueprint(
 @containment_actions.post(
     "/api/cases/<int:case_id>/containment-actions"
 )
+@login_required
 def create_containment_action(case_id):
 
     case = db.session.get(
@@ -33,34 +35,64 @@ def create_containment_action(case_id):
             "error": "Case not found"
         }), 404
 
-    data = request.get_json()
+
+    data = request.get_json(
+        silent=True
+    ) or {}
+
 
     if not data:
         return jsonify({
             "error": "Request body must be JSON"
         }), 400
 
-    if not data.get("action_type"):
+
+    action_type = str(
+        data.get("action_type", "")
+    ).strip()
+
+
+    if not action_type:
         return jsonify({
             "error": "action_type is required"
         }), 400
+
 
     affected_user_id = data.get(
         "affected_user_id"
     )
 
-    # -----------------------------------------------------
-    # Validate affected user
-    # -----------------------------------------------------
+
+    # =====================================================
+    # VALIDATE AFFECTED USER
+    # =====================================================
 
     if affected_user_id:
+
+        try:
+
+            affected_user_id = int(
+                affected_user_id
+            )
+
+        except (TypeError, ValueError):
+
+            return jsonify({
+                "error":
+                    "affected_user_id must be a valid integer"
+            }), 400
+
 
         user = db.session.get(
             AffectedUser,
             affected_user_id
         )
 
-        if not user or user.case_id != case_id:
+
+        if (
+            not user
+            or user.case_id != case_id
+        ):
 
             return jsonify({
                 "error": (
@@ -69,9 +101,38 @@ def create_containment_action(case_id):
                 )
             }), 400
 
-    # -----------------------------------------------------
-    # Create action
-    # -----------------------------------------------------
+
+    # =====================================================
+    # VALIDATE STATUS
+    # =====================================================
+
+    status = str(
+        data.get(
+            "status",
+            "pending"
+        )
+    ).lower().strip()
+
+
+    allowed_statuses = [
+        "pending",
+        "in_progress",
+        "completed",
+        "failed"
+    ]
+
+
+    if status not in allowed_statuses:
+
+        return jsonify({
+            "error":
+                "Invalid containment action status"
+        }), 400
+
+
+    # =====================================================
+    # CREATE ACTION
+    # =====================================================
 
     action = ContainmentAction(
 
@@ -79,14 +140,13 @@ def create_containment_action(case_id):
 
         affected_user_id=affected_user_id,
 
-        action_type=data["action_type"],
+        action_type=action_type,
 
-        target=data.get("target"),
-
-        status=data.get(
-            "status",
-            "pending"
+        target=data.get(
+            "target"
         ),
+
+        status=status,
 
         performed_by=data.get(
             "performed_by"
@@ -94,16 +154,22 @@ def create_containment_action(case_id):
 
         performed_at=(
             datetime.utcnow()
-            if data.get("status") == "completed"
+            if status == "completed"
             else None
         ),
 
-        notes=data.get("notes")
+        notes=data.get(
+            "notes"
+        )
+
     )
+
 
     try:
 
-        db.session.add(action)
+        db.session.add(
+            action
+        )
 
         db.session.commit()
 
@@ -117,18 +183,18 @@ def create_containment_action(case_id):
         )
 
         return jsonify({
-            "error": (
+            "error":
                 "Failed to create containment action"
-            )
         }), 500
+
 
     return jsonify({
 
-        "message": (
-            "Containment action created successfully"
-        ),
+        "message":
+            "Containment action created successfully",
 
-        "containment_action": action.to_dict()
+        "containment_action":
+            action.to_dict()
 
     }), 201
 
@@ -140,6 +206,7 @@ def create_containment_action(case_id):
 @containment_actions.get(
     "/api/cases/<int:case_id>/containment-actions"
 )
+@login_required
 def get_containment_actions(case_id):
 
     case = db.session.get(
@@ -147,10 +214,13 @@ def get_containment_actions(case_id):
         case_id
     )
 
+
     if not case:
+
         return jsonify({
             "error": "Case not found"
         }), 404
+
 
     actions = ContainmentAction.query.filter_by(
         case_id=case_id
@@ -158,15 +228,21 @@ def get_containment_actions(case_id):
         ContainmentAction.created_at.desc()
     ).all()
 
+
     return jsonify({
 
-        "case_id": case_id,
+        "case_id":
+            case_id,
 
-        "count": len(actions),
+        "count":
+            len(actions),
 
         "containment_actions": [
+
             action.to_dict()
+
             for action in actions
+
         ]
 
     })
@@ -179,6 +255,7 @@ def get_containment_actions(case_id):
 @containment_actions.get(
     "/api/containment-actions/<int:action_id>"
 )
+@login_required
 def get_containment_action(action_id):
 
     action = db.session.get(
@@ -186,16 +263,19 @@ def get_containment_action(action_id):
         action_id
     )
 
+
     if not action:
+
         return jsonify({
-            "error": "Containment action not found"
+            "error":
+                "Containment action not found"
         }), 404
+
 
     return jsonify({
 
-        "containment_action": (
+        "containment_action":
             action.to_dict()
-        )
 
     })
 
@@ -207,6 +287,7 @@ def get_containment_action(action_id):
 @containment_actions.put(
     "/api/containment-actions/<int:action_id>"
 )
+@login_required
 def update_containment_action(action_id):
 
     action = db.session.get(
@@ -214,53 +295,92 @@ def update_containment_action(action_id):
         action_id
     )
 
+
     if not action:
+
         return jsonify({
-            "error": "Containment action not found"
+            "error":
+                "Containment action not found"
         }), 404
 
-    data = request.get_json()
+
+    data = request.get_json(
+        silent=True
+    ) or {}
+
 
     if not data:
+
         return jsonify({
-            "error": "Request body must be JSON"
+            "error":
+                "Request body must be JSON"
         }), 400
 
-    # -----------------------------------------------------
-    # Update action type
-    # -----------------------------------------------------
+
+    # =====================================================
+    # ACTION TYPE
+    # =====================================================
 
     if "action_type" in data:
 
-        if not data["action_type"]:
+        action_type = str(
+            data["action_type"]
+        ).strip()
+
+
+        if not action_type:
 
             return jsonify({
-                "error": "action_type cannot be empty"
+                "error":
+                    "action_type cannot be empty"
             }), 400
 
-        action.action_type = (
-            data["action_type"]
-        )
+
+        action.action_type = action_type
 
 
-    # -----------------------------------------------------
-    # Update target
-    # -----------------------------------------------------
+    # =====================================================
+    # TARGET
+    # =====================================================
 
     if "target" in data:
 
-        action.target = data["target"]
+        action.target = data[
+            "target"
+        ]
 
 
-    # -----------------------------------------------------
-    # Update status
-    # -----------------------------------------------------
+    # =====================================================
+    # STATUS
+    # =====================================================
 
     if "status" in data:
 
-        action.status = data["status"]
+        status = str(
+            data["status"]
+        ).lower().strip()
 
-        if data["status"] == "completed":
+
+        allowed_statuses = [
+            "pending",
+            "in_progress",
+            "completed",
+            "failed"
+        ]
+
+
+        if status not in allowed_statuses:
+
+            return jsonify({
+                "error":
+                    "Invalid containment action status"
+            }), 400
+
+
+        action.status = status
+
+
+        if status == "completed":
 
             action.performed_at = (
                 datetime.utcnow()
@@ -271,9 +391,9 @@ def update_containment_action(action_id):
             action.performed_at = None
 
 
-    # -----------------------------------------------------
-    # Update performed by
-    # -----------------------------------------------------
+    # =====================================================
+    # PERFORMED BY
+    # =====================================================
 
     if "performed_by" in data:
 
@@ -282,18 +402,20 @@ def update_containment_action(action_id):
         )
 
 
-    # -----------------------------------------------------
-    # Update notes
-    # -----------------------------------------------------
+    # =====================================================
+    # NOTES
+    # =====================================================
 
     if "notes" in data:
 
-        action.notes = data["notes"]
+        action.notes = data[
+            "notes"
+        ]
 
 
-    # -----------------------------------------------------
-    # Save changes
-    # -----------------------------------------------------
+    # =====================================================
+    # SAVE
+    # =====================================================
 
     try:
 
@@ -309,20 +431,18 @@ def update_containment_action(action_id):
         )
 
         return jsonify({
-            "error": (
+            "error":
                 "Failed to update containment action"
-            )
         }), 500
+
 
     return jsonify({
 
-        "message": (
-            "Containment action updated successfully"
-        ),
+        "message":
+            "Containment action updated successfully",
 
-        "containment_action": (
+        "containment_action":
             action.to_dict()
-        )
 
     })
 
@@ -334,6 +454,7 @@ def update_containment_action(action_id):
 @containment_actions.delete(
     "/api/containment-actions/<int:action_id>"
 )
+@login_required
 def delete_containment_action(action_id):
 
     action = db.session.get(
@@ -341,14 +462,20 @@ def delete_containment_action(action_id):
         action_id
     )
 
+
     if not action:
+
         return jsonify({
-            "error": "Containment action not found"
+            "error":
+                "Containment action not found"
         }), 404
+
 
     try:
 
-        db.session.delete(action)
+        db.session.delete(
+            action
+        )
 
         db.session.commit()
 
@@ -362,15 +489,14 @@ def delete_containment_action(action_id):
         )
 
         return jsonify({
-            "error": (
+            "error":
                 "Failed to delete containment action"
-            )
         }), 500
+
 
     return jsonify({
 
-        "message": (
+        "message":
             "Containment action deleted successfully"
-        )
 
     })

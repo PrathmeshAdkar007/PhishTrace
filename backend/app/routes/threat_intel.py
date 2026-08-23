@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify
 from app import db
 from app.models.indicator import Indicator
 from app.models.threat_intel_result import ThreatIntelResult
+from app.routes.auth import login_required
 
 
 threat_intel = Blueprint(
@@ -27,13 +28,16 @@ def analyze_indicator(indicator):
 
     value = indicator.value.lower()
 
+
     suspicious_domains = [
         "micr0soft-support.com",
         "micros0ft-support.com",
         "microsoft-security-alert.com"
     ]
 
+
     suspicious = False
+
 
     reason = (
         "No obvious threat indicators detected."
@@ -141,7 +145,10 @@ def analyze_indicator(indicator):
 @threat_intel.post(
     "/api/indicators/<int:indicator_id>/threat-intel"
 )
-def analyze_indicator_threat_intel(indicator_id):
+@login_required
+def analyze_indicator_threat_intel(
+    indicator_id
+):
 
     indicator = db.session.get(
         Indicator,
@@ -198,15 +205,22 @@ def analyze_indicator_threat_intel(indicator_id):
 
         provider="local",
 
-        verdict=analysis["verdict"],
+        verdict=analysis[
+            "verdict"
+        ],
 
-        score=analysis["score"],
+        score=analysis[
+            "score"
+        ],
 
-        confidence=analysis["confidence"],
+        confidence=analysis[
+            "confidence"
+        ],
 
         raw_response={
 
-            "provider": "local",
+            "provider":
+                "local",
 
             "indicator":
                 indicator.value,
@@ -221,13 +235,29 @@ def analyze_indicator_threat_intel(indicator_id):
 
         checked_at=datetime.utcnow(),
 
-        notes=analysis["reason"]
+        notes=analysis[
+            "reason"
+        ]
+
     )
 
 
-    db.session.add(result)
+    try:
 
-    db.session.commit()
+        db.session.add(
+            result
+        )
+
+        db.session.commit()
+
+    except Exception:
+
+        db.session.rollback()
+
+        return jsonify({
+            "error":
+                "Failed to save threat intelligence result"
+        }), 500
 
 
     return jsonify({
@@ -248,7 +278,10 @@ def analyze_indicator_threat_intel(indicator_id):
 @threat_intel.get(
     "/api/indicators/<int:indicator_id>/threat-intel"
 )
-def get_indicator_threat_intel(indicator_id):
+@login_required
+def get_indicator_threat_intel(
+    indicator_id
+):
 
     indicator = db.session.get(
         Indicator,
@@ -296,6 +329,7 @@ def get_indicator_threat_intel(indicator_id):
 @threat_intel.get(
     "/api/threat-intelligence"
 )
+@login_required
 def get_all_threat_intelligence():
 
     results = ThreatIntelResult.query.order_by(

@@ -7,9 +7,13 @@ from app.models.email import Email
 from app.models.email_authentication import EmailAuthentication
 from app.models.indicator import Indicator
 from app.models.threat_intel_result import ThreatIntelResult
+from app.routes.auth import login_required
 
 
-findings = Blueprint("findings", __name__)
+findings = Blueprint(
+    "findings",
+    __name__
+)
 
 
 # =========================================================
@@ -17,6 +21,7 @@ findings = Blueprint("findings", __name__)
 # =========================================================
 
 @findings.get("/api/findings")
+@login_required
 def get_all_findings():
 
     findings_list = Finding.query.order_by(
@@ -36,7 +41,10 @@ def get_all_findings():
 # GET SINGLE FINDING
 # =========================================================
 
-@findings.get("/api/findings/<int:finding_id>")
+@findings.get(
+    "/api/findings/<int:finding_id>"
+)
+@login_required
 def get_finding(finding_id):
 
     finding = db.session.get(
@@ -58,7 +66,10 @@ def get_finding(finding_id):
 # GENERATE FINDINGS FOR A CASE
 # =========================================================
 
-@findings.post("/api/cases/<int:case_id>/generate-findings")
+@findings.post(
+    "/api/cases/<int:case_id>/generate-findings"
+)
+@login_required
 def generate_findings(case_id):
 
     case = db.session.get(
@@ -112,42 +123,71 @@ def generate_findings(case_id):
                 )
             ]
 
-            for check_name, result, description in authentication_checks:
+            for (
+                check_name,
+                result,
+                description
+            ) in authentication_checks:
 
-                if result and result.lower() == "fail":
+                if (
+                    result
+                    and result.lower() == "fail"
+                ):
 
                     existing = Finding.query.filter_by(
                         case_id=case_id,
                         finding_type="email_authentication",
-                        title=f"{check_name} authentication failure"
+                        title=(
+                            f"{check_name} "
+                            "authentication failure"
+                        )
                     ).first()
 
                     if existing:
                         continue
 
                     finding = Finding(
+
                         case_id=case_id,
-                        finding_type="email_authentication",
-                        title=f"{check_name} authentication failure",
+
+                        finding_type=(
+                            "email_authentication"
+                        ),
+
+                        title=(
+                            f"{check_name} "
+                            "authentication failure"
+                        ),
+
                         description=description,
+
                         severity="high",
+
                         confidence="high",
+
                         evidence={
                             "email_id": email.id,
                             "result": result
                         },
+
                         analyst_notes=(
-                            f"{check_name} returned a failure result "
-                            "during email authentication analysis."
+                            f"{check_name} returned a "
+                            "failure result during email "
+                            "authentication analysis."
                         )
+
                     )
 
-                    db.session.add(finding)
+                    db.session.add(
+                        finding
+                    )
+
                     db.session.flush()
 
                     created_findings.append(
                         finding.to_dict()
                     )
+
 
         # ==================================================
         # 2. THREAT INTELLIGENCE FINDINGS
@@ -170,52 +210,103 @@ def generate_findings(case_id):
                     existing = Finding.query.filter_by(
                         case_id=case_id,
                         finding_type="threat_intelligence",
-                        title=f"Malicious indicator: {indicator.value}"
+                        title=(
+                            f"Malicious indicator: "
+                            f"{indicator.value}"
+                        )
                     ).first()
 
                     if existing:
                         continue
 
                     finding = Finding(
+
                         case_id=case_id,
-                        finding_type="threat_intelligence",
-                        title=f"Malicious indicator: {indicator.value}",
-                        description=(
-                            f"The indicator {indicator.value} was classified "
-                            "as malicious by the threat intelligence analysis."
+
+                        finding_type=(
+                            "threat_intelligence"
                         ),
+
+                        title=(
+                            f"Malicious indicator: "
+                            f"{indicator.value}"
+                        ),
+
+                        description=(
+                            f"The indicator "
+                            f"{indicator.value} was "
+                            "classified as malicious by "
+                            "the threat intelligence "
+                            "analysis."
+                        ),
+
                         severity="critical",
-                        confidence=intel.confidence or "high",
+
+                        confidence=(
+                            intel.confidence
+                            or "high"
+                        ),
+
                         evidence={
-                            "email_id": email.id,
-                            "indicator_id": indicator.id,
-                            "indicator_type": indicator.indicator_type,
-                            "indicator_value": indicator.value,
-                            "provider": intel.provider,
-                            "verdict": intel.verdict,
+
+                            "email_id":
+                                email.id,
+
+                            "indicator_id":
+                                indicator.id,
+
+                            "indicator_type":
+                                indicator.indicator_type,
+
+                            "indicator_value":
+                                indicator.value,
+
+                            "provider":
+                                intel.provider,
+
+                            "verdict":
+                                intel.verdict,
+
                             "score": (
                                 float(intel.score)
                                 if intel.score is not None
                                 else None
                             )
+
                         },
+
                         analyst_notes=intel.notes
+
                     )
 
-                    db.session.add(finding)
+                    db.session.add(
+                        finding
+                    )
+
                     db.session.flush()
 
                     created_findings.append(
                         finding.to_dict()
                     )
 
+
     db.session.commit()
 
+
     return jsonify({
-        "message": "Findings generated successfully",
-        "case_id": case_id,
-        "count": len(created_findings),
-        "findings": created_findings
+
+        "message":
+            "Findings generated successfully",
+
+        "case_id":
+            case_id,
+
+        "count":
+            len(created_findings),
+
+        "findings":
+            created_findings
+
     }), 201
 
 
@@ -223,7 +314,10 @@ def generate_findings(case_id):
 # GET FINDINGS FOR A CASE
 # =========================================================
 
-@findings.get("/api/cases/<int:case_id>/findings")
+@findings.get(
+    "/api/cases/<int:case_id>/findings"
+)
+@login_required
 def get_case_findings(case_id):
 
     case = db.session.get(
@@ -232,9 +326,11 @@ def get_case_findings(case_id):
     )
 
     if not case:
+
         return jsonify({
             "error": "Case not found"
         }), 404
+
 
     findings_list = Finding.query.filter_by(
         case_id=case_id
@@ -242,11 +338,21 @@ def get_case_findings(case_id):
         Finding.created_at.desc()
     ).all()
 
+
     return jsonify({
-        "case_id": case_id,
-        "count": len(findings_list),
+
+        "case_id":
+            case_id,
+
+        "count":
+            len(findings_list),
+
         "findings": [
+
             finding.to_dict()
+
             for finding in findings_list
+
         ]
+
     })

@@ -14,13 +14,16 @@ function Login({ onLogin }) {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/api/auth/login",
+        "http://localhost:5000/api/auth/login",
         {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json",
           },
+
           credentials: "include",
+
           body: JSON.stringify({
             username,
             password,
@@ -31,16 +34,25 @@ function Login({ onLogin }) {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Login failed");
+        setError(
+          data.error || "Login failed"
+        );
+
         return;
       }
 
       onLogin(data.user);
 
     } catch (error) {
+      console.error(
+        "Login error:",
+        error
+      );
+
       setError(
         "Unable to connect to the PhishTrace backend."
       );
+
     } finally {
       setLoading(false);
     }
@@ -52,6 +64,7 @@ function Login({ onLogin }) {
       <div className="login-card">
 
         <div className="login-brand">
+
           <div className="brand-icon">
             P
           </div>
@@ -63,9 +76,12 @@ function Login({ onLogin }) {
           <p>
             Security Operations
           </p>
+
         </div>
 
+
         <div className="login-header">
+
           <h2>
             Analyst Login
           </h2>
@@ -73,15 +89,23 @@ function Login({ onLogin }) {
           <p>
             Sign in to access the SOC dashboard
           </p>
+
         </div>
 
+
         {error && (
+
           <div className="login-error">
+
             {error}
+
           </div>
+
         )}
 
+
         <form onSubmit={handleSubmit}>
+
 
           <div className="form-group">
 
@@ -97,9 +121,11 @@ function Login({ onLogin }) {
               }
               placeholder="Enter username"
               required
+              autoComplete="username"
             />
 
           </div>
+
 
           <div className="form-group">
 
@@ -115,16 +141,23 @@ function Login({ onLogin }) {
               }
               placeholder="Enter password"
               required
+              autoComplete="current-password"
             />
 
           </div>
+
 
           <button
             type="submit"
             disabled={loading}
           >
-            {loading ? "Signing in..." : "Sign In"}
+
+            {loading
+              ? "Signing in..."
+              : "Sign In"}
+
           </button>
+
 
         </form>
 

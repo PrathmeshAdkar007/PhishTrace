@@ -30,6 +30,11 @@ def create_app():
 
     app.config["SECRET_KEY"] = secret_key
 
+    # Session security
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    app.config["SESSION_COOKIE_SECURE"] = False
+
 
     # =========================
     # DATABASE CONFIGURATION
@@ -54,6 +59,10 @@ def create_app():
     db.init_app(app)
 
 
+    # =========================
+    # CORS
+    # =========================
+
     CORS(
         app,
         origins=[
@@ -72,9 +81,6 @@ def create_app():
     # =========================
     # IMPORT MODELS
     # =========================
-
-    # Import models so SQLAlchemy
-    # registers them.
 
     from app.models import (
         Case,
@@ -95,11 +101,8 @@ def create_app():
     # =========================
 
     from app.routes.health import health
-
     from app.routes.auth import auth
-
     from app.routes.cases import cases
-
     from app.routes.emails import emails
 
     from app.routes.email_authentication import (
@@ -113,7 +116,6 @@ def create_app():
     )
 
     from app.routes.findings import findings
-
     from app.routes.risk import risk
 
     from app.routes.affected_users import (
@@ -124,7 +126,6 @@ def create_app():
         containment_actions
     )
 
-    # NEW MITRE ROUTES
     from app.routes.mitre import mitre
 
     from app.routes.case_summary import (
@@ -140,62 +141,49 @@ def create_app():
         health
     )
 
-
     app.register_blueprint(
         auth
     )
-
 
     app.register_blueprint(
         cases
     )
 
-
     app.register_blueprint(
         emails
     )
-
 
     app.register_blueprint(
         email_authentication
     )
 
-
     app.register_blueprint(
         indicators
     )
-
 
     app.register_blueprint(
         threat_intel
     )
 
-
     app.register_blueprint(
         findings
     )
-
 
     app.register_blueprint(
         risk
     )
 
-
     app.register_blueprint(
         affected_users
     )
-
 
     app.register_blueprint(
         containment_actions
     )
 
-
-    # NEW MITRE BLUEPRINT
     app.register_blueprint(
         mitre
     )
-
 
     app.register_blueprint(
         case_summary
