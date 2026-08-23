@@ -254,6 +254,46 @@ The case summary brings the investigation together and provides information abou
 
 ---
 
+## Screenshots
+
+### Analyst Login
+
+![PhishTrace Login](screenshots/login.png)
+
+### SOC Dashboard
+
+![PhishTrace Dashboard](screenshots/dashboard.png)
+
+### Case Management
+
+![PhishTrace Cases](screenshots/cases-1.png)
+
+### Case Summary
+
+![PhishTrace Case Summary](screenshots/case-summary.png)
+
+### Email Investigation
+
+![PhishTrace Emails](screenshots/emails.png)
+
+### Security Findings
+
+![PhishTrace Findings](screenshots/findings.png)
+
+### Threat Intelligence
+
+![PhishTrace Threat Intelligence](screenshots/threat-intelligence-3.png)
+
+### Containment Actions
+
+![PhishTrace Containment](screenshots/containment-actions.png)
+
+### MITRE ATT&CK
+
+![PhishTrace MITRE ATT&CK](screenshots/mitre-attack-1.png)
+
+---
+
 ## System Architecture
 
 ```text
