@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "http://localhost:5000";
 
 
 // =====================================================
@@ -9,7 +9,6 @@ const API_BASE = "http://127.0.0.1:5000";
 // =====================================================
 
 function upper(value) {
-
   if (!value) {
     return "N/A";
   }
@@ -17,7 +16,6 @@ function upper(value) {
   return String(value)
     .replaceAll("_", " ")
     .toUpperCase();
-
 }
 
 
@@ -26,7 +24,6 @@ function upper(value) {
 // =====================================================
 
 function Findings() {
-
   const navigate = useNavigate();
 
   const [findings, setFindings] = useState([]);
@@ -41,28 +38,33 @@ function Findings() {
   // ===================================================
 
   const loadFindings = async () => {
-
     try {
-
       setLoading(true);
-
       setError("");
 
       const response = await fetch(
-        `${API_BASE}/api/findings`
+        `${API_BASE}/api/findings`,
+        {
+          method: "GET",
+
+          credentials: "include",
+
+          headers: {
+            Accept: "application/json",
+          },
+        }
       );
 
 
-      if (!response.ok) {
-
-        throw new Error(
-          `Failed to load findings (${response.status})`
-        );
-
-      }
-
-
       const data = await response.json();
+
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            `Failed to load findings (${response.status})`
+        );
+      }
 
 
       setFindings(
@@ -80,7 +82,7 @@ function Findings() {
 
       setError(
         err.message ||
-        "Failed to load findings."
+          "Failed to load findings."
       );
 
 
@@ -89,7 +91,6 @@ function Findings() {
       setLoading(false);
 
     }
-
   };
 
 
@@ -98,9 +99,7 @@ function Findings() {
   // ===================================================
 
   useEffect(() => {
-
     loadFindings();
-
   }, []);
 
 
@@ -109,11 +108,9 @@ function Findings() {
   // ===================================================
 
   const viewFinding = (findingId) => {
-
     navigate(
       `/findings/${findingId}`
     );
-
   };
 
 
@@ -122,9 +119,7 @@ function Findings() {
   // ===================================================
 
   if (loading) {
-
     return (
-
       <div className="loading-screen">
 
         <div>
@@ -145,9 +140,7 @@ function Findings() {
         </div>
 
       </div>
-
     );
-
   }
 
 
@@ -156,7 +149,6 @@ function Findings() {
   // ===================================================
 
   return (
-
     <div className="page">
 
 
@@ -173,7 +165,8 @@ function Findings() {
           </h2>
 
           <p>
-            Security findings identified during investigation
+            Security findings identified during
+            investigation
           </p>
 
         </div>
@@ -264,7 +257,6 @@ function Findings() {
 
         ) : (
 
-
           /* =================================================
              FINDINGS LIST
           ================================================= */
@@ -276,6 +268,7 @@ function Findings() {
 
               <div
                 className="finding finding-clickable"
+
                 key={finding.id}
 
                 onClick={() =>
@@ -419,9 +412,7 @@ function Findings() {
 
 
     </div>
-
   );
-
 }
 
 

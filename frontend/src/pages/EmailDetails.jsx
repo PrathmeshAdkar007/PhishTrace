@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "http://localhost:5000";
 
 
 function formatDate(value) {
@@ -99,7 +99,11 @@ function EmailDetails() {
       setError("");
 
       const response = await fetch(
-        `${API_BASE}/api/emails/${emailId}`
+        `${API_BASE}/api/emails/${emailId}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
       );
 
       const data = await response.json();
@@ -147,7 +151,11 @@ function EmailDetails() {
       setAuthLoading(true);
 
       const response = await fetch(
-        `${API_BASE}/api/emails/${emailId}/authentication`
+        `${API_BASE}/api/emails/${emailId}/authentication`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
       );
 
       const data = await response.json();
@@ -194,7 +202,11 @@ function EmailDetails() {
       setIndicatorLoading(true);
 
       const response = await fetch(
-        `${API_BASE}/api/emails/${emailId}/indicators`
+        `${API_BASE}/api/emails/${emailId}/indicators`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
       );
 
       const data = await response.json();
@@ -659,7 +671,6 @@ function EmailDetails() {
         ) : (
 
           <>
-
 
             <div className="auth-grid">
 

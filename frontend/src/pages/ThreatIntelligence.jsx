@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE_URL = "http://127.0.0.1:5000";
+const API_BASE_URL = "http://localhost:5000";
 
 
 // =====================================================
@@ -9,7 +9,6 @@ const API_BASE_URL = "http://127.0.0.1:5000";
 // =====================================================
 
 function formatDate(value) {
-
   if (!value) {
     return "N/A";
   }
@@ -21,7 +20,6 @@ function formatDate(value) {
   }
 
   return date.toLocaleString();
-
 }
 
 
@@ -30,7 +28,6 @@ function formatDate(value) {
 // =====================================================
 
 function upper(value) {
-
   if (!value) {
     return "N/A";
   }
@@ -38,7 +35,6 @@ function upper(value) {
   return String(value)
     .replaceAll("_", " ")
     .toUpperCase();
-
 }
 
 
@@ -71,7 +67,18 @@ function ThreatIntelligence() {
 
 
       const response = await fetch(
-        `${API_BASE_URL}/api/threat-intelligence`
+        `${API_BASE_URL}/api/threat-intelligence`,
+        {
+          method: "GET",
+
+          // IMPORTANT:
+          // Sends the Flask login session cookie.
+          credentials: "include",
+
+          headers: {
+            Accept: "application/json",
+          },
+        }
       );
 
 

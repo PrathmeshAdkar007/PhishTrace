@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "http://localhost:5000";
+
+
+// =========================================================
+// FORMAT DATE
+// =========================================================
 
 function formatDate(value) {
+
   if (!value) {
     return "N/A";
   }
@@ -17,63 +23,115 @@ function formatDate(value) {
   return date.toLocaleString();
 }
 
+
+// =========================================================
+// MITRE ATT&CK COMPONENT
+// =========================================================
+
 function MitreAttack() {
+
   const navigate = useNavigate();
 
   const [mappings, setMappings] = useState([]);
+
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
+
 
   // =========================================================
   // LOAD MITRE MAPPINGS
   // =========================================================
 
   useEffect(() => {
+
     const loadMitreMappings = async () => {
+
       try {
+
         setLoading(true);
+
         setError("");
 
+
         const response = await fetch(
-          `${API_BASE}/api/mitre`
+          `${API_BASE}/api/mitre`,
+          {
+            method: "GET",
+
+            // IMPORTANT:
+            // Sends the Flask authentication session cookie.
+            credentials: "include",
+
+            headers: {
+              Accept: "application/json",
+            },
+          }
         );
+
 
         const data = await response.json();
 
+
         if (!response.ok) {
+
           throw new Error(
             data.error ||
-              `Failed to load MITRE mappings (${response.status})`
+            `Failed to load MITRE mappings (${response.status})`
           );
+
         }
 
-        setMappings(data.mappings || []);
+
+        setMappings(
+          data.mappings || []
+        );
+
+
       } catch (err) {
+
         console.error(
           "MITRE ATT&CK API error:",
           err
         );
 
+
         setError(
           err.message ||
-            "Failed to load MITRE ATT&CK mappings."
+          "Failed to load MITRE ATT&CK mappings."
         );
+
+
       } finally {
+
         setLoading(false);
+
       }
+
     };
 
+
     loadMitreMappings();
+
   }, []);
+
 
   // =========================================================
   // LOADING
   // =========================================================
 
   if (loading) {
+
     return (
+
       <div className="loading-screen">
+
         <div>
+
+          <div className="brand-icon">
+            P
+          </div>
+
           <h2>
             Loading MITRE ATT&CK...
           </h2>
@@ -82,16 +140,23 @@ function MitreAttack() {
             Fetching technique mappings from the
             PhishTrace backend.
           </p>
+
         </div>
+
       </div>
+
     );
+
   }
+
 
   // =========================================================
   // CALCULATED VALUES
   // =========================================================
 
-  const mappingCount = mappings.length;
+  const mappingCount =
+    mappings.length;
+
 
   const techniques = [
     ...new Set(
@@ -104,6 +169,7 @@ function MitreAttack() {
     ),
   ];
 
+
   const tactics = [
     ...new Set(
       mappings
@@ -115,22 +181,27 @@ function MitreAttack() {
     ),
   ];
 
+
   const primaryTechnique =
     mappings.length > 0
       ? mappings[0].technique_id || "—"
       : "—";
+
 
   const primaryTactic =
     mappings.length > 0
       ? mappings[0].tactic || "—"
       : "—";
 
+
   // =========================================================
   // PAGE
   // =========================================================
 
   return (
+
     <div className="page">
+
 
       {/* =================================================
           TOP BAR
@@ -139,6 +210,7 @@ function MitreAttack() {
       <div className="topbar">
 
         <div>
+
           <h2>
             MITRE ATT&CK
           </h2>
@@ -147,11 +219,15 @@ function MitreAttack() {
             Attack technique mapping for the
             investigation
           </p>
+
         </div>
 
+
         <div className="case-badge">
+
           {mappingCount} TECHNIQUE
           {mappingCount !== 1 ? "S" : ""}
+
         </div>
 
       </div>
@@ -162,6 +238,7 @@ function MitreAttack() {
       ================================================= */}
 
       {error && (
+
         <div className="card-dark error-message">
 
           <strong>
@@ -173,6 +250,7 @@ function MitreAttack() {
           </p>
 
         </div>
+
       )}
 
 
@@ -181,6 +259,7 @@ function MitreAttack() {
       ================================================= */}
 
       <div className="stats-grid">
+
 
         {/* MAPPINGS */}
 
@@ -273,11 +352,14 @@ function MitreAttack() {
 
           </div>
 
+
           <small>
+
             {techniques.length} unique technique
             {techniques.length !== 1
               ? "s"
               : ""}
+
           </small>
 
         </div>
@@ -305,133 +387,173 @@ function MitreAttack() {
 
           <div className="mitre-grid">
 
-            {mappings.map((mapping) => (
+            {mappings.map(
+              (mapping) => (
 
-              <div
-                className="mitre-card clickable-card"
-                key={mapping.id}
-                onClick={() =>
-                  navigate(
-                    `/mitre/${mapping.id}`
-                  )
-                }
-                role="button"
-                tabIndex={0}
-                onKeyDown={(event) => {
-                  if (
-                    event.key === "Enter" ||
-                    event.key === " "
-                  ) {
+                <div
+                  className="mitre-card clickable-card"
+
+                  key={mapping.id}
+
+                  onClick={() =>
                     navigate(
                       `/mitre/${mapping.id}`
-                    );
+                    )
                   }
-                }}
-              >
 
-                {/* TECHNIQUE ID */}
+                  role="button"
 
-                <div className="technique-id">
-                  {mapping.technique_id ||
-                    "Unknown"}
-                </div>
+                  tabIndex={0}
 
+                  onKeyDown={(event) => {
 
-                {/* TECHNIQUE NAME */}
+                    if (
+                      event.key === "Enter" ||
+                      event.key === " "
+                    ) {
 
-                <h4>
-                  {mapping.technique_name ||
-                    "Unknown Technique"}
-                </h4>
+                      event.preventDefault();
 
+                      navigate(
+                        `/mitre/${mapping.id}`
+                      );
 
-                {/* TACTIC */}
+                    }
 
-                <div className="tactic">
-                  {mapping.tactic ||
-                    "Tactic not specified"}
-                </div>
+                  }}
+                >
 
 
-                {/* DESCRIPTION */}
+                  {/* TECHNIQUE ID */}
 
-                <p>
-                  {mapping.description ||
-                    "No technique description available."}
-                </p>
+                  <div className="technique-id">
 
-
-                {/* EVIDENCE */}
-
-                {mapping.evidence && (
-
-                  <div className="case-description">
-
-                    <span>
-                      Evidence
-                    </span>
-
-                    <p>
-                      {mapping.evidence}
-                    </p>
+                    {mapping.technique_id ||
+                      "Unknown"}
 
                   </div>
 
-                )}
+
+                  {/* TECHNIQUE NAME */}
+
+                  <h4>
+
+                    {mapping.technique_name ||
+                      "Unknown Technique"}
+
+                  </h4>
 
 
-                {/* TAGS */}
+                  {/* TACTIC */}
 
-                <div className="finding-tags">
+                  <div className="tactic">
 
-                  <span className="tag">
-                    {mapping.technique_id}
-                  </span>
+                    {mapping.tactic ||
+                      "Tactic not specified"}
 
-                  {mapping.tactic && (
+                  </div>
+
+
+                  {/* DESCRIPTION */}
+
+                  <p>
+
+                    {mapping.description ||
+                      "No technique description available."}
+
+                  </p>
+
+
+                  {/* EVIDENCE */}
+
+                  {mapping.evidence && (
+
+                    <div className="case-description">
+
+                      <span>
+                        Evidence
+                      </span>
+
+                      <p>
+                        {typeof mapping.evidence === "object"
+                          ? JSON.stringify(
+                              mapping.evidence
+                            )
+                          : mapping.evidence}
+                      </p>
+
+                    </div>
+
+                  )}
+
+
+                  {/* TAGS */}
+
+                  <div className="finding-tags">
 
                     <span className="tag">
-                      {mapping.tactic}
+
+                      {mapping.technique_id}
+
                     </span>
 
-                  )}
+
+                    {mapping.tactic && (
+
+                      <span className="tag">
+
+                        {mapping.tactic}
+
+                      </span>
+
+                    )}
+
+                  </div>
+
+
+                  {/* MAPPING INFORMATION */}
+
+                  <div className="case-list-meta">
+
+                    <span>
+
+                      Mapping ID: {mapping.id}
+
+                    </span>
+
+
+                    {mapping.finding_id && (
+
+                      <span>
+
+                        Finding ID:{" "}
+                        {mapping.finding_id}
+
+                      </span>
+
+                    )}
+
+
+                    {mapping.created_at && (
+
+                      <span>
+
+                        Created{" "}
+
+                        {formatDate(
+                          mapping.created_at
+                        )}
+
+                      </span>
+
+                    )}
+
+                  </div>
 
                 </div>
 
-
-                {/* MAPPING INFORMATION */}
-
-                <div className="case-list-meta">
-
-                  <span>
-                    Mapping ID: {mapping.id}
-                  </span>
-
-                  {mapping.finding_id && (
-
-                    <span>
-                      Finding ID:{" "}
-                      {mapping.finding_id}
-                    </span>
-
-                  )}
-
-                  {mapping.created_at && (
-
-                    <span>
-                      Created{" "}
-                      {formatDate(
-                        mapping.created_at
-                      )}
-                    </span>
-
-                  )}
-
-                </div>
-
-              </div>
-
-            ))}
+              )
+            )}
 
           </div>
 
@@ -467,6 +589,7 @@ function MitreAttack() {
 
 
           <div className="case-detail-grid">
+
 
             <div>
 
@@ -533,7 +656,9 @@ function MitreAttack() {
                   className="tag"
                   key={technique}
                 >
+
                   {technique}
+
                 </span>
 
               )
@@ -563,7 +688,10 @@ function MitreAttack() {
       </footer>
 
     </div>
+
   );
+
 }
+
 
 export default MitreAttack;

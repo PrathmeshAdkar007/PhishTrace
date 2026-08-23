@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const API_BASE_URL = "http://127.0.0.1:5000";
+const API_BASE_URL = "http://localhost:5000";
 
 function formatDate(value) {
   if (!value) {
@@ -28,112 +28,84 @@ function upper(value) {
 }
 
 function ThreatIntelligenceDetails() {
-
   const { resultId } = useParams();
 
   const navigate = useNavigate();
 
   const [result, setResult] = useState(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
 
-
   // =====================================================
-  // LOAD ALL RESULTS AND FIND REQUESTED RESULT
+  // LOAD THREAT INTELLIGENCE RESULT
   // =====================================================
 
   useEffect(() => {
-
     const loadResult = async () => {
-
       try {
-
         setLoading(true);
-
         setError("");
 
-
         const response = await fetch(
-          `${API_BASE_URL}/api/threat-intelligence`
+          `${API_BASE_URL}/api/threat-intelligence`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              Accept: "application/json",
+            },
+          }
         );
-
 
         const data = await response.json();
 
-
         if (!response.ok) {
-
           throw new Error(
             data.error ||
-            "Failed to load threat intelligence."
+              `Failed to load threat intelligence (${response.status})`
           );
-
         }
 
-
         const results = data.results || [];
-
 
         const selectedResult = results.find(
           (item) =>
             String(item.id) === String(resultId)
         );
 
-
         if (!selectedResult) {
-
           throw new Error(
             "Threat intelligence result not found."
           );
-
         }
 
-
         setResult(selectedResult);
-
-
       } catch (err) {
-
         console.error(
           "Threat intelligence details error:",
           err
         );
 
-
         setError(
           err.message ||
-          "Failed to load threat intelligence details."
+            "Failed to load threat intelligence details."
         );
-
-
       } finally {
-
         setLoading(false);
-
       }
-
     };
 
-
     loadResult();
-
   }, [resultId]);
-
 
   // =====================================================
   // LOADING
   // =====================================================
 
   if (loading) {
-
     return (
-
       <div className="loading-screen">
-
         <div>
-
           <div className="brand-icon">
             P
           </div>
@@ -146,28 +118,19 @@ function ThreatIntelligenceDetails() {
             Fetching detailed threat intelligence
             information.
           </p>
-
         </div>
-
       </div>
-
     );
-
   }
-
 
   // =====================================================
   // ERROR
   // =====================================================
 
   if (error) {
-
     return (
-
       <div className="page">
-
         <div className="card-dark error-message">
-
           <strong>
             Error
           </strong>
@@ -176,7 +139,6 @@ function ThreatIntelligenceDetails() {
             {error}
           </p>
 
-
           <button
             type="button"
             className="secondary-button"
@@ -186,29 +148,23 @@ function ThreatIntelligenceDetails() {
           >
             ← Back to Threat Intelligence
           </button>
-
         </div>
-
       </div>
-
     );
-
   }
 
+  // =====================================================
+  // RESULT NOT FOUND
+  // =====================================================
 
   if (!result) {
-
     return (
-
       <div className="page">
-
         <div className="card-dark empty-state">
-
           <h3>
             Result not found
           </h3>
 
-
           <button
             type="button"
             className="secondary-button"
@@ -218,15 +174,10 @@ function ThreatIntelligenceDetails() {
           >
             ← Back to Threat Intelligence
           </button>
-
         </div>
-
       </div>
-
     );
-
   }
-
 
   // =====================================================
   // EXTRACT INDICATOR INFORMATION
@@ -236,25 +187,24 @@ function ThreatIntelligenceDetails() {
     result.raw_response?.indicator ||
     "Unknown indicator";
 
-
   const indicatorType =
     result.raw_response?.indicator_type ||
     "Unknown";
-
 
   const analysis =
     result.raw_response?.analysis ||
     {};
 
+  const isMalicious =
+    result.verdict?.toLowerCase() ===
+    "malicious";
 
   // =====================================================
   // PAGE
   // =====================================================
 
   return (
-
     <div className="page">
-
 
       {/* =================================================
           TOP BAR
@@ -263,7 +213,6 @@ function ThreatIntelligenceDetails() {
       <div className="topbar">
 
         <div>
-
           <h2>
             Threat Intelligence Details
           </h2>
@@ -271,18 +220,13 @@ function ThreatIntelligenceDetails() {
           <p>
             Detailed indicator threat analysis
           </p>
-
         </div>
 
-
         <div className="case-badge">
-
           RESULT #{result.id}
-
         </div>
 
       </div>
-
 
       {/* =================================================
           BACK BUTTON
@@ -298,13 +242,11 @@ function ThreatIntelligenceDetails() {
         ← Back to Threat Intelligence
       </button>
 
-
       {/* =================================================
           MAIN SUMMARY
       ================================================= */}
 
       <div className="card-dark">
-
 
         <div className="section-header">
 
@@ -314,29 +256,21 @@ function ThreatIntelligenceDetails() {
               {upper(indicatorType)}
             </small>
 
-
             <h3>
               {indicatorValue}
             </h3>
 
           </div>
 
-
           <span
             className={`tag severity-tag ${
-              result.verdict?.toLowerCase() ===
-              "malicious"
-                ? "critical"
-                : ""
+              isMalicious ? "critical" : ""
             }`}
           >
-
             {upper(result.verdict)}
-
           </span>
 
         </div>
-
 
         {/* =================================================
             DESCRIPTION
@@ -348,17 +282,13 @@ function ThreatIntelligenceDetails() {
             Analysis
           </h4>
 
-
           <p>
-
             {result.notes ||
               analysis.reason ||
               "No analysis notes available."}
-
           </p>
 
         </div>
-
 
         {/* =================================================
             DETAILS GRID
@@ -366,11 +296,7 @@ function ThreatIntelligenceDetails() {
 
         <div className="details-grid">
 
-
-          {/* RESULT ID */}
-
           <div className="detail-box">
-
             <span>
               Result ID
             </span>
@@ -378,14 +304,9 @@ function ThreatIntelligenceDetails() {
             <strong>
               #{result.id}
             </strong>
-
           </div>
 
-
-          {/* INDICATOR ID */}
-
           <div className="detail-box">
-
             <span>
               Indicator ID
             </span>
@@ -393,14 +314,9 @@ function ThreatIntelligenceDetails() {
             <strong>
               #{result.indicator_id}
             </strong>
-
           </div>
 
-
-          {/* INDICATOR */}
-
           <div className="detail-box">
-
             <span>
               Indicator
             </span>
@@ -408,14 +324,9 @@ function ThreatIntelligenceDetails() {
             <strong>
               {indicatorValue}
             </strong>
-
           </div>
 
-
-          {/* TYPE */}
-
           <div className="detail-box">
-
             <span>
               Indicator Type
             </span>
@@ -423,14 +334,9 @@ function ThreatIntelligenceDetails() {
             <strong>
               {upper(indicatorType)}
             </strong>
-
           </div>
 
-
-          {/* VERDICT */}
-
           <div className="detail-box">
-
             <span>
               Verdict
             </span>
@@ -438,14 +344,9 @@ function ThreatIntelligenceDetails() {
             <strong>
               {upper(result.verdict)}
             </strong>
-
           </div>
 
-
-          {/* SCORE */}
-
           <div className="detail-box">
-
             <span>
               Threat Score
             </span>
@@ -456,14 +357,9 @@ function ThreatIntelligenceDetails() {
                 ? result.score
                 : "N/A"}
             </strong>
-
           </div>
 
-
-          {/* CONFIDENCE */}
-
           <div className="detail-box">
-
             <span>
               Confidence
             </span>
@@ -471,14 +367,9 @@ function ThreatIntelligenceDetails() {
             <strong>
               {upper(result.confidence)}
             </strong>
-
           </div>
 
-
-          {/* PROVIDER */}
-
           <div className="detail-box">
-
             <span>
               Provider
             </span>
@@ -486,14 +377,9 @@ function ThreatIntelligenceDetails() {
             <strong>
               {result.provider || "local"}
             </strong>
-
           </div>
 
-
-          {/* CHECKED */}
-
           <div className="detail-box">
-
             <span>
               Checked
             </span>
@@ -501,13 +387,11 @@ function ThreatIntelligenceDetails() {
             <strong>
               {formatDate(result.checked_at)}
             </strong>
-
           </div>
 
         </div>
 
       </div>
-
 
       {/* =================================================
           ANALYSIS RESULT
@@ -532,50 +416,37 @@ function ThreatIntelligenceDetails() {
 
         </div>
 
-
         <div className="findings-list">
-
 
           <div className="finding">
 
             <div
               className={`finding-indicator ${
-                result.verdict?.toLowerCase() ===
-                "malicious"
-                  ? "danger"
-                  : ""
+                isMalicious ? "danger" : ""
               }`}
             >
               !
             </div>
 
-
             <div className="finding-content">
 
               <h5>
-                {result.verdict?.toLowerCase() ===
-                "malicious"
+                {isMalicious
                   ? "Malicious indicator detected"
                   : "Threat intelligence analysis completed"}
               </h5>
 
-
               <p>
-
                 {analysis.reason ||
                   result.notes ||
                   "No analysis reason available."}
-
               </p>
-
 
               <div className="finding-tags">
 
-
                 <span
                   className={`tag ${
-                    result.verdict?.toLowerCase() ===
-                    "malicious"
+                    isMalicious
                       ? "severity-tag"
                       : ""
                   }`}
@@ -583,31 +454,22 @@ function ThreatIntelligenceDetails() {
                   {upper(result.verdict)}
                 </span>
 
-
                 <span className="tag">
-
                   SCORE{" "}
                   {result.score !== null &&
                   result.score !== undefined
                     ? result.score
                     : "N/A"}
-
                 </span>
 
-
                 <span className="tag">
-
                   {upper(result.confidence)}
                   {" "}
                   CONFIDENCE
-
                 </span>
 
-
                 <span className="tag">
-
                   {result.provider || "local"}
-
                 </span>
 
               </div>
@@ -619,7 +481,6 @@ function ThreatIntelligenceDetails() {
         </div>
 
       </div>
-
 
       {/* =================================================
           RAW THREAT INTELLIGENCE RESPONSE
@@ -644,19 +505,15 @@ function ThreatIntelligenceDetails() {
 
         </div>
 
-
         <pre className="evidence-block">
-
           {JSON.stringify(
             result.raw_response,
             null,
             2
           )}
-
         </pre>
 
       </div>
-
 
       {/* =================================================
           FOOTER
@@ -675,10 +532,7 @@ function ThreatIntelligenceDetails() {
       </footer>
 
     </div>
-
   );
-
 }
-
 
 export default ThreatIntelligenceDetails;

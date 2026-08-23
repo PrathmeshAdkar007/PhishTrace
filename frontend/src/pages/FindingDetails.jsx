@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "http://localhost:5000";
 
 function formatDate(value) {
   if (!value) {
@@ -35,6 +35,10 @@ function FindingDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // =====================================================
+  // LOAD FINDING
+  // =====================================================
+
   useEffect(() => {
     const loadFinding = async () => {
       try {
@@ -42,23 +46,39 @@ function FindingDetails() {
         setError("");
 
         const response = await fetch(
-          `${API_BASE}/api/findings/${findingId}`
+          `${API_BASE}/api/findings/${findingId}`,
+          {
+            method: "GET",
+
+            // IMPORTANT:
+            // Send Flask authentication session cookie
+            credentials: "include",
+
+            headers: {
+              Accept: "application/json",
+            },
+          }
         );
 
         const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.error || "Failed to load finding."
+            data.error ||
+              `Failed to load finding (${response.status})`
           );
         }
 
         setFinding(data.finding);
       } catch (err) {
-        console.error("Finding details error:", err);
+        console.error(
+          "Finding details error:",
+          err
+        );
 
         setError(
-          err.message || "Failed to load finding."
+          err.message ||
+            "Failed to load finding."
         );
       } finally {
         setLoading(false);
@@ -68,70 +88,122 @@ function FindingDetails() {
     loadFinding();
   }, [findingId]);
 
+  // =====================================================
+  // LOADING
+  // =====================================================
+
   if (loading) {
     return (
       <div className="loading-screen">
+
         <div>
-          <h2>Loading Finding...</h2>
+
+          <div className="brand-icon">
+            P
+          </div>
+
+          <h2>
+            Loading Finding...
+          </h2>
 
           <p>
             Fetching finding details from the
             PhishTrace backend.
           </p>
+
         </div>
+
       </div>
     );
   }
+
+  // =====================================================
+  // ERROR
+  // =====================================================
 
   if (error) {
     return (
       <div className="page">
-        <div className="card-dark error-message">
-          <strong>Error</strong>
 
-          <p>{error}</p>
+        <div className="card-dark error-message">
+
+          <strong>
+            Error
+          </strong>
+
+          <p>
+            {error}
+          </p>
 
           <button
+            type="button"
             className="secondary-button"
-            onClick={() => navigate("/findings")}
+            onClick={() =>
+              navigate("/findings")
+            }
           >
-            Back to Findings
+            ← Back to Findings
           </button>
+
         </div>
+
       </div>
     );
   }
+
+  // =====================================================
+  // NOT FOUND
+  // =====================================================
 
   if (!finding) {
     return (
       <div className="page">
+
         <div className="card-dark empty-state">
-          <h3>Finding not found</h3>
+
+          <h3>
+            Finding not found
+          </h3>
 
           <button
+            type="button"
             className="secondary-button"
-            onClick={() => navigate("/findings")}
+            onClick={() =>
+              navigate("/findings")
+            }
           >
-            Back to Findings
+            ← Back to Findings
           </button>
+
         </div>
+
       </div>
     );
   }
 
+  // =====================================================
+  // PAGE
+  // =====================================================
+
   return (
     <div className="page">
 
-      {/* TOP BAR */}
+      {/* =================================================
+          TOP BAR
+      ================================================= */}
 
       <div className="topbar">
 
         <div>
-          <h2>Finding Details</h2>
+
+          <h2>
+            Finding Details
+          </h2>
 
           <p>
             Detailed security finding analysis
           </p>
+
         </div>
 
         <div className="case-badge">
@@ -141,46 +213,63 @@ function FindingDetails() {
       </div>
 
 
-      {/* BACK BUTTON */}
+      {/* =================================================
+          BACK BUTTON
+      ================================================= */}
 
       <button
+        type="button"
         className="secondary-button"
-        onClick={() => navigate("/findings")}
+        onClick={() =>
+          navigate("/findings")
+        }
       >
         ← Back to Findings
       </button>
 
 
-      {/* FINDING SUMMARY */}
+      {/* =================================================
+          FINDING SUMMARY
+      ================================================= */}
 
       <div className="card-dark">
 
         <div className="section-header">
 
           <div>
+
             <small>
-              {upper(finding.finding_type)}
+              {upper(
+                finding.finding_type
+              )}
             </small>
 
             <h3>
-              {finding.title}
+              {finding.title ||
+                `Finding #${finding.id}`}
             </h3>
+
           </div>
 
           <span
             className={`tag severity-tag ${
-              finding.severity === "critical"
+              finding.severity?.toLowerCase() ===
+              "critical"
                 ? "critical"
                 : ""
             }`}
           >
-            {upper(finding.severity)}
+            {upper(
+              finding.severity
+            )}
           </span>
 
         </div>
 
 
-        {/* DESCRIPTION */}
+        {/* =================================================
+            DESCRIPTION
+        ================================================= */}
 
         <div className="detail-section">
 
@@ -196,7 +285,9 @@ function FindingDetails() {
         </div>
 
 
-        {/* DETAILS */}
+        {/* =================================================
+            DETAILS
+        ================================================= */}
 
         <div className="details-grid">
 
@@ -233,7 +324,9 @@ function FindingDetails() {
             </span>
 
             <strong>
-              {upper(finding.finding_type)}
+              {upper(
+                finding.finding_type
+              )}
             </strong>
 
           </div>
@@ -246,7 +339,9 @@ function FindingDetails() {
             </span>
 
             <strong>
-              {upper(finding.severity)}
+              {upper(
+                finding.severity
+              )}
             </strong>
 
           </div>
@@ -259,7 +354,9 @@ function FindingDetails() {
             </span>
 
             <strong>
-              {upper(finding.confidence)}
+              {upper(
+                finding.confidence
+              )}
             </strong>
 
           </div>
@@ -272,7 +369,9 @@ function FindingDetails() {
             </span>
 
             <strong>
-              {formatDate(finding.created_at)}
+              {formatDate(
+                finding.created_at
+              )}
             </strong>
 
           </div>
@@ -282,13 +381,16 @@ function FindingDetails() {
       </div>
 
 
-      {/* EVIDENCE */}
+      {/* =================================================
+          EVIDENCE
+      ================================================= */}
 
       <div className="card-dark">
 
         <div className="section-header">
 
           <div>
+
             <h3>
               Evidence
             </h3>
@@ -296,26 +398,32 @@ function FindingDetails() {
             <small>
               Evidence associated with this finding
             </small>
+
           </div>
 
         </div>
 
+
         {finding.evidence ? (
 
           <pre className="evidence-block">
+
             {JSON.stringify(
               finding.evidence,
               null,
               2
             )}
+
           </pre>
 
         ) : (
 
           <div className="empty-state">
+
             <p>
               No evidence available.
             </p>
+
           </div>
 
         )}
@@ -323,20 +431,25 @@ function FindingDetails() {
       </div>
 
 
-      {/* ANALYST NOTES */}
+      {/* =================================================
+          ANALYST NOTES
+      ================================================= */}
 
       <div className="card-dark">
 
         <div className="section-header">
 
           <div>
+
             <h3>
               Analyst Notes
             </h3>
 
             <small>
-              Investigation notes recorded by PhishTrace
+              Investigation notes recorded by
+              PhishTrace
             </small>
+
           </div>
 
         </div>
@@ -349,7 +462,9 @@ function FindingDetails() {
       </div>
 
 
-      {/* FOOTER */}
+      {/* =================================================
+          FOOTER
+      ================================================= */}
 
       <footer>
 

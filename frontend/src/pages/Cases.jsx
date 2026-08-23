@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "http://localhost:5000";
 
 function formatDate(value) {
   if (!value) {
@@ -42,9 +42,9 @@ function Cases() {
   const [severityFilter, setSeverityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  /* =====================================================
-     LOAD CASES
-  ===================================================== */
+  // =====================================================
+  // LOAD CASES
+  // =====================================================
 
   const loadCases = async () => {
     try {
@@ -52,24 +52,32 @@ function Cases() {
       setError("");
 
       const response = await fetch(
-        `${API_BASE}/api/cases`
+        `${API_BASE}/api/cases`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
       );
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to load cases (${response.status})`
-        );
-      }
 
       const data = await response.json();
 
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            `Failed to load cases (${response.status})`
+        );
+      }
+
       setCases(data.cases || []);
+
     } catch (err) {
       console.error("Cases API error:", err);
 
       setError(
-        err.message || "Failed to load cases."
+        err.message ||
+          "Failed to load cases."
       );
+
     } finally {
       setLoading(false);
     }
@@ -79,9 +87,9 @@ function Cases() {
     loadCases();
   }, []);
 
-  /* =====================================================
-     FILTER CASES
-  ===================================================== */
+  // =====================================================
+  // FILTER CASES
+  // =====================================================
 
   const filteredCases = useMemo(() => {
     const search = searchTerm
@@ -89,9 +97,6 @@ function Cases() {
       .toLowerCase();
 
     return cases.filter((caseItem) => {
-      // -------------------------
-      // SEARCH
-      // -------------------------
 
       const matchesSearch =
         !search ||
@@ -105,17 +110,9 @@ function Cases() {
           .toLowerCase()
           .includes(search);
 
-      // -------------------------
-      // SEVERITY
-      // -------------------------
-
       const matchesSeverity =
         severityFilter === "all" ||
         caseItem.severity === severityFilter;
-
-      // -------------------------
-      // STATUS
-      // -------------------------
 
       const matchesStatus =
         statusFilter === "all" ||
@@ -127,6 +124,7 @@ function Cases() {
         matchesStatus
       );
     });
+
   }, [
     cases,
     searchTerm,
@@ -134,9 +132,9 @@ function Cases() {
     statusFilter,
   ]);
 
-  /* =====================================================
-     CLEAR FILTERS
-  ===================================================== */
+  // =====================================================
+  // CLEAR FILTERS
+  // =====================================================
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -149,17 +147,17 @@ function Cases() {
     severityFilter !== "all" ||
     statusFilter !== "all";
 
-  /* =====================================================
-     VIEW CASE
-  ===================================================== */
+  // =====================================================
+  // VIEW CASE
+  // =====================================================
 
   const viewCase = (caseId) => {
     navigate(`/cases/${caseId}`);
   };
 
-  /* =====================================================
-     CLOSE CASE
-  ===================================================== */
+  // =====================================================
+  // CLOSE CASE
+  // =====================================================
 
   const closeCase = async (caseId) => {
     const confirmed = window.confirm(
@@ -177,6 +175,7 @@ function Cases() {
         `${API_BASE}/api/cases/${caseId}/close`,
         {
           method: "PATCH",
+          credentials: "include",
         }
       );
 
@@ -184,44 +183,56 @@ function Cases() {
 
       if (!response.ok) {
         throw new Error(
-          data.error || "Failed to close case"
+          data.error ||
+            "Failed to close case"
         );
       }
 
       await loadCases();
 
-      alert("Case closed successfully.");
+      alert(
+        "Case closed successfully."
+      );
+
     } catch (err) {
-      console.error("Close case error:", err);
+      console.error(
+        "Close case error:",
+        err
+      );
 
       setError(
-        err.message || "Failed to close case."
+        err.message ||
+          "Failed to close case."
       );
     }
   };
 
-  /* =====================================================
-     LOADING
-  ===================================================== */
+  // =====================================================
+  // LOADING
+  // =====================================================
 
   if (loading) {
     return (
       <div className="loading-screen">
         <div>
-          <h2>Loading Cases...</h2>
+
+          <h2>
+            Loading Cases...
+          </h2>
 
           <p>
             Fetching investigations from the
             PhishTrace backend.
           </p>
+
         </div>
       </div>
     );
   }
 
-  /* =====================================================
-     PAGE
-  ===================================================== */
+  // =====================================================
+  // PAGE
+  // =====================================================
 
   return (
     <div className="page">
@@ -233,20 +244,26 @@ function Cases() {
       <div className="topbar">
 
         <div>
-          <h2>Cases</h2>
+
+          <h2>
+            Cases
+          </h2>
 
           <p>
-            Phishing investigations and case management
+            Phishing investigations and
+            case management
           </p>
+
         </div>
 
         <div className="case-badge">
+
           {cases.length} CASE
           {cases.length !== 1 ? "S" : ""}
+
         </div>
 
       </div>
-
 
       {/* =================================================
           ERROR
@@ -266,7 +283,6 @@ function Cases() {
         </div>
       )}
 
-
       {/* =================================================
           SEARCH & FILTERS
       ================================================= */}
@@ -276,6 +292,7 @@ function Cases() {
         <div className="section-header">
 
           <div>
+
             <h3>
               Search & Filter Cases
             </h3>
@@ -284,6 +301,7 @@ function Cases() {
               Find investigations by case details,
               severity, or status
             </small>
+
           </div>
 
           {filtersActive && (
@@ -296,7 +314,6 @@ function Cases() {
           )}
 
         </div>
-
 
         <div className="case-filter-grid">
 
@@ -314,12 +331,13 @@ function Cases() {
               placeholder="Case number, title, or description..."
               value={searchTerm}
               onChange={(event) =>
-                setSearchTerm(event.target.value)
+                setSearchTerm(
+                  event.target.value
+                )
               }
             />
 
           </div>
-
 
           {/* SEVERITY */}
 
@@ -333,9 +351,12 @@ function Cases() {
               id="severity-filter"
               value={severityFilter}
               onChange={(event) =>
-                setSeverityFilter(event.target.value)
+                setSeverityFilter(
+                  event.target.value
+                )
               }
             >
+
               <option value="all">
                 All Severities
               </option>
@@ -355,10 +376,10 @@ function Cases() {
               <option value="low">
                 Low
               </option>
+
             </select>
 
           </div>
-
 
           {/* STATUS */}
 
@@ -372,9 +393,12 @@ function Cases() {
               id="status-filter"
               value={statusFilter}
               onChange={(event) =>
-                setStatusFilter(event.target.value)
+                setStatusFilter(
+                  event.target.value
+                )
               }
             >
+
               <option value="all">
                 All Statuses
               </option>
@@ -403,7 +427,6 @@ function Cases() {
 
       </div>
 
-
       {/* =================================================
           CASE LIST
       ================================================= */}
@@ -413,24 +436,31 @@ function Cases() {
         <div className="section-header">
 
           <div>
+
             <h3>
               Investigation Cases
             </h3>
 
             <small>
+
               {filtersActive
                 ? `Showing ${filteredCases.length} of ${cases.length} cases`
                 : "All PhishTrace investigations"}
+
             </small>
+
           </div>
 
           <small>
+
             {filteredCases.length} result
-            {filteredCases.length !== 1 ? "s" : ""}
+            {filteredCases.length !== 1
+              ? "s"
+              : ""}
+
           </small>
 
         </div>
-
 
         {cases.length === 0 ? (
 
@@ -473,116 +503,119 @@ function Cases() {
 
           <div className="cases-list">
 
-            {filteredCases.map((caseItem) => (
+            {filteredCases.map(
+              (caseItem) => (
 
-              <div
-                className="case-list-item"
-                key={caseItem.id}
-              >
+                <div
+                  className="case-list-item"
+                  key={caseItem.id}
+                >
 
-                {/* =================================================
-                    CASE INFORMATION
-                ================================================= */}
+                  {/* CASE INFORMATION */}
 
-                <div className="case-list-main">
+                  <div className="case-list-main">
 
-                  <div className="case-number">
-                    {caseItem.case_number}
+                    <div className="case-number">
+                      {caseItem.case_number}
+                    </div>
+
+                    <h3>
+                      {caseItem.title}
+                    </h3>
+
+                    <p>
+                      {caseItem.description ||
+                        "No description available."}
+                    </p>
+
+                    <div className="case-list-meta">
+
+                      <span>
+                        Created{" "}
+                        {formatDate(
+                          caseItem.created_at
+                        )}
+                      </span>
+
+                    </div>
+
                   </div>
 
-                  <h3>
-                    {caseItem.title}
-                  </h3>
+                  {/* CASE STATUS */}
 
-                  <p>
-                    {caseItem.description ||
-                      "No description available."}
-                  </p>
+                  <div className="case-list-status">
 
-                  <div className="case-list-meta">
+                    <span
+                      className={`severity ${
+                        caseItem.severity ===
+                        "critical"
+                          ? "critical"
+                          : ""
+                      }`}
+                    >
+                      {upper(
+                        caseItem.severity
+                      )}
+                    </span>
 
-                    <span>
-                      Created{" "}
-                      {formatDate(
-                        caseItem.created_at
+                    <span
+                      className={`status ${
+                        caseItem.status ===
+                        "closed"
+                          ? ""
+                          : "case-open"
+                      }`}
+                    >
+                      {upper(
+                        caseItem.status
                       )}
                     </span>
 
                   </div>
 
-                </div>
+                  {/* ACTIONS */}
 
-
-                {/* =================================================
-                    CASE STATUS
-                ================================================= */}
-
-                <div className="case-list-status">
-
-                  <span
-                    className={`severity ${
-                      caseItem.severity === "critical"
-                        ? "critical"
-                        : ""
-                    }`}
-                  >
-                    {upper(caseItem.severity)}
-                  </span>
-
-                  <span
-                    className={`status ${
-                      caseItem.status === "closed"
-                        ? ""
-                        : "case-open"
-                    }`}
-                  >
-                    {upper(caseItem.status)}
-                  </span>
-
-                </div>
-
-
-                {/* =================================================
-                    ACTIONS
-                ================================================= */}
-
-                <div className="case-list-actions">
-
-                  <button
-                    className="secondary-button"
-                    onClick={() =>
-                      viewCase(caseItem.id)
-                    }
-                  >
-                    View Case
-                  </button>
-
-
-                  {caseItem.status !== "closed" && (
+                  <div className="case-list-actions">
 
                     <button
-                      className="danger-button"
+                      className="secondary-button"
                       onClick={() =>
-                        closeCase(caseItem.id)
+                        viewCase(
+                          caseItem.id
+                        )
                       }
                     >
-                      Close
+                      View Case
                     </button>
 
-                  )}
+                    {caseItem.status !==
+                      "closed" && (
+
+                      <button
+                        className="danger-button"
+                        onClick={() =>
+                          closeCase(
+                            caseItem.id
+                          )
+                        }
+                      >
+                        Close
+                      </button>
+
+                    )}
+
+                  </div>
 
                 </div>
 
-              </div>
-
-            ))}
+              )
+            )}
 
           </div>
 
         )}
 
       </div>
-
 
       {/* =================================================
           FOOTER

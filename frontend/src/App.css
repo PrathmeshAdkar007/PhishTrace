@@ -2799,3 +2799,388 @@ footer {
 
   transform: translateX(4px);
 }
+
+/* =========================================================
+   CONTAINMENT ACTION FORM - POLISHED UI
+========================================================= */
+
+.containment-form {
+  margin-top: 24px;
+  padding: 24px;
+  background: #0b111a;
+  border: 1px solid #202c3a;
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+/* =========================================================
+   CONTAINMENT FORM GROUP
+========================================================= */
+
+.containment-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.containment-form .form-group label {
+  display: block;
+
+  color: #aab6c8;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.2px;
+}
+
+
+/* =========================================================
+   INPUT / SELECT / TEXTAREA
+========================================================= */
+
+.containment-form input,
+.containment-form select,
+.containment-form textarea {
+  width: 100%;
+
+  background: #101722;
+
+  border: 1px solid #293647;
+
+  border-radius: 8px;
+
+  color: #e8edf5;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+
+/* INPUT */
+
+.containment-form input {
+  height: 44px;
+  padding: 0 13px;
+}
+
+
+/* SELECT */
+
+.containment-form select {
+  height: 44px;
+  padding: 0 40px 0 13px;
+
+  cursor: pointer;
+
+  appearance: auto;
+
+  color-scheme: dark;
+}
+
+
+/* TEXTAREA */
+
+.containment-form textarea {
+  min-height: 110px;
+
+  padding: 12px 13px;
+
+  line-height: 1.5;
+
+  resize: vertical;
+}
+
+
+/* PLACEHOLDER */
+
+.containment-form input::placeholder,
+.containment-form textarea::placeholder {
+  color: #596679;
+}
+
+
+/* =========================================================
+   FOCUS
+========================================================= */
+
+.containment-form input:focus,
+.containment-form select:focus,
+.containment-form textarea:focus {
+  border-color: #0dcaf0;
+
+  background: #111a26;
+
+  box-shadow:
+    0 0 0 2px rgba(13, 202, 240, 0.08);
+}
+
+
+/* =========================================================
+   DROPDOWN OPTIONS
+========================================================= */
+
+.containment-form select option {
+  background: #101722;
+  color: #e8edf5;
+}
+
+
+/* =========================================================
+   FORM BUTTONS
+========================================================= */
+
+.containment-form .form-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 4px;
+
+  padding-top: 18px;
+
+  border-top: 1px solid #202c3a;
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.primary-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 40px;
+
+  padding: 9px 16px;
+
+  border-radius: 7px;
+
+  background: #0dcaf0;
+
+  border: 1px solid #0dcaf0;
+
+  color: #061018;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.primary-button:hover {
+  background: #20d4f7;
+
+  border-color: #20d4f7;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 14px rgba(13, 202, 240, 0.18);
+}
+
+
+.primary-button:active {
+  transform: translateY(0);
+}
+
+
+.primary-button:focus-visible {
+  outline: 2px solid #18c8f5;
+
+  outline-offset: 2px;
+}
+
+
+.primary-button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+
+/* =========================================================
+   SECONDARY BUTTON
+========================================================= */
+
+.secondary-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 40px;
+
+  padding: 9px 16px;
+
+  border-radius: 7px;
+
+  background: #14202c;
+
+  border: 1px solid #2a3b4d;
+
+  color: #0dcaf0;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.secondary-button:hover {
+  background: #1a2b3a;
+
+  border-color: #18c8f5;
+
+  color: #18c8f5;
+
+  transform: translateY(-1px);
+}
+
+
+.secondary-button:active {
+  transform: translateY(0);
+}
+
+
+.secondary-button:focus-visible {
+  outline: 2px solid #18c8f5;
+
+  outline-offset: 2px;
+}
+
+
+.secondary-button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* =========================================================
+   RESPONSE ACTION HEADER BUTTON
+========================================================= */
+
+.card-dark > .section-header > .primary-button {
+  flex-shrink: 0;
+
+  min-width: 112px;
+}
+
+
+/* =========================================================
+   CONTAINMENT EMPTY STATE BUTTON
+========================================================= */
+
+.containment-list + .empty-state .primary-button {
+  margin-top: 12px;
+}
+
+
+/* =========================================================
+   FORM ERROR
+========================================================= */
+
+.containment-form + .error-message {
+  margin-top: 15px;
+}
+
+
+/* =========================================================
+   CONTAINMENT CARD EDIT BUTTON
+========================================================= */
+
+.containment-card .form-actions {
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 18px;
+}
+
+
+.containment-card .secondary-button {
+  min-width: 72px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .containment-form {
+    padding: 18px;
+
+    gap: 17px;
+  }
+
+
+  .containment-form .form-actions {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+
+  .containment-form .form-actions button {
+    width: 100%;
+  }
+
+
+  .card-dark > .section-header {
+    align-items: flex-start;
+
+    gap: 15px;
+  }
+
+
+  .card-dark > .section-header > .primary-button {
+    min-width: 100px;
+  }
+
+}

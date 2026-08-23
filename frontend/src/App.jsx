@@ -59,9 +59,7 @@ function App() {
           }
         );
 
-
         const data = await response.json();
-
 
         if (data.authenticated) {
 
@@ -73,7 +71,6 @@ function App() {
 
         }
 
-
       } catch (error) {
 
         console.error(
@@ -82,7 +79,6 @@ function App() {
         );
 
         setUser(null);
-
 
       } finally {
 
@@ -168,7 +164,6 @@ function App() {
         }
       );
 
-
       if (!response.ok) {
 
         console.error(
@@ -187,7 +182,6 @@ function App() {
 
     } finally {
 
-      // Always clear frontend authentication state
       setUser(null);
 
     }

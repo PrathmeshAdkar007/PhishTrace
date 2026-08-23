@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "http://localhost:5000";
 
 const CASE_ID = 1;
 
 
-function upper(value) {
+// =========================================================
+// FORMAT TEXT
+// =========================================================
 
+function upper(value) {
   if (!value) {
     return "UNKNOWN";
   }
@@ -15,12 +18,14 @@ function upper(value) {
   return String(value)
     .replaceAll("_", " ")
     .toUpperCase();
-
 }
 
 
-function formatDate(value) {
+// =========================================================
+// FORMAT DATE
+// =========================================================
 
+function formatDate(value) {
   if (!value) {
     return "N/A";
   }
@@ -32,12 +37,14 @@ function formatDate(value) {
   }
 
   return date.toLocaleString();
-
 }
 
 
-function AffectedUsers() {
+// =========================================================
+// AFFECTED USERS
+// =========================================================
 
+function AffectedUsers() {
   const navigate = useNavigate();
 
   const [users, setUsers] = useState([]);
@@ -52,6 +59,10 @@ function AffectedUsers() {
 
   const [saving, setSaving] = useState(false);
 
+
+  // =========================================================
+  // FORM
+  // =========================================================
 
   const [form, setForm] = useState({
     user_email: "",
@@ -71,26 +82,32 @@ function AffectedUsers() {
   // =========================================================
 
   const loadUsers = async () => {
-
     try {
-
       setLoading(true);
-
       setError("");
 
       const response = await fetch(
-        `${API_BASE}/api/cases/${CASE_ID}/affected-users`
+        `${API_BASE}/api/cases/${CASE_ID}/affected-users`,
+        {
+          method: "GET",
+
+          // IMPORTANT:
+          // Send Flask login session cookie
+          credentials: "include",
+
+          headers: {
+            Accept: "application/json",
+          },
+        }
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-
         throw new Error(
           data.error ||
-          "Failed to load affected users."
+            `Failed to load affected users (${response.status})`
         );
-
       }
 
       setUsers(
@@ -98,7 +115,6 @@ function AffectedUsers() {
       );
 
     } catch (err) {
-
       console.error(
         "Affected users error:",
         err
@@ -106,22 +122,21 @@ function AffectedUsers() {
 
       setError(
         err.message ||
-        "Failed to load affected users."
+          "Failed to load affected users."
       );
 
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
 
+  // =========================================================
+  // LOAD PAGE
+  // =========================================================
+
   useEffect(() => {
-
     loadUsers();
-
   }, []);
 
 
@@ -130,7 +145,6 @@ function AffectedUsers() {
   // =========================================================
 
   const handleChange = (event) => {
-
     const {
       name,
       value,
@@ -140,17 +154,20 @@ function AffectedUsers() {
 
     setForm((previous) => ({
       ...previous,
+
       [name]:
         type === "checkbox"
           ? checked
           : value,
     }));
-
   };
 
 
-  const resetForm = () => {
+  // =========================================================
+  // RESET FORM
+  // =========================================================
 
+  const resetForm = () => {
     setForm({
       user_email: "",
       display_name: "",
@@ -164,21 +181,24 @@ function AffectedUsers() {
     });
 
     setEditingUser(null);
-
   };
 
+
+  // =========================================================
+  // OPEN ADD FORM
+  // =========================================================
 
   const openAddForm = () => {
-
     resetForm();
-
     setShowForm(true);
-
   };
 
 
-  const openEditForm = (user) => {
+  // =========================================================
+  // OPEN EDIT FORM
+  // =========================================================
 
+  const openEditForm = (user) => {
     setEditingUser(user);
 
     setForm({
@@ -216,72 +236,81 @@ function AffectedUsers() {
     });
 
     setShowForm(true);
-
-  };
-
-
-  const closeForm = () => {
-
-    setShowForm(false);
-
-    resetForm();
-
   };
 
 
   // =========================================================
-  // CREATE / UPDATE
+  // CLOSE FORM
+  // =========================================================
+
+  const closeForm = () => {
+    setShowForm(false);
+    resetForm();
+  };
+
+
+  // =========================================================
+  // CREATE / UPDATE USER
   // =========================================================
 
   const handleSubmit = async (event) => {
-
     event.preventDefault();
 
     try {
-
       setSaving(true);
-
       setError("");
 
       let response;
 
+      // =====================================================
+      // UPDATE
+      // =====================================================
 
       if (editingUser) {
-
         response = await fetch(
           `${API_BASE}/api/affected-users/${editingUser.id}`,
           {
             method: "PUT",
 
+            credentials: "include",
+
             headers: {
               "Content-Type":
                 "application/json",
-            },
 
-            credentials: "include",
+              Accept:
+                "application/json",
+            },
 
             body: JSON.stringify(form),
           }
         );
 
-      } else {
+      }
 
+      // =====================================================
+      // CREATE
+      // =====================================================
+
+      else {
         response = await fetch(
           `${API_BASE}/api/cases/${CASE_ID}/affected-users`,
           {
             method: "POST",
 
+            credentials: "include",
+
             headers: {
               "Content-Type":
                 "application/json",
-            },
 
-            credentials: "include",
+              Accept:
+                "application/json",
+            },
 
             body: JSON.stringify(form),
           }
         );
-
       }
 
 
@@ -290,12 +319,10 @@ function AffectedUsers() {
 
 
       if (!response.ok) {
-
         throw new Error(
           data.error ||
-          "Failed to save affected user."
+            `Failed to save affected user (${response.status})`
         );
-
       }
 
 
@@ -304,7 +331,6 @@ function AffectedUsers() {
       await loadUsers();
 
     } catch (err) {
-
       console.error(
         "Save affected user error:",
         err
@@ -312,15 +338,12 @@ function AffectedUsers() {
 
       setError(
         err.message ||
-        "Failed to save affected user."
+          "Failed to save affected user."
       );
 
     } finally {
-
       setSaving(false);
-
     }
-
   };
 
 
@@ -329,11 +352,14 @@ function AffectedUsers() {
   // =========================================================
 
   if (loading) {
-
     return (
       <div className="loading-screen">
 
         <div>
+
+          <div className="brand-icon">
+            P
+          </div>
 
           <h2>
             Loading Affected Users...
@@ -348,7 +374,6 @@ function AffectedUsers() {
 
       </div>
     );
-
   }
 
 
@@ -374,23 +399,12 @@ function AffectedUsers() {
         user.submitted_credentials
     );
 
-  const highImpactUsers =
-    users.filter(
-      (user) =>
-        ["high", "critical"].includes(
-          String(
-            user.impact_status || ""
-          ).toLowerCase()
-        )
-    );
-
 
   // =========================================================
   // PAGE
   // =========================================================
 
   return (
-
     <div className="page">
 
 
@@ -431,7 +445,6 @@ function AffectedUsers() {
       ================================================= */}
 
       {error && (
-
         <div className="card-dark error-message">
 
           <strong>
@@ -443,7 +456,6 @@ function AffectedUsers() {
           </p>
 
         </div>
-
       )}
 
 
@@ -482,6 +494,8 @@ function AffectedUsers() {
       <div className="stats-grid">
 
 
+        {/* TOTAL */}
+
         <div className="stat-card">
 
           <div className="stat-icon">
@@ -502,6 +516,8 @@ function AffectedUsers() {
 
         </div>
 
+
+        {/* CLICKED */}
 
         <div className="stat-card">
 
@@ -524,6 +540,8 @@ function AffectedUsers() {
         </div>
 
 
+        {/* CREDENTIALS */}
+
         <div className="stat-card">
 
           <div className="stat-icon">
@@ -544,6 +562,8 @@ function AffectedUsers() {
 
         </div>
 
+
+        {/* COMPROMISED */}
 
         <div className="stat-card">
 
@@ -581,11 +601,9 @@ function AffectedUsers() {
             <div>
 
               <h3>
-
                 {editingUser
                   ? "Edit Affected User"
                   : "Add Affected User"}
-
               </h3>
 
               <small>
@@ -662,7 +680,7 @@ function AffectedUsers() {
             </div>
 
 
-            {/* IMPACT STATUS */}
+            {/* IMPACT */}
 
             <div className="form-group">
 
@@ -704,7 +722,6 @@ function AffectedUsers() {
             {/* CHECKBOXES */}
 
             <div className="checkbox-grid">
-
 
               <label className="checkbox-item">
 
@@ -911,16 +928,12 @@ function AffectedUsers() {
                   <div>
 
                     <h4>
-
                       {user.display_name ||
                         "Unnamed User"}
-
                     </h4>
 
                     <p>
-
                       {user.user_email}
-
                     </p>
 
                   </div>
@@ -944,9 +957,7 @@ function AffectedUsers() {
                   {user.account_compromised && (
 
                     <span className="tag severity-tag">
-
                       COMPROMISED
-
                     </span>
 
                   )}
@@ -979,11 +990,9 @@ function AffectedUsers() {
                     </span>
 
                     <strong>
-
                       {user.received_email
                         ? "YES"
                         : "NO"}
-
                     </strong>
 
                   </div>
@@ -996,11 +1005,9 @@ function AffectedUsers() {
                     </span>
 
                     <strong>
-
                       {user.clicked_link
                         ? "YES"
                         : "NO"}
-
                     </strong>
 
                   </div>
@@ -1013,11 +1020,9 @@ function AffectedUsers() {
                     </span>
 
                     <strong>
-
                       {user.submitted_credentials
                         ? "YES"
                         : "NO"}
-
                     </strong>
 
                   </div>
@@ -1109,9 +1114,7 @@ function AffectedUsers() {
       </footer>
 
     </div>
-
   );
-
 }
 
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "http://localhost:5000";
 
 function formatDate(value) {
   if (!value) {
@@ -32,7 +32,14 @@ function MitreDetails() {
         setError("");
 
         const response = await fetch(
-          `${API_BASE}/api/mitre/${mappingId}`
+          `${API_BASE}/api/mitre/${mappingId}`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              Accept: "application/json",
+            },
+          }
         );
 
         const data = await response.json();
@@ -40,7 +47,7 @@ function MitreDetails() {
         if (!response.ok) {
           throw new Error(
             data.error ||
-              "Failed to load MITRE mapping."
+              `Failed to load MITRE mapping (${response.status})`
           );
         }
 
@@ -63,10 +70,18 @@ function MitreDetails() {
     loadMapping();
   }, [mappingId]);
 
+  // =====================================================
+  // LOADING
+  // =====================================================
+
   if (loading) {
     return (
       <div className="loading-screen">
         <div>
+          <div className="brand-icon">
+            P
+          </div>
+
           <h2>
             Loading MITRE Mapping...
           </h2>
@@ -80,12 +95,14 @@ function MitreDetails() {
     );
   }
 
+  // =====================================================
+  // ERROR
+  // =====================================================
+
   if (error) {
     return (
       <div className="page">
-
         <div className="card-dark error-message">
-
           <strong>
             Error
           </strong>
@@ -95,6 +112,7 @@ function MitreDetails() {
           </p>
 
           <button
+            type="button"
             className="secondary-button"
             onClick={() =>
               navigate("/mitre")
@@ -102,24 +120,25 @@ function MitreDetails() {
           >
             ← Back to MITRE ATT&CK
           </button>
-
         </div>
-
       </div>
     );
   }
 
+  // =====================================================
+  // NOT FOUND
+  // =====================================================
+
   if (!mapping) {
     return (
       <div className="page">
-
         <div className="card-dark empty-state">
-
           <h3>
             MITRE mapping not found
           </h3>
 
           <button
+            type="button"
             className="secondary-button"
             onClick={() =>
               navigate("/mitre")
@@ -127,17 +146,21 @@ function MitreDetails() {
           >
             ← Back to MITRE ATT&CK
           </button>
-
         </div>
-
       </div>
     );
   }
 
+  // =====================================================
+  // PAGE
+  // =====================================================
+
   return (
     <div className="page">
 
-      {/* TOP BAR */}
+      {/* =================================================
+          TOP BAR
+      ================================================= */}
 
       <div className="topbar">
 
@@ -159,9 +182,12 @@ function MitreDetails() {
       </div>
 
 
-      {/* BACK BUTTON */}
+      {/* =================================================
+          BACK BUTTON
+      ================================================= */}
 
       <button
+        type="button"
         className="secondary-button"
         onClick={() =>
           navigate("/mitre")
@@ -171,7 +197,9 @@ function MitreDetails() {
       </button>
 
 
-      {/* TECHNIQUE SUMMARY */}
+      {/* =================================================
+          TECHNIQUE SUMMARY
+      ================================================= */}
 
       <div className="card-dark">
 
@@ -232,7 +260,9 @@ function MitreDetails() {
       </div>
 
 
-      {/* MAPPING INFORMATION */}
+      {/* =================================================
+          MAPPING INFORMATION
+      ================================================= */}
 
       <div className="card-dark">
 
@@ -329,7 +359,9 @@ function MitreDetails() {
       </div>
 
 
-      {/* EVIDENCE */}
+      {/* =================================================
+          EVIDENCE
+      ================================================= */}
 
       <div className="card-dark">
 
@@ -353,15 +385,23 @@ function MitreDetails() {
 
         <div className="evidence-block">
 
-          {mapping.evidence ||
-            "No evidence available."}
+          {typeof mapping.evidence === "object"
+            ? JSON.stringify(
+                mapping.evidence,
+                null,
+                2
+              )
+            : mapping.evidence ||
+              "No evidence available."}
 
         </div>
 
       </div>
 
 
-      {/* FOOTER */}
+      {/* =================================================
+          FOOTER
+      ================================================= */}
 
       <footer>
 

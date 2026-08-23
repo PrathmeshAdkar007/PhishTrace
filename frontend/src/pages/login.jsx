@@ -1,20 +1,35 @@
 import { useState } from "react";
 
+
+const API_BASE = "http://localhost:5000";
+
+
 function Login({ onLogin }) {
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
   const [error, setError] = useState("");
+
   const [loading, setLoading] = useState(false);
 
+
+  // =================================================
+  // LOGIN
+  // =================================================
+
   const handleSubmit = async (event) => {
+
     event.preventDefault();
 
     setError("");
     setLoading(true);
 
+
     try {
+
       const response = await fetch(
-        "http://localhost:5000/api/auth/login",
+        `${API_BASE}/api/auth/login`,
         {
           method: "POST",
 
@@ -25,15 +40,18 @@ function Login({ onLogin }) {
           credentials: "include",
 
           body: JSON.stringify({
-            username,
+            username: username.trim(),
             password,
           }),
         }
       );
 
+
       const data = await response.json();
 
+
       if (!response.ok) {
+
         setError(
           data.error || "Login failed"
         );
@@ -41,9 +59,26 @@ function Login({ onLogin }) {
         return;
       }
 
-      onLogin(data.user);
+
+      // ---------------------------------------------
+      // Login successful
+      // ---------------------------------------------
+
+      if (data.user) {
+
+        onLogin(data.user);
+
+      } else {
+
+        setError(
+          "Login succeeded but user information was not returned."
+        );
+
+      }
+
 
     } catch (error) {
+
       console.error(
         "Login error:",
         error
@@ -53,15 +88,31 @@ function Login({ onLogin }) {
         "Unable to connect to the PhishTrace backend."
       );
 
+
     } finally {
+
       setLoading(false);
+
     }
+
   };
 
+
+  // =================================================
+  // PAGE
+  // =================================================
+
   return (
+
     <div className="login-page">
 
+
       <div className="login-card">
+
+
+        {/* =================================================
+            BRAND
+        ================================================= */}
 
         <div className="login-brand">
 
@@ -69,9 +120,11 @@ function Login({ onLogin }) {
             P
           </div>
 
+
           <h1>
             PhishTrace
           </h1>
+
 
           <p>
             Security Operations
@@ -80,11 +133,17 @@ function Login({ onLogin }) {
         </div>
 
 
+
+        {/* =================================================
+            LOGIN HEADER
+        ================================================= */}
+
         <div className="login-header">
 
           <h2>
             Analyst Login
           </h2>
+
 
           <p>
             Sign in to access the SOC dashboard
@@ -92,6 +151,11 @@ function Login({ onLogin }) {
 
         </div>
 
+
+
+        {/* =================================================
+            ERROR
+        ================================================= */}
 
         {error && (
 
@@ -104,14 +168,22 @@ function Login({ onLogin }) {
         )}
 
 
+
+        {/* =================================================
+            LOGIN FORM
+        ================================================= */}
+
         <form onSubmit={handleSubmit}>
 
+
+          {/* USERNAME */}
 
           <div className="form-group">
 
             <label>
               Username
             </label>
+
 
             <input
               type="text"
@@ -122,16 +194,21 @@ function Login({ onLogin }) {
               placeholder="Enter username"
               required
               autoComplete="username"
+              disabled={loading}
             />
 
           </div>
 
+
+
+          {/* PASSWORD */}
 
           <div className="form-group">
 
             <label>
               Password
             </label>
+
 
             <input
               type="password"
@@ -142,10 +219,14 @@ function Login({ onLogin }) {
               placeholder="Enter password"
               required
               autoComplete="current-password"
+              disabled={loading}
             />
 
           </div>
 
+
+
+          {/* LOGIN BUTTON */}
 
           <button
             type="submit"
@@ -161,10 +242,15 @@ function Login({ onLogin }) {
 
         </form>
 
+
       </div>
 
+
     </div>
+
   );
+
 }
+
 
 export default Login;

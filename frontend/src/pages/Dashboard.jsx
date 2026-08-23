@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
+const API_BASE = "http://localhost:5000";
+
+
 // =====================================================
 // STAT CARD
 // =====================================================
@@ -117,7 +120,10 @@ function Dashboard() {
 
 
         const response = await fetch(
-          `http://127.0.0.1:5000/api/cases/${CASE_ID}/summary`
+          `${API_BASE}/api/cases/${CASE_ID}/summary`,
+          {
+            credentials: "include",
+          }
         );
 
 
@@ -225,7 +231,7 @@ function Dashboard() {
 
 
           <code>
-            http://127.0.0.1:5000
+            http://localhost:5000
           </code>
 
         </div>

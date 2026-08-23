@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "http://localhost:5000";
 
 const CASE_ID = 1;
 
@@ -10,7 +10,6 @@ const CASE_ID = 1;
 // =========================================================
 
 function formatDate(value) {
-
   if (!value) {
     return "N/A";
   }
@@ -30,7 +29,6 @@ function formatDate(value) {
 // =========================================================
 
 function upper(value) {
-
   if (!value) {
     return "N/A";
   }
@@ -57,6 +55,12 @@ function ContainmentActions() {
 
   const [editingId, setEditingId] = useState(null);
 
+  const [saving, setSaving] = useState(false);
+
+
+  // =========================================================
+  // FORM DATA
+  // =========================================================
 
   const [formData, setFormData] = useState({
     action_type: "",
@@ -81,7 +85,18 @@ function ContainmentActions() {
 
 
       const response = await fetch(
-        `${API_BASE}/api/cases/${CASE_ID}/containment-actions`
+        `${API_BASE}/api/cases/${CASE_ID}/containment-actions`,
+        {
+          method: "GET",
+
+          // IMPORTANT:
+          // Sends Flask session cookie
+          credentials: "include",
+
+          headers: {
+            Accept: "application/json",
+          },
+        }
       );
 
 
@@ -92,7 +107,7 @@ function ContainmentActions() {
 
         throw new Error(
           data.error ||
-          "Failed to load containment actions."
+          `Failed to load containment actions (${response.status})`
         );
 
       }
@@ -127,7 +142,7 @@ function ContainmentActions() {
 
 
   // =========================================================
-  // LOAD ON PAGE OPEN
+  // LOAD WHEN PAGE OPENS
   // =========================================================
 
   useEffect(() => {
@@ -145,7 +160,7 @@ function ContainmentActions() {
 
     const {
       name,
-      value
+      value,
     } = event.target;
 
 
@@ -239,6 +254,8 @@ function ContainmentActions() {
 
     try {
 
+      setSaving(true);
+
       setError("");
 
 
@@ -262,9 +279,19 @@ function ContainmentActions() {
         url,
         {
           method,
+
+          // IMPORTANT:
+          // Sends Flask session cookie
+          credentials: "include",
+
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type":
+              "application/json",
+
+            Accept:
+              "application/json",
           },
+
           body: JSON.stringify({
 
             action_type:
@@ -295,7 +322,7 @@ function ContainmentActions() {
 
         throw new Error(
           data.error ||
-          "Failed to save containment action."
+          `Failed to save containment action (${response.status})`
         );
 
       }
@@ -319,6 +346,10 @@ function ContainmentActions() {
         err.message ||
         "Failed to save containment action."
       );
+
+    } finally {
+
+      setSaving(false);
 
     }
 
@@ -381,6 +412,10 @@ function ContainmentActions() {
       <div className="loading-screen">
 
         <div>
+
+          <div className="brand-icon">
+            P
+          </div>
 
           <h2>
             Loading Containment Actions...
@@ -562,7 +597,6 @@ function ContainmentActions() {
 
         </div>
 
-
       </div>
 
 
@@ -691,7 +725,6 @@ function ContainmentActions() {
                   Other
                 </option>
 
-
               </select>
 
             </div>
@@ -807,9 +840,12 @@ function ContainmentActions() {
               <button
                 type="submit"
                 className="primary-button"
+                disabled={saving}
               >
 
-                {editingId !== null
+                {saving
+                  ? "Saving..."
+                  : editingId !== null
                   ? "Update Action"
                   : "Create Action"}
 
@@ -820,6 +856,7 @@ function ContainmentActions() {
                 type="button"
                 className="secondary-button"
                 onClick={resetForm}
+                disabled={saving}
               >
 
                 Cancel
@@ -877,7 +914,6 @@ function ContainmentActions() {
 
           <div className="empty-state">
 
-
             <div className="stat-icon">
               ✓
             </div>
@@ -905,11 +941,9 @@ function ContainmentActions() {
 
             </button>
 
-
           </div>
 
         ) : (
-
 
           /* =================================================
              ACTION LIST
@@ -959,14 +993,7 @@ function ContainmentActions() {
                   <div className="finding-tags">
 
 
-                    <span
-                      className={`tag severity-tag ${
-                        action.status ===
-                        "completed"
-                          ? "completed"
-                          : ""
-                      }`}
-                    >
+                    <span className="tag severity-tag">
 
                       {upper(
                         action.status
@@ -986,7 +1013,6 @@ function ContainmentActions() {
 
                     )}
 
-
                   </div>
 
 
@@ -996,16 +1022,13 @@ function ContainmentActions() {
 
                     <div className="case-description">
 
-
                       <span>
                         Notes
                       </span>
 
-
                       <p>
                         {action.notes}
                       </p>
-
 
                     </div>
 
@@ -1041,14 +1064,12 @@ function ContainmentActions() {
 
                     )}
 
-
                   </div>
 
 
-                  {/* EDIT BUTTON */}
+                  {/* EDIT */}
 
                   <div className="form-actions">
-
 
                     <button
                       type="button"
@@ -1057,17 +1078,13 @@ function ContainmentActions() {
                         handleEdit(action)
                       }
                     >
-
                       Edit
-
                     </button>
-
 
                   </div>
 
 
                 </div>
-
 
               </div>
 
@@ -1077,7 +1094,6 @@ function ContainmentActions() {
           </div>
 
         )}
-
 
       </div>
 
