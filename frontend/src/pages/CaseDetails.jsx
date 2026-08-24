@@ -32,7 +32,11 @@ function CaseDetails() {
   const navigate = useNavigate();
 
   const [summary, setSummary] = useState(null);
+  const [riskAssessment, setRiskAssessment] = useState(null);
+
   const [loading, setLoading] = useState(true);
+  const [riskLoading, setRiskLoading] = useState(true);
+
   const [error, setError] = useState("");
 
   /* =================================================
@@ -74,8 +78,51 @@ function CaseDetails() {
     }
   };
 
+  /* =================================================
+     LOAD V2 RISK ASSESSMENT
+  ================================================= */
+
+  const loadRiskAssessment = async () => {
+    try {
+      setRiskLoading(true);
+
+      const response = await fetch(
+        `${API_BASE}/api/cases/${caseId}/risk-assessment`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            `Failed to calculate risk (${response.status})`
+        );
+      }
+
+      setRiskAssessment(data);
+    } catch (err) {
+      console.error(
+        "Risk assessment error:",
+        err
+      );
+
+      setRiskAssessment(null);
+    } finally {
+      setRiskLoading(false);
+    }
+  };
+
+  /* =================================================
+     LOAD CASE DATA
+  ================================================= */
+
   useEffect(() => {
     loadSummary();
+    loadRiskAssessment();
   }, [caseId]);
 
   /* =================================================
@@ -171,6 +218,19 @@ function CaseDetails() {
 
   const mitreCount =
     summary.counts?.mitre_mappings || 0;
+
+  /* =================================================
+     RISK DATA
+  ================================================= */
+
+  const riskScore =
+    riskAssessment?.risk_score;
+
+  const riskSeverity =
+    riskAssessment?.risk_severity;
+
+  const riskComponents =
+    riskAssessment?.risk_components;
 
   /* =================================================
      PAGE
@@ -728,7 +788,7 @@ function CaseDetails() {
                 </h3>
 
                 <small>
-                  Current case risk
+                  V2 evidence-based case risk
                 </small>
               </div>
             </div>
@@ -736,13 +796,9 @@ function CaseDetails() {
             <div className="risk-score">
 
               <div className="score">
-                {caseData.severity === "critical"
-                  ? "90"
-                  : caseData.severity === "high"
-                  ? "75"
-                  : caseData.severity === "medium"
-                  ? "50"
-                  : "25"}
+                {riskLoading
+                  ? "..."
+                  : riskScore ?? "N/A"}
               </div>
 
               <div className="score-label">
@@ -753,15 +809,25 @@ function CaseDetails() {
 
             <div className="risk-breakdown">
 
+              {/* ================================
+                  RISK LEVEL
+              ================================= */}
+
               <div>
-                <span>Severity</span>
+                <span>Risk Level</span>
 
                 <strong>
-                  {upper(
-                    caseData.severity
-                  )}
+                  {riskLoading
+                    ? "CALCULATING"
+                    : upper(
+                        riskSeverity
+                      )}
                 </strong>
               </div>
+
+              {/* ================================
+                  STATUS
+              ================================= */}
 
               <div>
                 <span>Status</span>
@@ -773,6 +839,10 @@ function CaseDetails() {
                 </strong>
               </div>
 
+              {/* ================================
+                  FINDINGS
+              ================================= */}
+
               <div>
                 <span>Findings</span>
 
@@ -780,6 +850,10 @@ function CaseDetails() {
                   {findingCount}
                 </strong>
               </div>
+
+              {/* ================================
+                  THREAT INTEL
+              ================================= */}
 
               <div>
                 <span>Threat Intel</span>
@@ -789,7 +863,84 @@ function CaseDetails() {
                 </strong>
               </div>
 
+              {/* ================================
+                  V2 COMPONENTS
+              ================================= */}
+
+              {riskAssessment && (
+                <>
+                  <div>
+                    <span>Finding Risk</span>
+
+                    <strong>
+                      {riskComponents
+                        ?.finding_score ?? 0}
+                      /40
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>
+                      Authentication
+                    </span>
+
+                    <strong>
+                      {riskComponents
+                        ?.authentication_score ?? 0}
+                      /20
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>
+                      Threat Intel Risk
+                    </span>
+
+                    <strong>
+                      {riskComponents
+                        ?.threat_intelligence_score ??
+                        0}
+                      /25
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>
+                      User Impact
+                    </span>
+
+                    <strong>
+                      {riskComponents
+                        ?.user_impact_score ?? 0}
+                      /15
+                    </strong>
+                  </div>
+                </>
+              )}
+
             </div>
+
+            {/* =================================================
+                RISK EXPLANATION
+            ================================================= */}
+
+            {riskAssessment && (
+              <div
+                className="risk-summary"
+                style={{
+                  marginTop: "20px",
+                  padding: "15px",
+                  borderRadius: "10px",
+                  background:
+                    "rgba(255, 255, 255, 0.03)",
+                }}
+              >
+                <small>
+                  {riskAssessment.summary}
+                </small>
+              </div>
+            )}
+
           </section>
 
           {/* =================================================
@@ -1002,7 +1153,7 @@ function CaseDetails() {
 
       <footer>
         <span>
-          PhishTrace SOC v1.0
+          PhishTrace SOC v2
         </span>
 
         <span>
