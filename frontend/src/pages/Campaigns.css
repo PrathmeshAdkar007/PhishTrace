@@ -1,0 +1,557 @@
+/* =========================================================
+   CAMPAIGN PAGE
+========================================================= */
+
+.campaign-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 35px 40px 60px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.campaign-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+
+.campaign-page-header h1 {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 700;
+}
+
+
+.campaign-page-header p {
+    margin: 8px 0 0;
+    color: #7f91aa;
+    font-size: 15px;
+}
+
+
+.campaign-count {
+    min-width: 110px;
+    padding: 14px 20px;
+    border: 1px solid #243247;
+    border-radius: 10px;
+    background: #101722;
+    text-align: center;
+}
+
+
+.campaign-count strong {
+    display: block;
+    color: #18c8eb;
+    font-size: 26px;
+}
+
+
+.campaign-count span {
+    display: block;
+    margin-top: 3px;
+    color: #8495ad;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.campaign-loading {
+    padding: 60px;
+    text-align: center;
+    color: #8ca0ba;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.campaign-error {
+    padding: 30px;
+    border: 1px solid #542a31;
+    border-radius: 12px;
+    background: #171116;
+}
+
+
+.campaign-error h3 {
+    margin: 0 0 8px;
+    color: #ff5964;
+}
+
+
+.campaign-error p {
+    margin: 0;
+    color: #9aa9bb;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.campaign-empty {
+    padding: 70px 30px;
+    border: 1px solid #202d40;
+    border-radius: 14px;
+    background: #0f1621;
+    text-align: center;
+}
+
+
+.campaign-empty-icon {
+    margin-bottom: 15px;
+    font-size: 42px;
+    color: #18c8eb;
+}
+
+
+.campaign-empty h2 {
+    margin: 0 0 10px;
+}
+
+
+.campaign-empty p {
+    max-width: 550px;
+    margin: 0 auto;
+    color: #8092aa;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   CAMPAIGN LIST
+========================================================= */
+
+.campaign-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+
+/* =========================================================
+   CAMPAIGN CARD
+========================================================= */
+
+.campaign-card {
+    overflow: hidden;
+    border: 1px solid #243247;
+    border-radius: 15px;
+    background: #0f1722;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.campaign-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 26px 28px;
+    border-bottom: 1px solid #202c3d;
+}
+
+
+.campaign-overline {
+    display: block;
+    margin-bottom: 7px;
+    color: #6f849e;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+
+.campaign-card-header h2 {
+    margin: 0;
+    color: #f1f5f9;
+    font-size: 26px;
+}
+
+
+.campaign-badge {
+    padding: 7px 12px;
+    border: 1px solid #1d513e;
+    border-radius: 6px;
+    background: #10261e;
+    color: #35d58b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.campaign-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    padding: 22px 28px;
+}
+
+
+.campaign-stat {
+    padding: 18px;
+    border: 1px solid #1d2939;
+    border-radius: 10px;
+    background: #111b28;
+    text-align: center;
+}
+
+
+.campaign-stat span {
+    display: block;
+    margin-bottom: 8px;
+    color: #71859f;
+    font-size: 12px;
+}
+
+
+.campaign-stat strong {
+    color: #e7edf5;
+    font-size: 23px;
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.campaign-section {
+    padding: 25px 28px;
+    border-top: 1px solid #202c3d;
+}
+
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+
+.section-heading h3 {
+    margin: 0;
+    color: #edf2f7;
+    font-size: 18px;
+}
+
+
+.section-heading span {
+    display: block;
+    margin-top: 4px;
+    color: #70839c;
+    font-size: 12px;
+}
+
+
+.section-heading > strong {
+    color: #18c8eb;
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   RELATED CASES
+========================================================= */
+
+.related-case-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.related-case {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid #202d40;
+    border-radius: 9px;
+    background: #111b28;
+}
+
+
+.case-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    background: #172b3a;
+    color: #18c8eb;
+}
+
+
+.case-information {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+}
+
+
+.case-information strong {
+    color: #e8eef5;
+    font-size: 14px;
+}
+
+
+.case-information span {
+    color: #71849c;
+    font-size: 12px;
+}
+
+
+.case-arrow {
+    color: #18c8eb;
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   INDICATORS
+========================================================= */
+
+.indicator-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.indicator-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid #202d40;
+    border-radius: 9px;
+    background: #111b28;
+}
+
+
+.indicator-type {
+    min-width: 80px;
+    color: #18c8eb;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+
+.indicator-item code {
+    overflow-wrap: anywhere;
+    color: #dce5ef;
+    font-family: Consolas, monospace;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   EXPLANATION
+========================================================= */
+
+.campaign-explanation {
+    display: flex;
+    gap: 15px;
+    margin: 0 28px 28px;
+    padding: 18px;
+    border: 1px solid #26384b;
+    border-radius: 10px;
+    background: #101b27;
+}
+
+
+.explanation-icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #103b34;
+    color: #35d58b;
+    font-weight: 700;
+}
+
+
+.campaign-explanation strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #e6edf5;
+    font-size: 14px;
+}
+
+
+.campaign-explanation p {
+    margin: 0;
+    color: #7e91a9;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .campaign-page {
+        padding: 25px 18px 40px;
+    }
+
+
+    .campaign-page-header {
+        flex-direction: column;
+    }
+
+
+    .campaign-stats {
+        grid-template-columns: 1fr;
+    }
+
+
+    .campaign-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+}
+
+/* =========================================================
+   CAMPAIGN RISK ASSESSMENT
+   ========================================================= */
+
+.campaign-risk-section {
+    margin-top: 32px;
+    padding: 28px;
+    border: 1px solid #243247;
+    border-radius: 16px;
+    background: #0d141f;
+}
+
+.campaign-risk-header {
+    margin-bottom: 20px;
+}
+
+.campaign-risk-header h3 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.campaign-risk-header span {
+    display: block;
+    margin-top: 6px;
+    color: #7190b5;
+    font-size: 14px;
+}
+
+.campaign-risk-score {
+    text-align: center;
+    padding: 10px 0 24px;
+}
+
+.campaign-risk-score strong {
+    display: block;
+    font-size: 64px;
+    line-height: 1;
+    color: #ff5264;
+    font-weight: 800;
+}
+
+.campaign-risk-score span {
+    display: block;
+    margin-top: 8px;
+    color: #ff5264;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.campaign-risk-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.campaign-risk-stat {
+    min-height: 82px;
+    padding: 18px;
+    border-radius: 10px;
+    background: #111b29;
+    text-align: center;
+}
+
+.campaign-risk-stat span {
+    display: block;
+    margin-bottom: 8px;
+    color: #7190b5;
+    font-size: 13px;
+}
+
+.campaign-risk-stat strong {
+    display: block;
+    color: #f2f5fa;
+    font-size: 20px;
+}
+
+.campaign-risk-summary {
+    margin-top: 18px;
+    padding: 18px;
+    border-radius: 12px;
+    background: #111b29;
+    color: #dce5f2;
+    text-align: center;
+    line-height: 1.7;
+    font-size: 14px;
+}
+
+.campaign-risk-summary strong {
+    color: #f2f5fa;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .campaign-risk-section {
+        padding: 20px;
+    }
+
+    .campaign-risk-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .campaign-risk-score strong {
+        font-size: 52px;
+    }
+
+}

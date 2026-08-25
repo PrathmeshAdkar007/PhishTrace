@@ -26,6 +26,8 @@ import ThreatIntelligenceDetails from "./pages/ThreatIntelligenceDetails";
 import MitreAttack from "./pages/MitreAttack";
 import MitreDetails from "./pages/MitreDetails";
 
+import Campaigns from "./pages/Campaigns";
+
 import ContainmentActions from "./pages/ContainmentActions";
 
 import Login from "./pages/login";
@@ -382,6 +384,24 @@ function App() {
             </NavLink>
 
 
+            {/* CAMPAIGNS */}
+
+            <NavLink
+              to="/campaigns"
+              className={navClass}
+            >
+
+              <span className="nav-icon">
+                ◈
+              </span>
+
+              <span>
+                Campaigns
+              </span>
+
+            </NavLink>
+
+
           </nav>
 
 
@@ -560,6 +580,16 @@ function App() {
             <Route
               path="/mitre/:mappingId"
               element={<MitreDetails />}
+            />
+
+
+            {/* =================================================
+                CAMPAIGNS
+            ================================================= */}
+
+            <Route
+              path="/campaigns"
+              element={<Campaigns />}
             />
 
 
