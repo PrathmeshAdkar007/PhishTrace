@@ -11,6 +11,7 @@ import {
 import Dashboard from "./pages/Dashboard";
 import Cases from "./pages/Cases";
 import CaseDetails from "./pages/CaseDetails";
+import InvestigationTimeline from "./pages/InvestigationTimeline";
 
 import Emails from "./pages/Emails";
 import EmailDetails from "./pages/EmailDetails";
@@ -480,6 +481,16 @@ function App() {
             <Route
               path="/cases/:caseId"
               element={<CaseDetails />}
+            />
+
+
+            {/* =================================================
+                INVESTIGATION TIMELINE
+            ================================================= */}
+
+            <Route
+              path="/cases/:caseId/timeline"
+              element={<InvestigationTimeline />}
             />
 
 

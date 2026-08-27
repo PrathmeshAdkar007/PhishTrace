@@ -198,16 +198,30 @@ function CaseDetails() {
       </div>
 
       {/* =================================================
-          BACK BUTTON
+          CASE NAVIGATION
       ================================================= */}
 
-      <button
-        type="button"
-        className="secondary-button back-button"
-        onClick={() => navigate("/cases")}
-      >
-        ← Back to Cases
-      </button>
+      <div className="case-navigation-buttons">
+
+        <button
+          type="button"
+          className="secondary-button back-button"
+          onClick={() => navigate("/cases")}
+        >
+          ← Back to Cases
+        </button>
+
+        <button
+          type="button"
+          className="timeline-button"
+          onClick={() =>
+            navigate(`/cases/${caseId}/timeline`)
+          }
+        >
+          🕒 Investigation Timeline →
+        </button>
+
+      </div>
 
       {/* =================================================
           CASE HEADER

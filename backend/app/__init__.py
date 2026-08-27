@@ -157,11 +157,19 @@ def create_app():
         case_summary
     )
 
+
     # =========================================================
     # CAMPAIGN CORRELATION
     # =========================================================
 
     from app.routes.campaigns import campaigns
+
+
+    # =========================================================
+    # INVESTIGATION TIMELINE
+    # =========================================================
+
+    from app.routes.timeline import timeline
 
 
     # =========================================================
@@ -220,12 +228,22 @@ def create_app():
         case_summary
     )
 
+
     # =========================================================
     # REGISTER CAMPAIGN CORRELATION
     # =========================================================
 
     app.register_blueprint(
         campaigns
+    )
+
+
+    # =========================================================
+    # REGISTER INVESTIGATION TIMELINE
+    # =========================================================
+
+    app.register_blueprint(
+        timeline
     )
 
 

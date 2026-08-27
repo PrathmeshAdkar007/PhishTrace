@@ -3184,3 +3184,32 @@ footer {
   }
 
 }
+
+.case-navigation-buttons {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.timeline-button {
+  border: 1px solid #08d9ff;
+  background: rgba(8, 217, 255, 0.08);
+  color: #08d9ff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timeline-button:hover {
+  background: rgba(8, 217, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+.timeline-button:active {
+  transform: translateY(0);
+}
