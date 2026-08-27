@@ -45,13 +45,19 @@ def calculate_risk(findings_list):
         )
 
 
-    # Cap the score at 100
+    # =====================================================
+    # CAP SCORE
+    # =====================================================
 
     score = min(
         score,
         100
     )
 
+
+    # =====================================================
+    # DETERMINE RISK SEVERITY
+    # =====================================================
 
     if score >= 80:
 
@@ -74,7 +80,175 @@ def calculate_risk(findings_list):
 
 
 # =========================================================
-# CASE RISK ASSESSMENT
+# GET FINDING BREAKDOWN
+# =========================================================
+
+def get_finding_breakdown(findings_list):
+
+    return {
+
+        "critical": sum(
+            1
+            for finding in findings_list
+            if (
+                finding.severity or ""
+            ).lower() == "critical"
+        ),
+
+        "high": sum(
+            1
+            for finding in findings_list
+            if (
+                finding.severity or ""
+            ).lower() == "high"
+        ),
+
+        "medium": sum(
+            1
+            for finding in findings_list
+            if (
+                finding.severity or ""
+            ).lower() == "medium"
+        ),
+
+        "low": sum(
+            1
+            for finding in findings_list
+            if (
+                finding.severity or ""
+            ).lower() == "low"
+        )
+
+    }
+
+
+# =========================================================
+# BUILD RISK ASSESSMENT
+# =========================================================
+
+def build_risk_assessment(case_id):
+
+    findings_list = Finding.query.filter_by(
+        case_id=case_id
+    ).all()
+
+
+    # If there are no findings yet,
+    # the case simply has zero risk.
+
+    if not findings_list:
+
+        return {
+
+            "case_id": case_id,
+
+            "risk_score": 0,
+
+            "risk_severity": "low",
+
+            "finding_count": 0,
+
+            "breakdown": {
+
+                "critical": 0,
+
+                "high": 0,
+
+                "medium": 0,
+
+                "low": 0
+
+            },
+
+            "summary": (
+                "No findings are currently available. "
+                "Overall risk score is 0/100."
+            )
+
+        }
+
+
+    # =====================================================
+    # CALCULATE SCORE
+    # =====================================================
+
+    score, severity = calculate_risk(
+        findings_list
+    )
+
+
+    breakdown = get_finding_breakdown(
+        findings_list
+    )
+
+
+    # =====================================================
+    # RESPONSE DATA
+    # =====================================================
+
+    return {
+
+        "case_id": case_id,
+
+        "risk_score": score,
+
+        "risk_severity": severity,
+
+        "finding_count": len(
+            findings_list
+        ),
+
+        "breakdown": breakdown,
+
+        "summary": (
+
+            f"Case contains "
+            f"{len(findings_list)} findings. "
+
+            f"Overall risk is "
+            f"{severity} with a score of "
+            f"{score}/100."
+
+        )
+
+    }
+
+
+# =========================================================
+# GET CASE RISK ASSESSMENT
+# =========================================================
+
+@risk.get(
+    "/api/cases/<int:case_id>/risk-assessment"
+)
+@login_required
+def get_case_risk(case_id):
+
+    case = db.session.get(
+        Case,
+        case_id
+    )
+
+
+    if not case:
+
+        return jsonify({
+            "error": "Case not found"
+        }), 404
+
+
+    assessment = build_risk_assessment(
+        case_id
+    )
+
+
+    return jsonify(
+        assessment
+    )
+
+
+# =========================================================
+# MANUAL RISK ASSESSMENT
 # =========================================================
 
 @risk.post(
@@ -92,128 +266,21 @@ def assess_case_risk(case_id):
     if not case:
 
         return jsonify({
-            "error":
-                "Case not found"
+            "error": "Case not found"
         }), 404
 
 
-    findings_list = Finding.query.filter_by(
-        case_id=case_id
-    ).all()
-
-
-    if not findings_list:
-
-        return jsonify({
-            "error":
-                "No findings available for risk assessment"
-        }), 404
-
-
-    score, severity = calculate_risk(
-        findings_list
+    assessment = build_risk_assessment(
+        case_id
     )
 
-
-    # =====================================================
-    # FINDING BREAKDOWN
-    # =====================================================
-
-    critical_count = sum(
-
-        1
-
-        for finding in findings_list
-
-        if (
-            finding.severity or ""
-        ).lower() == "critical"
-
-    )
-
-
-    high_count = sum(
-
-        1
-
-        for finding in findings_list
-
-        if (
-            finding.severity or ""
-        ).lower() == "high"
-
-    )
-
-
-    medium_count = sum(
-
-        1
-
-        for finding in findings_list
-
-        if (
-            finding.severity or ""
-        ).lower() == "medium"
-
-    )
-
-
-    low_count = sum(
-
-        1
-
-        for finding in findings_list
-
-        if (
-            finding.severity or ""
-        ).lower() == "low"
-
-    )
-
-
-    # =====================================================
-    # RESPONSE
-    # =====================================================
 
     return jsonify({
 
-        "case_id":
-            case_id,
+        "message":
+            "Risk assessment completed",
 
-        "risk_score":
-            score,
-
-        "risk_severity":
-            severity,
-
-        "finding_count":
-            len(findings_list),
-
-        "breakdown": {
-
-            "critical":
-                critical_count,
-
-            "high":
-                high_count,
-
-            "medium":
-                medium_count,
-
-            "low":
-                low_count
-
-        },
-
-        "summary": (
-
-            f"Case contains "
-            f"{len(findings_list)} findings. "
-
-            f"Overall risk is "
-            f"{severity} with a score of "
-            f"{score}/100."
-
-        )
+        "assessment":
+            assessment
 
     })

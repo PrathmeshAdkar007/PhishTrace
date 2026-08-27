@@ -3944,3 +3944,1731 @@ footer {
   }
 
 }
+
+/* =========================================================
+   CASES PAGE – PROFESSIONAL SOC DESIGN
+========================================================= */
+
+/* Search and filter card */
+
+.card-dark .filters-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.6fr)
+    minmax(180px, 0.8fr)
+    minmax(180px, 0.8fr);
+
+  gap: 18px;
+
+  margin-top: 22px;
+}
+
+
+/* Filter fields */
+
+.filter-group {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+
+.filter-group label {
+  color: #aeb9c9;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  text-align: center;
+}
+
+
+.filter-group input,
+.filter-group select {
+  width: 100%;
+
+  min-height: 46px;
+
+  padding: 0 14px;
+
+  background: #111a26;
+
+  border: 1px solid #2a394b;
+
+  border-radius: 9px;
+
+  color: #e7edf6;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+
+.filter-group input::placeholder {
+  color: #728096;
+}
+
+
+.filter-group input:focus,
+.filter-group select:focus {
+  border-color: #20c7e8;
+
+  background: #131e2b;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(32, 199, 232, 0.08);
+}
+
+
+.filter-group select {
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   CASE RESULTS LIST
+========================================================= */
+
+.cases-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 14px;
+
+  margin-top: 18px;
+}
+
+
+/* Individual case card */
+
+.case-list-item {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto
+    auto;
+
+  align-items: center;
+
+  gap: 24px;
+
+  padding: 24px 26px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(21, 31, 45, 0.96),
+      rgba(15, 23, 34, 0.96)
+    );
+
+  border: 1px solid #26384a;
+
+  border-radius: 12px;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.case-list-item:hover {
+  transform: translateY(-2px);
+
+  border-color: #20c7e8;
+
+  box-shadow:
+    0 10px 30px
+    rgba(0, 0, 0, 0.22);
+}
+
+
+/* =========================================================
+   CASE INFORMATION
+========================================================= */
+
+.case-list-main {
+  min-width: 0;
+}
+
+
+.case-number {
+  display: inline-flex;
+
+  align-items: center;
+
+  margin-bottom: 10px;
+
+  color: #48d5f2;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.8px;
+
+  text-transform: uppercase;
+}
+
+
+.case-list-main h3 {
+  margin: 0 0 10px;
+
+  color: #f1f5f9;
+
+  font-size: 18px;
+
+  font-weight: 750;
+
+  line-height: 1.4;
+}
+
+
+.case-list-main p {
+  max-width: 760px;
+
+  margin: 0;
+
+  color: #98a8ba;
+
+  font-size: 14px;
+
+  line-height: 1.65;
+}
+
+
+/* Case metadata */
+
+.case-list-meta {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 18px;
+
+  padding-top: 14px;
+
+  border-top:
+    1px solid
+    rgba(89, 108, 129, 0.18);
+}
+
+
+.case-list-meta span {
+  color: #8292a6;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   SEVERITY + STATUS
+========================================================= */
+
+.case-list-status {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 95px;
+}
+
+
+.case-list-status .severity,
+.case-list-status .status {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 92px;
+
+  min-height: 38px;
+
+  padding: 0 14px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.8px;
+
+  text-transform: uppercase;
+}
+
+
+/* Default severity */
+
+.case-list-status .severity {
+  background:
+    rgba(255, 193, 7, 0.08);
+
+  border:
+    1px solid
+    rgba(255, 193, 7, 0.22);
+
+  color: #f5c451;
+}
+
+
+/* Critical severity */
+
+.case-list-status .severity.critical {
+  background:
+    rgba(255, 82, 94, 0.1);
+
+  border:
+    1px solid
+    rgba(255, 82, 94, 0.35);
+
+  color: #ff7781;
+}
+
+
+/* Open status */
+
+.case-list-status .status.case-open {
+  background:
+    rgba(46, 204, 113, 0.08);
+
+  border:
+    1px solid
+    rgba(46, 204, 113, 0.3);
+
+  color: #66d99a;
+}
+
+
+/* Closed status */
+
+.case-list-status .status {
+  background:
+    rgba(117, 134, 153, 0.08);
+
+  border:
+    1px solid
+    rgba(117, 134, 153, 0.25);
+
+  color: #a5b1c1;
+}
+
+
+/* =========================================================
+   CASE ACTION BUTTONS
+========================================================= */
+
+.case-list-actions {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+  min-width: 98px;
+}
+
+
+.case-list-actions button {
+  min-width: 98px;
+
+  min-height: 42px;
+
+  padding: 0 16px;
+
+  border-radius: 8px;
+
+  font-size: 12px;
+
+  font-weight: 700;
+}
+
+
+.case-list-actions .secondary-button {
+  border-color:
+    rgba(72, 213, 242, 0.28);
+}
+
+
+.case-list-actions .danger-button {
+  border-color:
+    rgba(255, 82, 94, 0.32);
+}
+
+
+/* =========================================================
+   CASE PAGE SECTION HEADER
+========================================================= */
+
+.card-dark .section-header {
+  padding-bottom: 18px;
+
+  border-bottom:
+    1px solid
+    rgba(89, 108, 129, 0.2);
+}
+
+
+.card-dark .section-header h3 {
+  margin: 0 0 6px;
+
+  color: #eaf0f7;
+
+  font-size: 20px;
+
+  font-weight: 750;
+}
+
+
+.card-dark .section-header small {
+  color: #8292a6;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   EMPTY STATES
+========================================================= */
+
+.empty-state {
+  padding: 50px 24px;
+
+  text-align: center;
+}
+
+
+.empty-state h3 {
+  margin-bottom: 10px;
+
+  color: #e7edf6;
+}
+
+
+.empty-state p {
+  max-width: 520px;
+
+  margin:
+    0 auto 22px;
+
+  color: #8292a6;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   CASES FOOTER
+========================================================= */
+
+.page footer {
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-top: 28px;
+
+  padding: 20px 4px;
+
+  border-top:
+    1px solid
+    rgba(89, 108, 129, 0.18);
+
+  color: #718095;
+
+  font-size: 12px;
+
+  letter-spacing: 0.4px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+  .card-dark .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .case-list-item {
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto;
+
+    gap: 20px;
+  }
+
+
+  .case-list-actions {
+    grid-column: 1 / -1;
+
+    flex-direction: row;
+
+    justify-content: flex-start;
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .case-list-item {
+    grid-template-columns: 1fr;
+
+    padding: 20px;
+  }
+
+
+  .case-list-status {
+    flex-direction: row;
+
+    align-items: flex-start;
+
+    justify-content: flex-start;
+  }
+
+
+  .case-list-actions {
+    width: 100%;
+
+    flex-direction: column;
+  }
+
+
+  .case-list-actions button {
+    width: 100%;
+  }
+
+
+  .case-list-main h3 {
+    font-size: 16px;
+  }
+
+
+  .page footer {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+}
+
+/* =========================================================
+   CASE DETAILS – RISK ASSESSMENT
+========================================================= */
+
+.risk-card {
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   RISK SCORE OVERVIEW
+========================================================= */
+
+.risk-score-overview {
+  display: flex;
+
+  align-items: center;
+
+  gap: 22px;
+
+  margin-top: 22px;
+
+  padding: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(20, 33, 48, 0.95),
+      rgba(14, 24, 36, 0.95)
+    );
+
+  border: 1px solid #26394c;
+
+  border-radius: 14px;
+}
+
+
+/* Main risk number */
+
+.risk-score-value {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 112px;
+
+  min-width: 112px;
+
+  height: 112px;
+
+  border-radius: 50%;
+
+  border: 2px solid rgba(255, 92, 104, 0.35);
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 92, 104, 0.14),
+      rgba(255, 92, 104, 0.03)
+    );
+
+  color: #ff6b75;
+
+  font-size: 34px;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+}
+
+
+/* Risk information */
+
+.risk-score-info {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  gap: 8px;
+}
+
+
+.risk-label {
+  color: #e7edf5;
+
+  font-size: 18px;
+
+  font-weight: 750;
+}
+
+
+.risk-severity-text {
+  color: #8392a5;
+
+  font-size: 13px;
+}
+
+
+/* Severity badge */
+
+.risk-severity-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-top: 4px;
+
+  padding: 7px 13px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.8px;
+}
+
+
+/* Critical */
+
+.risk-severity-badge.critical {
+  color: #ff7a84;
+
+  background:
+    rgba(255, 82, 94, 0.1);
+
+  border:
+    1px solid
+    rgba(255, 82, 94, 0.3);
+}
+
+
+/* High */
+
+.risk-severity-badge.high {
+  color: #ffb36b;
+
+  background:
+    rgba(255, 153, 82, 0.1);
+
+  border:
+    1px solid
+    rgba(255, 153, 82, 0.3);
+}
+
+
+/* Medium */
+
+.risk-severity-badge.medium {
+  color: #f2cc60;
+
+  background:
+    rgba(242, 204, 96, 0.08);
+
+  border:
+    1px solid
+    rgba(242, 204, 96, 0.25);
+}
+
+
+/* Low */
+
+.risk-severity-badge.low {
+  color: #6edba0;
+
+  background:
+    rgba(46, 204, 113, 0.08);
+
+  border:
+    1px solid
+    rgba(46, 204, 113, 0.25);
+}
+
+
+/* =========================================================
+   RISK DETAILS GRID
+========================================================= */
+
+.risk-details-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 12px;
+
+  margin-top: 18px;
+}
+
+
+.risk-detail-item {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  min-height: 105px;
+
+  padding: 18px 12px;
+
+  background: #111b28;
+
+  border: 1px solid #26394c;
+
+  border-radius: 12px;
+
+  text-align: center;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+
+.risk-detail-item:hover {
+  transform: translateY(-2px);
+
+  background: #142131;
+
+  border-color:
+    rgba(32, 199, 232, 0.45);
+}
+
+
+.risk-detail-label {
+  color: #8796aa;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.7px;
+
+  text-transform: uppercase;
+}
+
+
+.risk-detail-value {
+  color: #eef3f8;
+
+  font-size: 22px;
+
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   STATUS COLORS
+========================================================= */
+
+.risk-detail-value.status-open {
+  color: #65d99a;
+}
+
+
+.risk-detail-value.status-closed {
+  color: #8ea0b5;
+}
+
+
+.risk-detail-value.status-pending {
+  color: #f2cc60;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .risk-score-overview {
+    flex-direction: column;
+
+    text-align: center;
+  }
+
+
+  .risk-score-info {
+    align-items: center;
+  }
+
+
+  .risk-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 1000px) {
+
+  .risk-details-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+}
+
+/* =========================================================
+   THREAT INTELLIGENCE – POLISHED UI
+========================================================= */
+
+.threat-intel-page {
+  width: 100%;
+}
+
+
+/* =========================================================
+   THREAT INTELLIGENCE SUMMARY
+========================================================= */
+
+.threat-intel-page .stats-grid {
+  margin-bottom: 24px;
+}
+
+.threat-intel-page .stat-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 125px;
+  padding: 22px;
+  border: 1px solid #26384d;
+  border-radius: 14px;
+  background: #141e2b;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.threat-intel-page .stat-card:hover {
+  transform: translateY(-3px);
+  border-color: #2fc3e7;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+.threat-intel-page .stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #20c8ee;
+  opacity: 0.85;
+}
+
+
+/* =========================================================
+   THREAT INTELLIGENCE TABLE
+========================================================= */
+
+.threat-table {
+  overflow: hidden;
+  border: 1px solid #26384d;
+  border-radius: 12px;
+}
+
+.threat-table th {
+  background: #101925;
+  color: #8ea1b8;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 15px 16px;
+  border: none;
+  border-bottom: 1px solid #26384d;
+}
+
+.threat-table td {
+  padding: 16px;
+  border: none;
+  border-bottom: 1px solid #202d3e;
+  background: #141e2b;
+}
+
+.threat-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.threat-table tbody tr:hover td {
+  background: #182536;
+}
+
+.threat-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.threat-table code {
+  color: #5bd7f4;
+  background: #0e1722;
+  border: 1px solid #24364a;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  word-break: break-word;
+}
+
+
+/* =========================================================
+   VERDICT BADGES
+========================================================= */
+
+.verdict {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.verdict.malicious,
+.malicious {
+  background: rgba(255, 91, 105, 0.1);
+  color: #ff7882;
+  border-color: rgba(255, 91, 105, 0.35);
+}
+
+.verdict.suspicious {
+  background: rgba(255, 190, 80, 0.1);
+  color: #ffc76b;
+  border-color: rgba(255, 190, 80, 0.35);
+}
+
+.verdict.safe,
+.verdict.benign {
+  background: rgba(77, 214, 140, 0.1);
+  color: #70dda3;
+  border-color: rgba(77, 214, 140, 0.3);
+}
+
+.verdict.unknown {
+  background: #182536;
+  color: #9aaabd;
+  border-color: #2a3a4e;
+}
+
+
+/* =========================================================
+   THREAT ANALYSIS CARDS
+========================================================= */
+
+.threat-analysis-card {
+  position: relative;
+  padding: 20px;
+  border: 1px solid #26384d;
+  border-radius: 14px;
+  background: #141e2b;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.threat-clickable-card {
+  cursor: pointer;
+}
+
+.threat-clickable-card:hover {
+  transform: translateY(-3px);
+  border-color: #20c8ee;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.threat-clickable-card:focus {
+  outline: none;
+  border-color: #20c8ee;
+  box-shadow: 0 0 0 3px rgba(32, 200, 238, 0.12);
+}
+
+.threat-analysis-card .finding-indicator {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(32, 200, 238, 0.08);
+  border: 1px solid rgba(32, 200, 238, 0.3);
+  color: #4dd9f5;
+  font-size: 20px;
+}
+
+.threat-analysis-card .finding-indicator.danger {
+  background: rgba(255, 91, 105, 0.1);
+  border-color: rgba(255, 91, 105, 0.4);
+  color: #ff707b;
+}
+
+.threat-analysis-card h5 {
+  color: #edf3fa;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.threat-analysis-card p {
+  color: #9cadc1;
+  line-height: 1.65;
+}
+
+.threat-analysis-card p strong {
+  color: #65d8f4;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   THREAT ANALYSIS TAGS
+========================================================= */
+
+.threat-analysis-card .finding-tags {
+  margin-top: 14px;
+  gap: 8px;
+}
+
+.threat-analysis-card .tag {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #182536;
+  border: 1px solid #293b50;
+  color: #a9b9cb;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.threat-analysis-card .severity-tag {
+  color: #ff7882;
+  background: rgba(255, 91, 105, 0.08);
+  border-color: rgba(255, 91, 105, 0.25);
+}
+
+.threat-analysis-card .finding-time {
+  display: block;
+  margin-top: 14px;
+  color: #718197;
+  font-size: 11px;
+}
+
+.threat-analysis-card .finding-arrow {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #162536;
+  border: 1px solid #284258;
+  color: #43d2ef;
+  font-size: 21px;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.threat-clickable-card:hover .finding-arrow {
+  transform: translateX(4px);
+  background: #193144;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.threat-intel-page .empty-state {
+  padding: 45px 25px;
+  text-align: center;
+  border: 1px dashed #2a3b50;
+  border-radius: 12px;
+  background: #111a26;
+}
+
+.threat-intel-page .empty-state p {
+  margin: 0;
+  color: #8393a7;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+  .threat-analysis-card {
+    padding: 16px;
+  }
+
+  .threat-analysis-card .finding-arrow {
+    display: none;
+  }
+
+  .threat-table th,
+  .threat-table td {
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  .verdict {
+    min-width: auto;
+  }
+
+}
+
+/* =========================================================
+   MITRE ATT&CK – POLISHED SOC UI
+========================================================= */
+
+.mitre-page {
+  width: 100%;
+}
+
+
+/* =========================================================
+   PAGE KICKER
+========================================================= */
+
+.mitre-page .page-kicker {
+  margin-bottom: 6px;
+  color: #43d2ef;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.mitre-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.mitre-summary-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-height: 110px;
+  padding: 20px;
+  overflow: hidden;
+  border: 1px solid #26384d;
+  border-radius: 14px;
+  background: #141e2b;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.mitre-summary-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #20c8ee;
+}
+
+.mitre-summary-card:hover {
+  transform: translateY(-3px);
+  border-color: #20c8ee;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.summary-icon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(32, 200, 238, 0.3);
+  border-radius: 12px;
+  background: rgba(32, 200, 238, 0.08);
+  color: #4dd9f5;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.mitre-summary-card strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #edf3fa;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.mitre-summary-card span {
+  display: block;
+  color: #8fa0b4;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   OBSERVED ATTACK PATH
+========================================================= */
+
+.mitre-path-card {
+  margin-bottom: 24px;
+}
+
+.mitre-attack-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.attack-flow-step {
+  flex: 1;
+  min-height: 110px;
+  padding: 20px;
+  border: 1px solid #293d52;
+  border-radius: 12px;
+  background: #101a27;
+}
+
+.attack-flow-step span {
+  display: block;
+  margin-bottom: 10px;
+  color: #71839a;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.attack-flow-step strong {
+  display: block;
+  color: #edf3fa;
+  font-size: 17px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.attack-flow-arrow {
+  flex-shrink: 0;
+  color: #43d2ef;
+  font-size: 28px;
+  font-weight: 300;
+}
+
+.primary-technique-name {
+  margin-top: 20px;
+  padding: 18px 20px;
+  border-left: 3px solid #20c8ee;
+  border-radius: 0 10px 10px 0;
+  background: #111d2a;
+}
+
+.primary-technique-name span {
+  display: block;
+  margin-bottom: 6px;
+  color: #71839a;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.primary-technique-name h4 {
+  margin: 0;
+  color: #edf3fa;
+  font-size: 18px;
+}
+
+
+/* =========================================================
+   TECHNIQUE MAPPINGS
+========================================================= */
+
+.mitre-mappings-section {
+  margin-bottom: 24px;
+}
+
+.section-count {
+  padding: 7px 11px;
+  border: 1px solid #2a4055;
+  border-radius: 999px;
+  background: #162536;
+  color: #9fb2c6;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.mitre-mapping-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+
+/* =========================================================
+   MAPPING CARD
+========================================================= */
+
+.mitre-mapping-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid #26384d;
+  border-radius: 14px;
+  background: #141e2b;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.mitre-mapping-card.clickable-card {
+  cursor: pointer;
+}
+
+.mitre-mapping-card.clickable-card:hover {
+  transform: translateY(-2px);
+  border-color: #20c8ee;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.mitre-mapping-card.clickable-card:focus {
+  outline: none;
+  border-color: #20c8ee;
+  box-shadow: 0 0 0 3px rgba(32, 200, 238, 0.12);
+}
+
+
+/* =========================================================
+   CARD INDICATOR
+========================================================= */
+
+.mitre-card-indicator {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(32, 200, 238, 0.3);
+  border-radius: 50%;
+  background: rgba(32, 200, 238, 0.08);
+  color: #43d2ef;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.mitre-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+
+/* =========================================================
+   TECHNIQUE + TACTIC
+========================================================= */
+
+.mitre-card-topline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.technique-id {
+  padding: 6px 10px;
+  border: 1px solid rgba(32, 200, 238, 0.35);
+  border-radius: 7px;
+  background: rgba(32, 200, 238, 0.08);
+  color: #55d8f3;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.tactic {
+  padding: 6px 10px;
+  border: 1px solid #304256;
+  border-radius: 999px;
+  background: #182536;
+  color: #aabaca;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.mitre-mapping-card h4 {
+  margin: 0 0 10px;
+  color: #edf3fa;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.mitre-description {
+  margin: 0;
+  color: #9dacbe;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+
+/* =========================================================
+   SUPPORTING EVIDENCE
+========================================================= */
+
+.mitre-evidence {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-left: 3px solid #20c8ee;
+  border-radius: 0 10px 10px 0;
+  background: #101b28;
+}
+
+.mitre-evidence-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #5cd9f3;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.mitre-evidence p {
+  margin: 0;
+  color: #b2c0cf;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   CARD METADATA
+========================================================= */
+
+.mitre-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #223246;
+}
+
+.mitre-card-meta span {
+  color: #718298;
+  font-size: 11px;
+}
+
+.mitre-card-meta strong {
+  color: #aebdcd;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   VIEW DETAILS
+========================================================= */
+
+.mitre-card-action {
+  min-width: 70px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: #43d2ef;
+  transition: transform 0.2s ease;
+}
+
+.mitre-card-action span {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #29445a;
+  border-radius: 50%;
+  background: #162536;
+  font-size: 20px;
+}
+
+.mitre-card-action small {
+  color: #728398;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.mitre-mapping-card:hover .mitre-card-action {
+  transform: translateX(4px);
+}
+
+
+/* =========================================================
+   ATT&CK OVERVIEW
+========================================================= */
+
+.mitre-overview-card {
+  margin-bottom: 24px;
+}
+
+.mitre-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.mitre-overview-stat {
+  padding: 18px;
+  border: 1px solid #293b4f;
+  border-radius: 12px;
+  background: #111c29;
+}
+
+.mitre-overview-stat span {
+  display: block;
+  margin-bottom: 9px;
+  color: #7f90a5;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.mitre-overview-stat strong {
+  color: #edf3fa;
+  font-size: 24px;
+}
+
+
+/* =========================================================
+   TACTICS AND TECHNIQUES TAGS
+========================================================= */
+
+.mitre-tag-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #223246;
+}
+
+.mitre-group-label {
+  display: block;
+  margin-bottom: 12px;
+  color: #7d8fa5;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.mitre-page .finding-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mitre-page .tag {
+  padding: 7px 11px;
+  border: 1px solid #2d4054;
+  border-radius: 999px;
+  background: #182536;
+  color: #aab9c9;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.mitre-page .mitre-tactic-tag {
+  border-color: rgba(32, 200, 238, 0.3);
+  background: rgba(32, 200, 238, 0.06);
+  color: #64d9f1;
+}
+
+.mitre-page .mitre-technique-tag {
+  color: #c0ccd8;
+  font-family: monospace;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.mitre-empty-state {
+  padding: 55px 25px;
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #304256;
+  border-radius: 50%;
+  background: #162536;
+  color: #5ccfe9;
+  font-size: 25px;
+}
+
+.mitre-empty-state h3 {
+  margin-bottom: 8px;
+  color: #dce6f0;
+}
+
+.mitre-empty-state p {
+  margin: 0;
+  color: #8495a9;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .mitre-summary-grid,
+  .mitre-overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+
+@media (max-width: 768px) {
+
+  .mitre-summary-grid,
+  .mitre-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mitre-attack-flow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .attack-flow-arrow {
+    transform: rotate(90deg);
+    text-align: center;
+  }
+
+  .mitre-mapping-card {
+    flex-direction: column;
+  }
+
+  .mitre-card-action {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .mitre-card-action small {
+    font-size: 11px;
+  }
+
+  .mitre-card-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+}

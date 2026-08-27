@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
+
 import Cases from "./pages/Cases";
 import CaseDetails from "./pages/CaseDetails";
 import InvestigationTimeline from "./pages/InvestigationTimeline";
@@ -31,6 +32,8 @@ import Campaigns from "./pages/Campaigns";
 
 import ContainmentActions from "./pages/ContainmentActions";
 
+import Report from "./pages/Report";
+
 import Login from "./pages/login";
 
 import "./App.css";
@@ -42,6 +45,7 @@ const API_BASE = "http://localhost:5000";
 function App() {
 
   const [user, setUser] = useState(null);
+
   const [loading, setLoading] = useState(true);
 
 
@@ -56,17 +60,24 @@ function App() {
       try {
 
         const response = await fetch(
+
           `${API_BASE}/api/auth/me`,
+
           {
             credentials: "include",
           }
+
         );
+
 
         const data = await response.json();
 
+
         if (data.authenticated) {
 
-          setUser(data.user);
+          setUser(
+            data.user
+          );
 
         } else {
 
@@ -77,9 +88,13 @@ function App() {
       } catch (error) {
 
         console.error(
+
           "Authentication check failed:",
+
           error
+
         );
+
 
         setUser(null);
 
@@ -111,6 +126,7 @@ function App() {
           P
         </div>
 
+
         <h4>
           Loading PhishTrace...
         </h4>
@@ -131,11 +147,15 @@ function App() {
     return (
 
       <Login
+
         onLogin={(loggedInUser) => {
 
-          setUser(loggedInUser);
+          setUser(
+            loggedInUser
+          );
 
         }}
+
       />
 
     );
@@ -160,18 +180,28 @@ function App() {
     try {
 
       const response = await fetch(
+
         `${API_BASE}/api/auth/logout`,
+
         {
+
           method: "POST",
+
           credentials: "include",
+
         }
+
       );
+
 
       if (!response.ok) {
 
         console.error(
+
           "Logout request failed:",
+
           response.status
+
         );
 
       }
@@ -179,8 +209,11 @@ function App() {
     } catch (error) {
 
       console.error(
+
         "Logout failed:",
+
         error
+
       );
 
     } finally {
@@ -210,13 +243,17 @@ function App() {
         <aside className="sidebar">
 
 
-          {/* BRAND */}
+          {/* =================================================
+              BRAND
+          ================================================= */}
 
           <div className="brand">
+
 
             <div className="brand-icon">
               P
             </div>
+
 
             <div>
 
@@ -224,11 +261,13 @@ function App() {
                 PhishTrace
               </h4>
 
+
               <small>
                 Security Operations
               </small>
 
             </div>
+
 
           </div>
 
@@ -243,14 +282,19 @@ function App() {
             {/* DASHBOARD */}
 
             <NavLink
+
               to="/"
+
               end
+
               className={navClass}
+
             >
 
               <span className="nav-icon">
                 ▣
               </span>
+
 
               <span>
                 Dashboard
@@ -262,13 +306,17 @@ function App() {
             {/* CASES */}
 
             <NavLink
+
               to="/cases"
+
               className={navClass}
+
             >
 
               <span className="nav-icon">
                 ◉
               </span>
+
 
               <span>
                 Cases
@@ -280,13 +328,17 @@ function App() {
             {/* EMAILS */}
 
             <NavLink
+
               to="/emails"
+
               className={navClass}
+
             >
 
               <span className="nav-icon">
                 ✉
               </span>
+
 
               <span>
                 Emails
@@ -298,13 +350,17 @@ function App() {
             {/* FINDINGS */}
 
             <NavLink
+
               to="/findings"
+
               className={navClass}
+
             >
 
               <span className="nav-icon">
                 ⚠
               </span>
+
 
               <span>
                 Findings
@@ -316,13 +372,17 @@ function App() {
             {/* AFFECTED USERS */}
 
             <NavLink
+
               to="/affected-users"
+
               className={navClass}
+
             >
 
               <span className="nav-icon">
                 ♟
               </span>
+
 
               <span>
                 Affected Users
@@ -331,16 +391,20 @@ function App() {
             </NavLink>
 
 
-            {/* CONTAINMENT ACTIONS */}
+            {/* CONTAINMENT */}
 
             <NavLink
+
               to="/containment-actions"
+
               className={navClass}
+
             >
 
               <span className="nav-icon">
                 🛡
               </span>
+
 
               <span>
                 Containment
@@ -352,13 +416,17 @@ function App() {
             {/* THREAT INTELLIGENCE */}
 
             <NavLink
+
               to="/threat-intelligence"
+
               className={navClass}
+
             >
 
               <span className="nav-icon">
                 ⌁
               </span>
+
 
               <span>
                 Threat Intelligence
@@ -370,13 +438,17 @@ function App() {
             {/* MITRE ATT&CK */}
 
             <NavLink
+
               to="/mitre"
+
               className={navClass}
+
             >
 
               <span className="nav-icon">
                 ⚔
               </span>
+
 
               <span>
                 MITRE ATT&CK
@@ -388,16 +460,42 @@ function App() {
             {/* CAMPAIGNS */}
 
             <NavLink
+
               to="/campaigns"
+
               className={navClass}
+
             >
 
               <span className="nav-icon">
                 ◈
               </span>
 
+
               <span>
                 Campaigns
+              </span>
+
+            </NavLink>
+
+
+            {/* REPORTS */}
+
+            <NavLink
+
+              to="/reports/1"
+
+              className={navClass}
+
+            >
+
+              <span className="nav-icon">
+                ▤
+              </span>
+
+
+              <span>
+                Incident Report
               </span>
 
             </NavLink>
@@ -412,6 +510,7 @@ function App() {
 
           <div className="sidebar-bottom">
 
+
             <div className="system-online">
 
               <span>
@@ -419,25 +518,33 @@ function App() {
               </span>
 
               {" "}
+
               System Online
 
             </div>
 
 
             <small>
+
               {user.username} • {user.role}
+
             </small>
 
 
             <button
+
               type="button"
+
               className="logout-button"
+
               onClick={handleLogout}
+
             >
 
               Logout
 
             </button>
+
 
           </div>
 
@@ -451,175 +558,209 @@ function App() {
 
         <main className="main-content">
 
+
           <Routes>
 
 
-            {/* =================================================
-                DASHBOARD
-            ================================================= */}
+            {/* DASHBOARD */}
 
             <Route
+
               path="/"
+
               element={<Dashboard />}
+
             />
 
 
-            {/* =================================================
-                CASE LIST
-            ================================================= */}
+            {/* CASE LIST */}
 
             <Route
+
               path="/cases"
+
               element={<Cases />}
+
             />
 
 
-            {/* =================================================
-                CASE DETAILS
-            ================================================= */}
+            {/* CASE DETAILS */}
 
             <Route
+
               path="/cases/:caseId"
+
               element={<CaseDetails />}
+
             />
 
 
-            {/* =================================================
-                INVESTIGATION TIMELINE
-            ================================================= */}
+            {/* INVESTIGATION TIMELINE */}
 
             <Route
+
               path="/cases/:caseId/timeline"
+
               element={<InvestigationTimeline />}
+
             />
 
 
-            {/* =================================================
-                EMAILS
-            ================================================= */}
+            {/* EMAILS */}
 
             <Route
+
               path="/emails"
+
               element={<Emails />}
+
             />
 
 
-            {/* =================================================
-                EMAIL DETAILS
-            ================================================= */}
+            {/* EMAIL DETAILS */}
 
             <Route
+
               path="/emails/:emailId"
+
               element={<EmailDetails />}
+
             />
 
 
-            {/* =================================================
-                FINDINGS
-            ================================================= */}
+            {/* FINDINGS */}
 
             <Route
+
               path="/findings"
+
               element={<Findings />}
+
             />
 
 
-            {/* =================================================
-                FINDING DETAILS
-            ================================================= */}
+            {/* FINDING DETAILS */}
 
             <Route
+
               path="/findings/:findingId"
+
               element={<FindingDetails />}
+
             />
 
 
-            {/* =================================================
-                AFFECTED USERS
-            ================================================= */}
+            {/* AFFECTED USERS */}
 
             <Route
+
               path="/affected-users"
+
               element={<AffectedUsers />}
+
             />
 
 
-            {/* =================================================
-                CONTAINMENT ACTIONS
-            ================================================= */}
+            {/* CONTAINMENT ACTIONS */}
 
             <Route
+
               path="/containment-actions"
+
               element={<ContainmentActions />}
+
             />
 
 
-            {/* =================================================
-                THREAT INTELLIGENCE
-            ================================================= */}
+            {/* THREAT INTELLIGENCE */}
 
             <Route
+
               path="/threat-intelligence"
+
               element={<ThreatIntelligence />}
+
             />
 
 
-            {/* =================================================
-                THREAT INTELLIGENCE DETAILS
-            ================================================= */}
+            {/* THREAT INTELLIGENCE DETAILS */}
 
             <Route
+
               path="/threat-intelligence/:resultId"
+
               element={<ThreatIntelligenceDetails />}
+
             />
 
 
-            {/* =================================================
-                MITRE ATT&CK
-            ================================================= */}
+            {/* MITRE ATT&CK */}
 
             <Route
+
               path="/mitre"
+
               element={<MitreAttack />}
+
             />
 
 
-            {/* =================================================
-                MITRE ATT&CK DETAILS
-            ================================================= */}
+            {/* MITRE ATT&CK DETAILS */}
 
             <Route
+
               path="/mitre/:mappingId"
+
               element={<MitreDetails />}
+
             />
 
 
-            {/* =================================================
-                CAMPAIGNS
-            ================================================= */}
+            {/* CAMPAIGNS */}
 
             <Route
+
               path="/campaigns"
+
               element={<Campaigns />}
+
             />
 
 
-            {/* =================================================
-                FALLBACK
-            ================================================= */}
+            {/* INCIDENT REPORT */}
 
             <Route
+
+              path="/reports/:caseId"
+
+              element={<Report />}
+
+            />
+
+
+            {/* FALLBACK */}
+
+            <Route
+
               path="*"
+
               element={
+
                 <Navigate
+
                   to="/"
+
                   replace
+
                 />
+
               }
+
             />
 
 
           </Routes>
+
 
         </main>
 

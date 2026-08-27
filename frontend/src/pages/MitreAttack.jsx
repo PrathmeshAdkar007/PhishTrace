@@ -25,6 +25,24 @@ function formatDate(value) {
 
 
 // =========================================================
+// FORMAT TEXT
+// =========================================================
+
+function formatLabel(value) {
+
+  if (!value) {
+    return "Not specified";
+  }
+
+  return String(value)
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (letter) =>
+      letter.toUpperCase()
+    );
+}
+
+
+// =========================================================
 // MITRE ATT&CK COMPONENT
 // =========================================================
 
@@ -34,18 +52,19 @@ function MitreAttack() {
 
   const [mappings, setMappings] = useState([]);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
 
   // =========================================================
   // LOAD MITRE MAPPINGS
   // =========================================================
 
-  useEffect(() => {
-
-    const loadMitreMappings = async () => {
+  const loadMitreMappings =
+    async () => {
 
       try {
 
@@ -57,20 +76,21 @@ function MitreAttack() {
         const response = await fetch(
           `${API_BASE}/api/mitre`,
           {
+
             method: "GET",
 
-            // IMPORTANT:
-            // Sends the Flask authentication session cookie.
             credentials: "include",
 
             headers: {
               Accept: "application/json",
             },
+
           }
         );
 
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
 
         if (!response.ok) {
@@ -111,6 +131,12 @@ function MitreAttack() {
     };
 
 
+  // =========================================================
+  // LOAD ON PAGE OPEN
+  // =========================================================
+
+  useEffect(() => {
+
     loadMitreMappings();
 
   }, []);
@@ -137,8 +163,8 @@ function MitreAttack() {
           </h2>
 
           <p>
-            Fetching technique mappings from the
-            PhishTrace backend.
+            Fetching attack technique mappings
+            from the PhishTrace backend.
           </p>
 
         </div>
@@ -159,39 +185,93 @@ function MitreAttack() {
 
 
   const techniques = [
+
     ...new Set(
+
       mappings
         .map(
           (mapping) =>
             mapping.technique_id
         )
         .filter(Boolean)
+
     ),
+
   ];
 
 
   const tactics = [
+
     ...new Set(
+
       mappings
         .map(
           (mapping) =>
             mapping.tactic
         )
         .filter(Boolean)
+
     ),
+
   ];
 
 
-  const primaryTechnique =
+  const evidenceCount =
+    mappings.filter(
+      (mapping) =>
+        mapping.evidence
+    ).length;
+
+
+  const primaryMapping =
     mappings.length > 0
-      ? mappings[0].technique_id || "—"
-      : "—";
+      ? mappings[0]
+      : null;
+
+
+  const primaryTechnique =
+    primaryMapping?.technique_id ||
+    "—";
 
 
   const primaryTactic =
-    mappings.length > 0
-      ? mappings[0].tactic || "—"
-      : "—";
+    primaryMapping?.tactic ||
+    "—";
+
+
+  // =========================================================
+  // OPEN MAPPING
+  // =========================================================
+
+  const openMapping =
+    (mappingId) => {
+
+      navigate(
+        `/mitre/${mappingId}`
+      );
+
+    };
+
+
+  // =========================================================
+  // KEYBOARD NAVIGATION
+  // =========================================================
+
+  const handleKeyDown =
+    (event, mappingId) => {
+
+      if (
+        event.key === "Enter" ||
+        event.key === " "
+      ) {
+
+        event.preventDefault();
+
+        openMapping(mappingId);
+
+      }
+
+    };
 
 
   // =========================================================
@@ -200,24 +280,29 @@ function MitreAttack() {
 
   return (
 
-    <div className="page">
+    <div className="page mitre-page">
 
 
       {/* =================================================
-          TOP BAR
+          PAGE HEADER
       ================================================= */}
 
       <div className="topbar">
 
         <div>
 
+          <div className="page-kicker">
+            ATTACK ANALYSIS
+          </div>
+
           <h2>
             MITRE ATT&CK
           </h2>
 
           <p>
-            Attack technique mapping for the
-            investigation
+            Map observed attacker behaviour
+            to tactics, techniques, and
+            supporting investigation evidence.
           </p>
 
         </div>
@@ -225,8 +310,10 @@ function MitreAttack() {
 
         <div className="case-badge">
 
-          {mappingCount} TECHNIQUE
-          {mappingCount !== 1 ? "S" : ""}
+          {mappingCount} MAPPING
+          {mappingCount !== 1
+            ? "S"
+            : ""}
 
         </div>
 
@@ -241,13 +328,26 @@ function MitreAttack() {
 
         <div className="card-dark error-message">
 
-          <strong>
-            Error
-          </strong>
+          <div>
 
-          <p>
-            {error}
-          </p>
+            <strong>
+              Unable to load MITRE ATT&CK
+            </strong>
+
+            <p>
+              {error}
+            </p>
+
+          </div>
+
+
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={loadMitreMappings}
+          >
+            Retry
+          </button>
 
         </div>
 
@@ -255,418 +355,643 @@ function MitreAttack() {
 
 
       {/* =================================================
-          SUMMARY STATS
+          SUMMARY
       ================================================= */}
 
-      <div className="stats-grid">
+      {!error && (
+
+        <>
 
 
-        {/* MAPPINGS */}
+          {/* =================================================
+              SUMMARY CARDS
+          ================================================= */}
 
-        <div className="stat-card">
+          <div className="mitre-summary-grid">
 
-          <div className="stat-icon">
-            ⚔
-          </div>
 
-          <div>
+            <div className="mitre-summary-card">
 
-            <div className="stat-value">
-              {mappingCount}
+              <div className="summary-icon">
+                ◎
+              </div>
+
+              <div>
+
+                <strong>
+                  {mappingCount}
+                </strong>
+
+                <span>
+                  Total Mappings
+                </span>
+
+              </div>
+
             </div>
 
-            <div className="stat-label">
-              Mappings
+
+            <div className="mitre-summary-card">
+
+              <div className="summary-icon">
+                ⌘
+              </div>
+
+              <div>
+
+                <strong>
+                  {techniques.length}
+                </strong>
+
+                <span>
+                  Unique Techniques
+                </span>
+
+              </div>
+
             </div>
 
-          </div>
 
-        </div>
+            <div className="mitre-summary-card">
 
+              <div className="summary-icon">
+                ◈
+              </div>
 
-        {/* TECHNIQUE */}
+              <div>
 
-        <div className="stat-card">
+                <strong>
+                  {tactics.length}
+                </strong>
 
-          <div className="stat-icon">
-            →
-          </div>
+                <span>
+                  ATT&CK Tactics
+                </span>
 
-          <div>
+              </div>
 
-            <div className="stat-value">
-              {primaryTechnique}
             </div>
 
-            <div className="stat-label">
-              Technique
+
+            <div className="mitre-summary-card">
+
+              <div className="summary-icon">
+                ✓
+              </div>
+
+              <div>
+
+                <strong>
+                  {evidenceCount}
+                </strong>
+
+                <span>
+                  Evidence Supported
+                </span>
+
+              </div>
+
             </div>
 
-          </div>
-
-        </div>
-
-
-        {/* TACTIC */}
-
-        <div className="stat-card">
-
-          <div className="stat-icon">
-            ◉
-          </div>
-
-          <div>
-
-            <div className="stat-value">
-              {primaryTactic}
-            </div>
-
-            <div className="stat-label">
-              Tactic
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      {/* =================================================
-          TECHNIQUE MAPPINGS
-      ================================================= */}
-
-      <div className="card-dark">
-
-        <div className="section-header">
-
-          <div>
-
-            <h3>
-              Technique Mappings
-            </h3>
-
-            <small>
-              MITRE ATT&CK classification
-            </small>
 
           </div>
 
 
-          <small>
+          {/* =================================================
+              ATTACK PATH OVERVIEW
+          ================================================= */}
 
-            {techniques.length} unique technique
-            {techniques.length !== 1
-              ? "s"
-              : ""}
+          {mappings.length > 0 && (
 
-          </small>
-
-        </div>
+            <div className="card-dark mitre-path-card">
 
 
-        {/* EMPTY STATE */}
+              <div className="section-header">
 
-        {mappings.length === 0 ? (
+                <div>
 
-          <div className="empty-state">
+                  <h3>
+                    Observed Attack Path
+                  </h3>
 
-            <h3>
-              No MITRE mappings found
-            </h3>
+                  <small>
+                    Primary MITRE ATT&CK behaviour
+                    identified during the investigation
+                  </small>
 
-            <p>
-              No MITRE ATT&CK techniques have
-              been mapped to the investigation
-              yet.
-            </p>
+                </div>
 
-          </div>
-
-        ) : (
-
-          <div className="mitre-grid">
-
-            {mappings.map(
-              (mapping) => (
-
-                <div
-                  className="mitre-card clickable-card"
-
-                  key={mapping.id}
-
-                  onClick={() =>
-                    navigate(
-                      `/mitre/${mapping.id}`
-                    )
-                  }
-
-                  role="button"
-
-                  tabIndex={0}
-
-                  onKeyDown={(event) => {
-
-                    if (
-                      event.key === "Enter" ||
-                      event.key === " "
-                    ) {
-
-                      event.preventDefault();
-
-                      navigate(
-                        `/mitre/${mapping.id}`
-                      );
-
-                    }
-
-                  }}
-                >
+              </div>
 
 
-                  {/* TECHNIQUE ID */}
-
-                  <div className="technique-id">
-
-                    {mapping.technique_id ||
-                      "Unknown"}
-
-                  </div>
+              <div className="mitre-attack-flow">
 
 
-                  {/* TECHNIQUE NAME */}
+                <div className="attack-flow-step">
+
+                  <span>
+                    TACTIC
+                  </span>
+
+                  <strong>
+                    {formatLabel(
+                      primaryTactic
+                    )}
+                  </strong>
+
+                </div>
+
+
+                <div className="attack-flow-arrow">
+                  →
+                </div>
+
+
+                <div className="attack-flow-step">
+
+                  <span>
+                    TECHNIQUE
+                  </span>
+
+                  <strong>
+                    {primaryTechnique}
+                  </strong>
+
+                </div>
+
+
+                <div className="attack-flow-arrow">
+                  →
+                </div>
+
+
+                <div className="attack-flow-step">
+
+                  <span>
+                    EVIDENCE
+                  </span>
+
+                  <strong>
+                    {primaryMapping?.evidence
+                      ? "Supported"
+                      : "Recorded"}
+                  </strong>
+
+                </div>
+
+
+              </div>
+
+
+              {primaryMapping?.technique_name && (
+
+                <div className="primary-technique-name">
+
+                  <span>
+                    PRIMARY TECHNIQUE
+                  </span>
 
                   <h4>
-
-                    {mapping.technique_name ||
-                      "Unknown Technique"}
-
+                    {
+                      primaryMapping.technique_name
+                    }
                   </h4>
 
+                </div>
 
-                  {/* TACTIC */}
-
-                  <div className="tactic">
-
-                    {mapping.tactic ||
-                      "Tactic not specified"}
-
-                  </div>
+              )}
 
 
-                  {/* DESCRIPTION */}
+            </div>
 
-                  <p>
-
-                    {mapping.description ||
-                      "No technique description available."}
-
-                  </p>
+          )}
 
 
-                  {/* EVIDENCE */}
+          {/* =================================================
+              TECHNIQUE MAPPINGS
+          ================================================= */}
 
-                  {mapping.evidence && (
+          <div className="card-dark mitre-mappings-section">
 
-                    <div className="case-description">
 
-                      <span>
-                        Evidence
-                      </span>
+            <div className="section-header">
 
-                      <p>
-                        {typeof mapping.evidence === "object"
-                          ? JSON.stringify(
-                              mapping.evidence
-                            )
-                          : mapping.evidence}
-                      </p>
+              <div>
+
+                <h3>
+                  Technique Mappings
+                </h3>
+
+                <small>
+                  MITRE ATT&CK classifications
+                  identified from investigation findings
+                </small>
+
+              </div>
+
+
+              <small className="section-count">
+
+                {mappingCount} mapping
+                {mappingCount !== 1
+                  ? "s"
+                  : ""}
+
+              </small>
+
+            </div>
+
+
+            {/* =================================================
+                EMPTY STATE
+            ================================================= */}
+
+            {mappings.length === 0 ? (
+
+              <div className="empty-state mitre-empty-state">
+
+                <div className="empty-state-icon">
+                  ◌
+                </div>
+
+                <h3>
+                  No MITRE mappings found
+                </h3>
+
+                <p>
+                  No MITRE ATT&CK techniques
+                  have been mapped to the
+                  investigation yet.
+                </p>
+
+              </div>
+
+            ) : (
+
+              <div className="mitre-mapping-list">
+
+
+                {mappings.map(
+                  (mapping) => (
+
+                    <div
+                      className="mitre-mapping-card clickable-card"
+                      key={mapping.id}
+                      onClick={() =>
+                        openMapping(
+                          mapping.id
+                        )
+                      }
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) =>
+                        handleKeyDown(
+                          event,
+                          mapping.id
+                        )
+                      }
+                      title="Open MITRE mapping details"
+                    >
+
+
+                      {/* LEFT INDICATOR */}
+
+                      <div className="mitre-card-indicator">
+
+                        <span>
+                          {mapping.evidence
+                            ? "✓"
+                            : "•"}
+                        </span>
+
+                      </div>
+
+
+                      {/* MAIN CONTENT */}
+
+                      <div className="mitre-card-content">
+
+
+                        <div className="mitre-card-topline">
+
+                          <div className="technique-id">
+
+                            {
+                              mapping.technique_id ||
+                              "Unknown"
+                            }
+
+                          </div>
+
+
+                          <div className="tactic">
+
+                            {
+                              formatLabel(
+                                mapping.tactic
+                              )
+                            }
+
+                          </div>
+
+                        </div>
+
+
+                        <h4>
+
+                          {
+                            mapping.technique_name ||
+                            "Unknown Technique"
+                          }
+
+                        </h4>
+
+
+                        <p className="mitre-description">
+
+                          {
+                            mapping.description ||
+                            "No technique description available."
+                          }
+
+                        </p>
+
+
+                        {/* EVIDENCE */}
+
+                        {mapping.evidence && (
+
+                          <div className="mitre-evidence">
+
+                            <span className="mitre-evidence-label">
+                              SUPPORTING EVIDENCE
+                            </span>
+
+                            <p>
+                              {mapping.evidence}
+                            </p>
+
+                          </div>
+
+                        )}
+
+
+                        {/* META */}
+
+                        <div className="mitre-card-meta">
+
+
+                          <span>
+
+                            Mapping ID:{" "}
+
+                            <strong>
+                              {mapping.id}
+                            </strong>
+
+                          </span>
+
+
+                          {mapping.finding_id && (
+
+                            <span>
+
+                              Finding:{" "}
+
+                              <strong>
+                                {mapping.finding_id}
+                              </strong>
+
+                            </span>
+
+                          )}
+
+
+                          {mapping.created_at && (
+
+                            <span>
+
+                              Mapped:{" "}
+
+                              <strong>
+
+                                {
+                                  formatDate(
+                                    mapping.created_at
+                                  )
+                                }
+
+                              </strong>
+
+                            </span>
+
+                          )}
+
+
+                        </div>
+
+
+                      </div>
+
+
+                      {/* OPEN ARROW */}
+
+                      <div className="mitre-card-action">
+
+                        <span>
+                          →
+                        </span>
+
+                        <small>
+                          View details
+                        </small>
+
+                      </div>
+
 
                     </div>
 
-                  )}
+                  )
+                )}
 
 
-                  {/* TAGS */}
+              </div>
+
+            )}
+
+
+          </div>
+
+
+          {/* =================================================
+              ATT&CK OVERVIEW
+          ================================================= */}
+
+          {mappings.length > 0 && (
+
+            <div className="card-dark mitre-overview-card">
+
+
+              <div className="section-header">
+
+                <div>
+
+                  <h3>
+                    ATT&CK Overview
+                  </h3>
+
+                  <small>
+                    Techniques and tactics
+                    identified in this investigation
+                  </small>
+
+                </div>
+
+              </div>
+
+
+              <div className="mitre-overview-grid">
+
+
+                <div className="mitre-overview-stat">
+
+                  <span>
+                    Total Mappings
+                  </span>
+
+                  <strong>
+                    {mappingCount}
+                  </strong>
+
+                </div>
+
+
+                <div className="mitre-overview-stat">
+
+                  <span>
+                    Unique Techniques
+                  </span>
+
+                  <strong>
+                    {techniques.length}
+                  </strong>
+
+                </div>
+
+
+                <div className="mitre-overview-stat">
+
+                  <span>
+                    Tactics Observed
+                  </span>
+
+                  <strong>
+                    {tactics.length}
+                  </strong>
+
+                </div>
+
+
+                <div className="mitre-overview-stat">
+
+                  <span>
+                    Evidence Supported
+                  </span>
+
+                  <strong>
+                    {evidenceCount}
+                  </strong>
+
+                </div>
+
+
+              </div>
+
+
+              {/* =================================================
+                  TACTICS
+              ================================================= */}
+
+              {tactics.length > 0 && (
+
+                <div className="mitre-tag-section">
+
+                  <span className="mitre-group-label">
+                    OBSERVED TACTICS
+                  </span>
+
 
                   <div className="finding-tags">
 
-                    <span className="tag">
+                    {tactics.map(
+                      (tactic) => (
 
-                      {mapping.technique_id}
+                        <span
+                          className="tag mitre-tactic-tag"
+                          key={tactic}
+                        >
 
-                    </span>
+                          {
+                            formatLabel(
+                              tactic
+                            )
+                          }
 
+                        </span>
 
-                    {mapping.tactic && (
-
-                      <span className="tag">
-
-                        {mapping.tactic}
-
-                      </span>
-
-                    )}
-
-                  </div>
-
-
-                  {/* MAPPING INFORMATION */}
-
-                  <div className="case-list-meta">
-
-                    <span>
-
-                      Mapping ID: {mapping.id}
-
-                    </span>
-
-
-                    {mapping.finding_id && (
-
-                      <span>
-
-                        Finding ID:{" "}
-                        {mapping.finding_id}
-
-                      </span>
-
-                    )}
-
-
-                    {mapping.created_at && (
-
-                      <span>
-
-                        Created{" "}
-
-                        {formatDate(
-                          mapping.created_at
-                        )}
-
-                      </span>
-
+                      )
                     )}
 
                   </div>
 
                 </div>
 
-              )
-            )}
-
-          </div>
-
-        )}
-
-      </div>
+              )}
 
 
-      {/* =================================================
-          ATT&CK OVERVIEW
-      ================================================= */}
+              {/* =================================================
+                  TECHNIQUES
+              ================================================= */}
 
-      {mappings.length > 0 && (
+              {techniques.length > 0 && (
 
-        <div className="card-dark">
+                <div className="mitre-tag-section">
 
-          <div className="section-header">
+                  <span className="mitre-group-label">
+                    OBSERVED TECHNIQUES
+                  </span>
 
-            <div>
 
-              <h3>
-                ATT&CK Overview
-              </h3>
+                  <div className="finding-tags">
 
-              <small>
-                Techniques identified in this
-                investigation
-              </small>
+                    {techniques.map(
+                      (technique) => (
+
+                        <span
+                          className="tag mitre-technique-tag"
+                          key={technique}
+                        >
+
+                          {technique}
+
+                        </span>
+
+                      )
+                    )}
+
+                  </div>
+
+                </div>
+
+              )}
+
 
             </div>
 
-          </div>
+          )}
 
 
-          <div className="case-detail-grid">
-
-
-            <div>
-
-              <span>
-                Case
-              </span>
-
-              <strong>
-                PH-2026-0001
-              </strong>
-
-            </div>
-
-
-            <div>
-
-              <span>
-                Total Mappings
-              </span>
-
-              <strong>
-                {mappingCount}
-              </strong>
-
-            </div>
-
-
-            <div>
-
-              <span>
-                Unique Techniques
-              </span>
-
-              <strong>
-                {techniques.length}
-              </strong>
-
-            </div>
-
-
-            <div>
-
-              <span>
-                Tactics
-              </span>
-
-              <strong>
-                {tactics.length}
-              </strong>
-
-            </div>
-
-          </div>
-
-
-          {/* TECHNIQUE LIST */}
-
-          <div className="finding-tags">
-
-            {techniques.map(
-              (technique) => (
-
-                <span
-                  className="tag"
-                  key={technique}
-                >
-
-                  {technique}
-
-                </span>
-
-              )
-            )}
-
-          </div>
-
-        </div>
+        </>
 
       )}
 
@@ -686,6 +1011,7 @@ function MitreAttack() {
         </span>
 
       </footer>
+
 
     </div>
 
