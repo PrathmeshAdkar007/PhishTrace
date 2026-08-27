@@ -2,7 +2,10 @@ from flask import Blueprint, jsonify, request
 
 from app import db
 
-from app.models.mitre_attack_mapping import MitreAttackMapping
+from app.models.mitre_attack_mapping import (
+    MitreAttackMapping
+)
+
 from app.models.finding import Finding
 from app.models.case import Case
 
@@ -16,10 +19,183 @@ mitre = Blueprint(
 
 
 # =========================================================
+# AUTOMATIC MITRE ATT&CK MAPPING RULES
+# =========================================================
+
+def get_automatic_mappings(finding):
+
+    text = " ".join([
+        finding.title or "",
+        finding.description or "",
+        finding.finding_type or ""
+    ]).lower()
+
+
+    mappings = []
+
+
+    # =====================================================
+    # PHISHING
+    # =====================================================
+
+    phishing_keywords = [
+        "phishing",
+        "malicious indicator",
+        "credential harvesting",
+        "lookalike domain"
+    ]
+
+
+    if any(
+        keyword in text
+        for keyword in phishing_keywords
+    ):
+
+        mappings.append({
+
+            "technique_id":
+                "T1566",
+
+            "technique_name":
+                "Phishing",
+
+            "tactic":
+                "Initial Access",
+
+            "description":
+                "Adversaries may send phishing messages to "
+                "gain access to victim systems or accounts.",
+
+            "evidence":
+                finding.title
+
+        })
+
+
+    # =====================================================
+    # SPEARPHISHING LINK
+    # =====================================================
+
+    link_keywords = [
+        "malicious link",
+        "suspicious url",
+        "phishing url",
+        "credential link"
+    ]
+
+
+    if any(
+        keyword in text
+        for keyword in link_keywords
+    ):
+
+        mappings.append({
+
+            "technique_id":
+                "T1566.002",
+
+            "technique_name":
+                "Spearphishing Link",
+
+            "tactic":
+                "Initial Access",
+
+            "description":
+                "Adversaries may send spearphishing messages "
+                "with malicious links.",
+
+            "evidence":
+                finding.title
+
+        })
+
+
+    # =====================================================
+    # SPEARPHISHING ATTACHMENT
+    # =====================================================
+
+    attachment_keywords = [
+        "malicious attachment",
+        "suspicious attachment",
+        "email attachment",
+        "infected attachment"
+    ]
+
+
+    if any(
+        keyword in text
+        for keyword in attachment_keywords
+    ):
+
+        mappings.append({
+
+            "technique_id":
+                "T1566.001",
+
+            "technique_name":
+                "Spearphishing Attachment",
+
+            "tactic":
+                "Initial Access",
+
+            "description":
+                "Adversaries may send spearphishing messages "
+                "with malicious attachments.",
+
+            "evidence":
+                finding.title
+
+        })
+
+
+    # =====================================================
+    # INPUT CAPTURE / CREDENTIAL HARVESTING
+    # =====================================================
+
+    credential_keywords = [
+        "credential",
+        "password",
+        "login page",
+        "account credentials"
+    ]
+
+
+    if any(
+        keyword in text
+        for keyword in credential_keywords
+    ):
+
+        mappings.append({
+
+            "technique_id":
+                "T1056",
+
+            "technique_name":
+                "Input Capture",
+
+            "tactic":
+                "Credential Access",
+
+            "description":
+                "Adversaries may capture credentials through "
+                "malicious forms or credential collection.",
+
+            "evidence":
+                finding.title
+
+        })
+
+
+    return mappings
+
+
+# =========================================================
 # GET ALL MITRE ATT&CK MAPPINGS
 # =========================================================
 
-@mitre.get("/api/mitre")
+@mitre.get(
+    "/api/mitre"
+)
 @login_required
 def get_all_mitre_mappings():
 
@@ -208,7 +384,171 @@ def get_case_mitre_mappings(case_id):
 
 
 # =========================================================
-# CREATE MITRE ATT&CK MAPPING
+# AUTOMATICALLY MAP A FINDING
+# =========================================================
+
+@mitre.post(
+    "/api/findings/<int:finding_id>/mitre/auto"
+)
+@login_required
+def auto_map_finding_mitre(
+    finding_id
+):
+
+    finding = db.session.get(
+        Finding,
+        finding_id
+    )
+
+
+    if not finding:
+
+        return jsonify({
+            "error":
+                "Finding not found"
+        }), 404
+
+
+    automatic_mappings = (
+        get_automatic_mappings(
+            finding
+        )
+    )
+
+
+    if not automatic_mappings:
+
+        return jsonify({
+
+            "message":
+                "No automatic MITRE ATT&CK mappings found",
+
+            "count":
+                0,
+
+            "mappings":
+                []
+
+        })
+
+
+    created_mappings = []
+
+
+    for mapping_data in automatic_mappings:
+
+        existing = (
+            MitreAttackMapping.query.filter_by(
+
+                finding_id=finding_id,
+
+                technique_id=(
+                    mapping_data[
+                        "technique_id"
+                    ]
+                )
+
+            ).first()
+        )
+
+
+        if existing:
+
+            created_mappings.append(
+                existing.to_dict()
+            )
+
+            continue
+
+
+        mapping = MitreAttackMapping(
+
+            finding_id=finding_id,
+
+            technique_id=(
+                mapping_data[
+                    "technique_id"
+                ]
+            ),
+
+            technique_name=(
+                mapping_data[
+                    "technique_name"
+                ]
+            ),
+
+            tactic=(
+                mapping_data[
+                    "tactic"
+                ]
+            ),
+
+            description=(
+                mapping_data[
+                    "description"
+                ]
+            ),
+
+            evidence=(
+                mapping_data[
+                    "evidence"
+                ]
+            )
+
+        )
+
+
+        db.session.add(
+            mapping
+        )
+
+
+        db.session.flush()
+
+
+        created_mappings.append(
+            mapping.to_dict()
+        )
+
+
+    try:
+
+        db.session.commit()
+
+    except Exception as error:
+
+        db.session.rollback()
+
+        print(
+            "Automatic MITRE mapping error:",
+            error
+        )
+
+        return jsonify({
+            "error":
+                "Failed to create automatic MITRE mappings"
+        }), 500
+
+
+    return jsonify({
+
+        "message":
+            "Automatic MITRE ATT&CK mapping completed",
+
+        "finding_id":
+            finding_id,
+
+        "count":
+            len(created_mappings),
+
+        "mappings":
+            created_mappings
+
+    }), 201
+
+
+# =========================================================
+# CREATE MANUAL MITRE ATT&CK MAPPING
 # =========================================================
 
 @mitre.post(
@@ -237,18 +577,6 @@ def create_mitre_mapping(
         silent=True
     ) or {}
 
-
-    if not data:
-
-        return jsonify({
-            "error":
-                "Request body must be JSON"
-        }), 400
-
-
-    # =====================================================
-    # REQUIRED FIELDS
-    # =====================================================
 
     technique_id = str(
         data.get(
@@ -282,10 +610,6 @@ def create_mitre_mapping(
         }), 400
 
 
-    # =====================================================
-    # CHECK DUPLICATE
-    # =====================================================
-
     existing = MitreAttackMapping.query.filter_by(
 
         finding_id=finding_id,
@@ -299,20 +623,14 @@ def create_mitre_mapping(
 
         return jsonify({
 
-            "error": (
-                "This MITRE technique is already "
-                "mapped to this finding"
-            ),
+            "error":
+                "This MITRE technique is already mapped to this finding",
 
             "mapping":
                 existing.to_dict()
 
         }), 409
 
-
-    # =====================================================
-    # CREATE MAPPING
-    # =====================================================
 
     mapping = MitreAttackMapping(
 
@@ -362,10 +680,8 @@ def create_mitre_mapping(
 
     return jsonify({
 
-        "message": (
-            "MITRE ATT&CK mapping "
-            "created successfully"
-        ),
+        "message":
+            "MITRE ATT&CK mapping created successfully",
 
         "mapping":
             mapping.to_dict()
@@ -424,9 +740,7 @@ def delete_mitre_mapping(
 
     return jsonify({
 
-        "message": (
-            "MITRE ATT&CK mapping "
-            "deleted successfully"
-        )
+        "message":
+            "MITRE ATT&CK mapping deleted successfully"
 
     })

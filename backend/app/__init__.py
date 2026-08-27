@@ -14,73 +14,117 @@ db = SQLAlchemy()
 
 def create_app():
 
-    app = Flask(__name__)
+    app = Flask(
+        __name__
+    )
 
 
-    # =========================
+    # =========================================================
     # APPLICATION CONFIGURATION
-    # =========================
+    # =========================================================
 
-    secret_key = os.getenv("FLASK_SECRET_KEY")
+    secret_key = os.getenv(
+        "FLASK_SECRET_KEY"
+    )
 
     if not secret_key:
+
         raise RuntimeError(
             "FLASK_SECRET_KEY is not configured"
         )
 
-    app.config["SECRET_KEY"] = secret_key
 
-    # Session security
-    app.config["SESSION_COOKIE_HTTPONLY"] = True
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-    app.config["SESSION_COOKIE_SECURE"] = False
+    app.config["SECRET_KEY"] = (
+        secret_key
+    )
 
 
-    # =========================
+    # =========================================================
+    # SESSION SECURITY
+    # =========================================================
+
+    app.config[
+        "SESSION_COOKIE_HTTPONLY"
+    ] = True
+
+    app.config[
+        "SESSION_COOKIE_SAMESITE"
+    ] = "Lax"
+
+    app.config[
+        "SESSION_COOKIE_SECURE"
+    ] = False
+
+
+    # =========================================================
     # DATABASE CONFIGURATION
-    # =========================
+    # =========================================================
 
-    database_url = os.getenv("DATABASE_URL")
+    database_url = os.getenv(
+        "DATABASE_URL"
+    )
 
     if not database_url:
+
         raise RuntimeError(
             "DATABASE_URL is not configured"
         )
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config[
+        "SQLALCHEMY_DATABASE_URI"
+    ] = database_url
+
+    app.config[
+        "SQLALCHEMY_TRACK_MODIFICATIONS"
+    ] = False
 
 
-    # =========================
+    # =========================================================
     # INITIALIZE EXTENSIONS
-    # =========================
+    # =========================================================
 
-    db.init_app(app)
+    db.init_app(
+        app
+    )
 
 
-    # =========================
+    # =========================================================
     # CORS
-    # =========================
+    # =========================================================
 
     CORS(
+
         app,
+
         origins=[
+
             "http://localhost:5173",
             "http://localhost:5174",
             "http://localhost:5175",
             "http://localhost:5176",
             "http://localhost:5177",
             "http://localhost:5178",
-            "http://localhost:5179"
+            "http://localhost:5179",
+
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:5174",
+            "http://127.0.0.1:5175",
+            "http://127.0.0.1:5176",
+            "http://127.0.0.1:5177",
+            "http://127.0.0.1:5178",
+            "http://127.0.0.1:5179",
+
         ],
+
         supports_credentials=True
+
     )
 
 
-    # =========================
+    # =========================================================
     # IMPORT MODELS
-    # =========================
+    # =========================================================
 
     from app.models import (
         Case,
@@ -96,13 +140,16 @@ def create_app():
     )
 
 
-    # =========================
+    # =========================================================
     # IMPORT ROUTES
-    # =========================
+    # =========================================================
 
     from app.routes.health import health
+
     from app.routes.auth import auth
+
     from app.routes.cases import cases
+
     from app.routes.emails import emails
 
     from app.routes.email_authentication import (
@@ -116,6 +163,7 @@ def create_app():
     )
 
     from app.routes.findings import findings
+
     from app.routes.risk import risk
 
     from app.routes.affected_users import (
@@ -132,10 +180,20 @@ def create_app():
         case_summary
     )
 
+    from app.routes.campaigns import campaigns
 
-    # =========================
+    from app.routes.timeline import timeline
+
+    # =========================================================
+    # INCIDENT REPORT
+    # =========================================================
+
+    from app.routes.report import report
+
+
+    # =========================================================
     # REGISTER BLUEPRINTS
-    # =========================
+    # =========================================================
 
     app.register_blueprint(
         health
@@ -187,6 +245,22 @@ def create_app():
 
     app.register_blueprint(
         case_summary
+    )
+
+    app.register_blueprint(
+        campaigns
+    )
+
+    app.register_blueprint(
+        timeline
+    )
+
+    # =========================================================
+    # REGISTER INCIDENT REPORT
+    # =========================================================
+
+    app.register_blueprint(
+        report
     )
 
 
