@@ -3213,3 +3213,734 @@ footer {
 .timeline-button:active {
   transform: translateY(0);
 }
+
+/* =========================================================
+   DASHBOARD IMPROVEMENTS
+   
+========================================================= */
+
+
+/* =========================================================
+   DASHBOARD TOP AREA
+========================================================= */
+
+.topbar {
+  padding-bottom: 22px;
+  border-bottom: 1px solid #1c2735;
+  margin-bottom: 28px;
+}
+
+.topbar h2 {
+  font-size: 32px;
+  letter-spacing: -0.5px;
+  color: #f2f6fb;
+}
+
+.topbar p {
+  font-size: 15px;
+  margin-top: 7px;
+}
+
+
+/* =========================================================
+   CASE BADGE
+========================================================= */
+
+.case-badge {
+  background: linear-gradient(
+    135deg,
+    #0d2530,
+    #101722
+  );
+
+  border-color: #1c5363;
+
+  color: #48d8f3;
+
+  padding: 11px 17px;
+
+  box-shadow:
+    0 8px 25px
+    rgba(0, 217, 255, 0.06);
+}
+
+
+/* =========================================================
+   INVESTIGATION OVERVIEW
+========================================================= */
+
+.case-header {
+  position: relative;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      #101a27,
+      #0e141e
+    );
+
+  border-color: #26384b;
+
+  padding: 30px;
+
+  box-shadow:
+    0 16px 40px
+    rgba(0, 0, 0, 0.18);
+}
+
+
+.case-header::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 5px;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      to bottom,
+      #00d9ff,
+      #1685ff
+    );
+
+  opacity: 0.9;
+}
+
+
+.small-label {
+  color: #62d8f1;
+
+  letter-spacing: 2px;
+
+  font-size: 10px;
+}
+
+
+.case-header h1 {
+  font-size: 32px;
+
+  color: #f4f7fb;
+
+  margin-bottom: 12px;
+}
+
+
+.case-header p {
+  font-size: 15px;
+
+  color: #9eabc0;
+
+  max-width: 850px;
+}
+
+
+.case-meta {
+  padding-top: 18px;
+
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.06);
+
+  margin-top: 22px;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.severity,
+.status {
+  border-radius: 999px;
+
+  padding: 8px 14px;
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.04);
+}
+
+
+.critical {
+  background:
+    rgba(255, 89, 101, 0.12);
+
+  border:
+    1px solid
+    rgba(255, 89, 101, 0.35);
+
+  color: #ff7a84;
+}
+
+
+.status {
+  background:
+    rgba(77, 214, 140, 0.1);
+
+  border:
+    1px solid
+    rgba(77, 214, 140, 0.3);
+
+  color: #65e59d;
+}
+
+
+/* =========================================================
+   STATISTICS GRID
+========================================================= */
+
+.stats-grid {
+  gap: 16px;
+}
+
+
+.stat-card {
+  position: relative;
+
+  overflow: hidden;
+
+  min-height: 100px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #111b28,
+      #0d141e
+    );
+
+  border-color: #223042;
+
+  padding: 20px;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.stat-card::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+
+  width: 100%;
+  height: 2px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #00d9ff,
+      transparent
+    );
+
+  opacity: 0;
+}
+
+
+.stat-card:hover {
+  transform: translateY(-3px);
+
+  border-color: #31516b;
+
+  box-shadow:
+    0 12px 30px
+    rgba(0, 0, 0, 0.2);
+}
+
+
+.stat-card:hover::after {
+  opacity: 1;
+}
+
+
+.stat-icon {
+  width: 46px;
+  height: 46px;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #123342,
+      #10212e
+    );
+
+  border:
+    1px solid
+    rgba(0, 217, 255, 0.12);
+
+  font-size: 18px;
+}
+
+
+.stat-value {
+  font-size: 28px;
+
+  color: #f2f6fb;
+
+  line-height: 1;
+}
+
+
+.stat-label {
+  margin-top: 7px;
+
+  color: #8d9aae;
+
+  font-size: 11px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.7px;
+}
+
+
+/* =========================================================
+   CLICKABLE STAT CARDS
+========================================================= */
+
+.clickable-stat {
+  cursor: pointer;
+}
+
+
+.clickable-stat:hover {
+  border-color: #00d9ff;
+}
+
+
+.clickable-stat:focus-visible {
+  outline:
+    2px solid #00d9ff;
+
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   MAIN DASHBOARD GRID
+========================================================= */
+
+.dashboard-grid {
+  gap: 22px;
+
+  align-items: start;
+}
+
+
+/* =========================================================
+   DASHBOARD CARDS
+========================================================= */
+
+.dashboard-grid .card-dark {
+  background:
+    linear-gradient(
+      145deg,
+      #101924,
+      #0d141e
+    );
+
+  border-color: #223042;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.dashboard-grid .card-dark:hover {
+  border-color: #2b4055;
+}
+
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+.section-header {
+  align-items: flex-start;
+
+  padding-bottom: 16px;
+
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.06);
+}
+
+
+.section-header h3 {
+  color: #edf2f7;
+
+  font-size: 19px;
+
+  margin-bottom: 5px;
+}
+
+
+.section-header small {
+  color: #748197;
+
+  font-size: 12px;
+}
+
+
+/* Section count */
+
+.section-header > span {
+  color: #7ddff2;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  background:
+    rgba(0, 217, 255, 0.07);
+
+  border:
+    1px solid
+    rgba(0, 217, 255, 0.14);
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+}
+
+
+/* =========================================================
+   FINDINGS
+========================================================= */
+
+.findings-list {
+  gap: 10px;
+}
+
+
+.finding {
+  background: #0c131d;
+
+  border-color: #1d2a39;
+
+  padding: 16px;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+
+.finding:hover {
+  background: #101925;
+
+  border-color: #2b4055;
+
+  transform: translateX(3px);
+}
+
+
+.finding-indicator {
+  width: 38px;
+  height: 38px;
+
+  font-size: 14px;
+
+  background:
+    rgba(255, 89, 101, 0.12);
+
+  border:
+    1px solid
+    rgba(255, 89, 101, 0.25);
+}
+
+
+.finding h5 {
+  color: #e9eef5;
+
+  font-size: 14px;
+
+  margin-bottom: 6px;
+}
+
+
+.finding p {
+  color: #8794a7;
+
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   TAGS
+========================================================= */
+
+.tag {
+  background: #16202c;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.05);
+
+  color: #91a0b5;
+
+  border-radius: 999px;
+
+  padding: 5px 9px;
+}
+
+
+.severity-tag {
+  color: #ff7b85;
+
+  background:
+    rgba(255, 89, 101, 0.08);
+}
+
+
+/* =========================================================
+   RISK CARD
+========================================================= */
+
+.risk-card {
+  position: relative;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(255, 89, 101, 0.08),
+      transparent 55%
+    ),
+    #0e141e;
+}
+
+
+.risk-score {
+  padding: 18px 0 20px;
+}
+
+
+.risk-score .score,
+.score {
+  font-size: 64px;
+
+  text-shadow:
+    0 0 30px
+    rgba(255, 89, 101, 0.18);
+}
+
+
+.score-label {
+  margin-top: 8px;
+
+  display: inline-block;
+
+  padding: 6px 11px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255, 89, 101, 0.1);
+
+  border:
+    1px solid
+    rgba(255, 89, 101, 0.22);
+}
+
+
+/* =========================================================
+   RISK BREAKDOWN
+========================================================= */
+
+.risk-breakdown {
+  gap: 10px;
+}
+
+
+.risk-breakdown div {
+  background: #101925;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.05);
+
+  border-radius: 9px;
+
+  padding: 14px;
+}
+
+
+.risk-breakdown span {
+  color: #748197;
+}
+
+
+.risk-breakdown strong {
+  color: #eaf0f7;
+
+  font-size: 17px;
+}
+
+
+/* =========================================================
+   CLICKABLE SECTIONS
+========================================================= */
+
+.clickable-section {
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.clickable-section:hover {
+  transform: translateY(-2px);
+
+  border-color: #31516b;
+
+  box-shadow:
+    0 12px 30px
+    rgba(0, 0, 0, 0.16);
+}
+
+
+/* =========================================================
+   DASHBOARD CLICKABLE ITEMS
+========================================================= */
+
+.dashboard-item-clickable {
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+
+.dashboard-item-clickable:hover {
+  transform: translateY(-2px);
+
+  border-color: #00d9ff;
+
+  box-shadow:
+    0 8px 25px
+    rgba(0, 217, 255, 0.08);
+}
+
+
+.dashboard-item-arrow {
+  background:
+    rgba(0, 217, 255, 0.06);
+
+  border:
+    1px solid
+    rgba(0, 217, 255, 0.1);
+
+  color: #43d9f2;
+}
+
+
+/* =========================================================
+   EMPTY DASHBOARD STATE
+========================================================= */
+
+.dashboard-grid .empty-state {
+  background:
+    rgba(255, 255, 255, 0.015);
+
+  border:
+    1px dashed #263648;
+
+  border-radius: 10px;
+
+  padding: 24px;
+
+  text-align: center;
+
+  color: #758297;
+}
+
+
+/* =========================================================
+   RESPONSIVE DASHBOARD
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .stats-grid {
+    grid-template-columns:
+      repeat(3, 1fr);
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 800px) {
+
+  .stats-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .case-header {
+    padding: 24px;
+  }
+
+  .case-header h1 {
+    font-size: 27px;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar h2 {
+    font-size: 26px;
+  }
+
+  .case-header {
+    padding: 20px;
+  }
+
+  .case-header h1 {
+    font-size: 23px;
+  }
+
+  .case-meta {
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+  .section-header {
+    gap: 12px;
+
+    flex-direction: column;
+  }
+
+}

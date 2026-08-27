@@ -91,8 +91,11 @@ function Dashboard() {
   const navigate = useNavigate();
 
 
-  const [data, setData] =
-    useState(null);
+  const [cases, setCases] =
+    useState([]);
+
+  const [findings, setFindings] =
+    useState([]);
 
   const [loading, setLoading] =
     useState(true);
@@ -101,11 +104,8 @@ function Dashboard() {
     useState("");
 
 
-  const CASE_ID = 1;
-
-
   // ===================================================
-  // LOAD CASE SUMMARY
+  // LOAD DASHBOARD DATA
   // ===================================================
 
   useEffect(() => {
@@ -119,28 +119,62 @@ function Dashboard() {
         setError("");
 
 
-        const response = await fetch(
-          `${API_BASE}/api/cases/${CASE_ID}/summary`,
-          {
-            credentials: "include",
-          }
-        );
+        const [
+          casesResponse,
+          findingsResponse,
+        ] = await Promise.all([
+
+          fetch(
+            `${API_BASE}/api/cases`,
+            {
+              credentials: "include",
+            }
+          ),
+
+          fetch(
+            `${API_BASE}/api/findings`,
+            {
+              credentials: "include",
+            }
+          ),
+
+        ]);
 
 
-        if (!response.ok) {
+        if (!casesResponse.ok) {
 
           throw new Error(
-            `API request failed with status ${response.status}`
+            `Cases API request failed with status ${casesResponse.status}`
           );
 
         }
 
 
-        const result =
-          await response.json();
+        if (!findingsResponse.ok) {
+
+          throw new Error(
+            `Findings API request failed with status ${findingsResponse.status}`
+          );
+
+        }
 
 
-        setData(result);
+        const casesData =
+          await casesResponse.json();
+
+
+        const findingsData =
+          await findingsResponse.json();
+
+
+        setCases(
+          casesData.cases || []
+        );
+
+
+        setFindings(
+          findingsData.findings || []
+        );
 
       } catch (err) {
 
@@ -183,7 +217,7 @@ function Dashboard() {
 
 
           <p>
-            Fetching investigation data
+            Fetching security investigation data
             from the backend.
           </p>
 
@@ -215,7 +249,7 @@ function Dashboard() {
 
           <p>
             The PhishTrace frontend could not
-            connect to the Flask backend.
+            load the security investigation data.
           </p>
 
 
@@ -244,121 +278,50 @@ function Dashboard() {
 
 
   // ===================================================
-  // SAFETY CHECK
-  // ===================================================
-
-  if (
-    !data ||
-    !data.case
-  ) {
-
-    return (
-
-      <div className="error-screen">
-
-        <div className="card-dark">
-
-          <h2>
-            No investigation data
-          </h2>
-
-
-          <p>
-            The backend returned an empty
-            case summary.
-          </p>
-
-        </div>
-
-      </div>
-
-    );
-
-  }
-
-
-  // ===================================================
-  // DATA
-  // ===================================================
-
-  const caseData =
-    data.case;
-
-
-  const counts =
-    data.counts || {};
-
-
-  const emails =
-    data.emails || [];
-
-
-  const indicators =
-    data.indicators || [];
-
-
-  const findings =
-    data.findings || [];
-
-
-  const threatIntel =
-    data.threat_intelligence || [];
-
-
-  const affectedUsers =
-    data.affected_users || [];
-
-
-  const containmentActions =
-    data.containment_actions || [];
-
-
-  const mitreMappings =
-    data.mitre_mappings || [];
-
-
-  // ===================================================
-  // THREAT INTELLIGENCE HELPERS
-  // ===================================================
-
-  const getThreatIndicator = (
-    result
-  ) => {
-
-    return (
-      result.raw_response?.indicator ||
-      result.indicator ||
-      result.value ||
-      "Unknown"
-    );
-
-  };
-
-
-  const getThreatIndicatorType = (
-    result
-  ) => {
-
-    return (
-      result.raw_response?.indicator_type ||
-      result.indicator_type ||
-      "Unknown"
-    );
-
-  };
-
-
-  // ===================================================
   // CALCULATIONS
   // ===================================================
 
-  const maliciousThreatIntel =
-    threatIntel.filter(
-      (result) =>
+  const totalCases =
+    cases.length;
+
+
+  const openCases =
+    cases.filter(
+      (caseItem) =>
         String(
-          result.verdict || ""
+          caseItem.status || ""
+        ).toLowerCase() !==
+        "closed"
+    );
+
+
+  const closedCases =
+    cases.filter(
+      (caseItem) =>
+        String(
+          caseItem.status || ""
         ).toLowerCase() ===
-        "malicious"
+        "closed"
+    );
+
+
+  const criticalCases =
+    cases.filter(
+      (caseItem) =>
+        String(
+          caseItem.severity || ""
+        ).toLowerCase() ===
+        "critical"
+    );
+
+
+  const highCases =
+    cases.filter(
+      (caseItem) =>
+        String(
+          caseItem.severity || ""
+        ).toLowerCase() ===
+        "high"
     );
 
 
@@ -402,25 +365,75 @@ function Dashboard() {
     );
 
 
-  const completedActions =
-    containmentActions.filter(
-      (action) =>
-        String(
-          action.status || ""
-        ).toLowerCase() ===
-        "completed"
-    );
+  // ===================================================
+  // SORT RECENT CASES
+  // ===================================================
+
+  const recentCases =
+    [...cases]
+      .sort(
+        (a, b) =>
+          new Date(
+            b.created_at || 0
+          ) -
+          new Date(
+            a.created_at || 0
+          )
+      )
+      .slice(0, 5);
 
 
   // ===================================================
-  // RISK LEVEL
+  // SORT RECENT FINDINGS
   // ===================================================
 
-  const riskLevel =
-    String(
-      caseData.severity ||
-      "unknown"
-    ).toUpperCase();
+  const recentFindings =
+    [...findings]
+      .sort(
+        (a, b) =>
+          new Date(
+            b.created_at || 0
+          ) -
+          new Date(
+            a.created_at || 0
+          )
+      )
+      .slice(0, 5);
+
+
+  // ===================================================
+  // DATE FORMATTER
+  // ===================================================
+
+  const formatDate = (
+    value
+  ) => {
+
+    if (!value) {
+
+      return "N/A";
+
+    }
+
+
+    const date =
+      new Date(value);
+
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+
+      return "N/A";
+
+    }
+
+
+    return date.toLocaleString();
+
+  };
 
 
   // ===================================================
@@ -446,7 +459,8 @@ function Dashboard() {
 
 
           <p>
-            Phishing investigation overview
+            Real-time overview of phishing
+            investigations and security findings
           </p>
 
         </div>
@@ -454,7 +468,7 @@ function Dashboard() {
 
         <div className="case-badge">
 
-          CASE {caseData.case_number}
+          SOC OVERVIEW
 
         </div>
 
@@ -462,88 +476,46 @@ function Dashboard() {
 
 
       {/* =================================================
-          CASE HEADER
+          DASHBOARD HEADER
       ================================================= */}
 
-      <div className="card-dark case-header">
+      <div className="card-dark dashboard-overview">
 
         <div>
 
           <div className="small-label">
 
-            {String(
-              caseData.status
-            ).toLowerCase() ===
-            "closed"
-
-              ? "CLOSED INVESTIGATION"
-
-              : "ACTIVE INVESTIGATION"}
+            PHISHTRACE SECURITY OPERATIONS
 
           </div>
 
 
           <h1>
-            {caseData.title}
+            Investigation Overview
           </h1>
 
 
           <p>
-            {caseData.description ||
-              "No case description available."}
+
+            Monitor active phishing investigations,
+            security findings, and incident severity
+            across your environment.
+
           </p>
-
-
-          <div className="case-meta">
-
-            <div>
-
-              Case ID:
-
-              <strong>
-                {" "}
-                {caseData.case_number}
-              </strong>
-
-            </div>
-
-
-            <div>
-
-              Created:
-
-              <strong>
-
-                {" "}
-
-                {caseData.created_at
-                  ? new Date(
-                      caseData.created_at
-                    ).toLocaleString()
-                  : "N/A"}
-
-              </strong>
-
-            </div>
-
-          </div>
 
         </div>
 
 
-        <div className="case-status">
-
-          <span className="severity">
-            {riskLevel}
-          </span>
-
+        <div className="dashboard-overview-status">
 
           <span className="status">
 
-            {String(
-              caseData.status ||
-              "unknown"
-            ).toUpperCase()}
+            {openCases.length}
+            {" "}
+            ACTIVE CASE
+            {openCases.length !== 1
+              ? "S"
+              : ""}
 
           </span>
 
@@ -553,62 +525,56 @@ function Dashboard() {
 
 
       {/* =================================================
-          STATISTICS
+          MAIN STATISTICS
       ================================================= */}
 
       <div className="stats-grid">
 
 
         <StatCard
-          label="Emails"
-          value={
-            counts.emails ??
-            emails.length
-          }
-          icon="✉"
-          onClick={() =>
-            navigate("/emails")
-          }
-        />
-
-
-        <StatCard
-          label="Indicators"
-          value={
-            counts.indicators ??
-            indicators.length
-          }
-          icon="⌁"
-          onClick={() =>
-            navigate(
-              "/threat-intelligence"
-            )
-          }
-        />
-
-
-        <StatCard
-          label="Threat Intel"
-          value={
-            counts.threat_intelligence ??
-            threatIntel.length
-          }
+          label="Total Cases"
+          value={totalCases}
           icon="◉"
           onClick={() =>
-            navigate(
-              "/threat-intelligence"
-            )
+            navigate("/cases")
           }
         />
 
 
         <StatCard
-          label="Findings"
-          value={
-            counts.findings ??
-            findings.length
+          label="Open Cases"
+          value={openCases.length}
+          icon="◌"
+          onClick={() =>
+            navigate("/cases")
           }
+        />
+
+
+        <StatCard
+          label="Critical Cases"
+          value={criticalCases.length}
           icon="⚠"
+          onClick={() =>
+            navigate("/cases")
+          }
+        />
+
+
+        <StatCard
+          label="High Severity"
+          value={highCases.length}
+          icon="▲"
+          onClick={() =>
+            navigate("/cases")
+          }
+        />
+
+
+        <StatCard
+          label="Total Findings"
+          value={findings.length}
+          icon="!"
           onClick={() =>
             navigate("/findings")
           }
@@ -616,29 +582,11 @@ function Dashboard() {
 
 
         <StatCard
-          label="Affected Users"
-          value={
-            counts.affected_users ??
-            affectedUsers.length
-          }
-          icon="♟"
+          label="Closed Cases"
+          value={closedCases.length}
+          icon="✓"
           onClick={() =>
-            navigate(
-              "/affected-users"
-            )
-          }
-        />
-
-
-        <StatCard
-          label="MITRE Mappings"
-          value={
-            counts.mitre_mappings ??
-            mitreMappings.length
-          }
-          icon="⚔"
-          onClick={() =>
-            navigate("/mitre")
+            navigate("/cases")
           }
         />
 
@@ -646,7 +594,7 @@ function Dashboard() {
 
 
       {/* =================================================
-          MAIN DASHBOARD GRID
+          DASHBOARD GRID
       ================================================= */}
 
       <div className="dashboard-grid">
@@ -660,119 +608,68 @@ function Dashboard() {
 
 
           {/* =================================================
-              FINDINGS
+              RECENT INVESTIGATIONS
           ================================================= */}
 
-          <div
-            className="card-dark clickable-section"
-            onClick={() =>
-              navigate("/findings")
-            }
-          >
+          <div className="card-dark">
 
             <div className="section-header">
 
               <div>
 
                 <h3>
-                  Investigation Findings
+                  Recent Investigations
                 </h3>
 
 
                 <small>
-                  Security findings identified
-                  during analysis
+                  Latest phishing cases
+                  created in PhishTrace
                 </small>
 
               </div>
 
 
-              <span>
+              <button
+                type="button"
+                className="dashboard-action-button"
+                onClick={() =>
+                  navigate("/cases")
+                }
+              >
 
-                {findings.length} finding
-                {findings.length !== 1
-                  ? "s"
-                  : ""}
+                View All
 
-              </span>
-
-            </div>
-
-
-            <div className="case-detail-grid">
-
-              <div>
-                <span>
-                  Critical
-                </span>
-
-                <strong>
-                  {criticalFindings.length}
-                </strong>
-              </div>
-
-
-              <div>
-                <span>
-                  High
-                </span>
-
-                <strong>
-                  {highFindings.length}
-                </strong>
-              </div>
-
-
-              <div>
-                <span>
-                  Medium
-                </span>
-
-                <strong>
-                  {mediumFindings.length}
-                </strong>
-              </div>
-
-
-              <div>
-                <span>
-                  Low
-                </span>
-
-                <strong>
-                  {lowFindings.length}
-                </strong>
-              </div>
+              </button>
 
             </div>
 
 
-            {findings.length === 0 ? (
+            {recentCases.length === 0 ? (
 
               <p className="page-description">
-                No findings recorded.
+
+                No investigations have been
+                created yet.
+
               </p>
 
             ) : (
 
               <div className="findings-list">
 
-                {findings.map(
-                  (finding) => (
+                {recentCases.map(
+                  (caseItem) => (
 
                     <div
                       className="finding dashboard-item-clickable"
-                      key={finding.id}
+                      key={caseItem.id}
 
-                      onClick={(event) => {
-
-                        event.stopPropagation();
-
+                      onClick={() =>
                         navigate(
-                          `/findings/${finding.id}`
-                        );
-
-                      }}
+                          `/cases/${caseItem.id}`
+                        )
+                      }
 
                       role="button"
 
@@ -787,7 +684,241 @@ function Dashboard() {
 
                           event.preventDefault();
 
-                          event.stopPropagation();
+                          navigate(
+                            `/cases/${caseItem.id}`
+                          );
+
+                        }
+
+                      }}
+
+                      title="Open investigation"
+                    >
+
+                      <div className="finding-indicator">
+
+                        {String(
+                          caseItem.severity ||
+                          "unknown"
+                        )
+                          .charAt(0)
+                          .toUpperCase()}
+
+                      </div>
+
+
+                      <div>
+
+                        <h5>
+
+                          {caseItem.title ||
+                            "Untitled Investigation"}
+
+                        </h5>
+
+
+                        <p>
+
+                          {caseItem.description ||
+                            "No description available."}
+
+                        </p>
+
+
+                        <div className="finding-tags">
+
+                          <span className="tag">
+
+                            {caseItem.case_number ||
+                              `CASE-${caseItem.id}`}
+
+                          </span>
+
+
+                          <span className="tag severity-tag">
+
+                            {String(
+                              caseItem.severity ||
+                              "unknown"
+                            ).toUpperCase()}
+
+                          </span>
+
+
+                          <span className="tag">
+
+                            {String(
+                              caseItem.status ||
+                              "unknown"
+                            ).toUpperCase()}
+
+                          </span>
+
+                        </div>
+
+
+                        <small>
+
+                          Created:
+                          {" "}
+
+                          {formatDate(
+                            caseItem.created_at
+                          )}
+
+                        </small>
+
+                      </div>
+
+
+                      <div className="dashboard-item-arrow">
+                        →
+                      </div>
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
+
+            )}
+
+          </div>
+
+
+          {/* =================================================
+              RECENT SECURITY FINDINGS
+          ================================================= */}
+
+          <div className="card-dark">
+
+            <div className="section-header">
+
+              <div>
+
+                <h3>
+                  Recent Security Findings
+                </h3>
+
+
+                <small>
+                  Latest findings generated
+                  during investigations
+                </small>
+
+              </div>
+
+
+              <button
+                type="button"
+                className="dashboard-action-button"
+                onClick={() =>
+                  navigate("/findings")
+                }
+              >
+
+                View All
+
+              </button>
+
+            </div>
+
+
+            <div className="case-detail-grid">
+
+              <div>
+
+                <span>
+                  Critical
+                </span>
+
+                <strong>
+                  {criticalFindings.length}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  High
+                </span>
+
+                <strong>
+                  {highFindings.length}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Medium
+                </span>
+
+                <strong>
+                  {mediumFindings.length}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Low
+                </span>
+
+                <strong>
+                  {lowFindings.length}
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            {recentFindings.length === 0 ? (
+
+              <p className="page-description">
+
+                No security findings have been
+                recorded yet.
+
+              </p>
+
+            ) : (
+
+              <div className="findings-list">
+
+                {recentFindings.map(
+                  (finding) => (
+
+                    <div
+                      className="finding dashboard-item-clickable"
+                      key={finding.id}
+
+                      onClick={() =>
+                        navigate(
+                          `/findings/${finding.id}`
+                        )
+                      }
+
+                      role="button"
+
+                      tabIndex={0}
+
+                      onKeyDown={(event) => {
+
+                        if (
+                          event.key === "Enter" ||
+                          event.key === " "
+                        ) {
+
+                          event.preventDefault();
 
                           navigate(
                             `/findings/${finding.id}`
@@ -808,14 +939,18 @@ function Dashboard() {
                       <div>
 
                         <h5>
+
                           {finding.title ||
-                            "Finding"}
+                            "Security Finding"}
+
                         </h5>
 
 
                         <p>
+
                           {finding.description ||
                             "No description available."}
+
                         </p>
 
 
@@ -835,7 +970,8 @@ function Dashboard() {
 
                             <span className="tag">
 
-                              Confidence:{" "}
+                              Confidence:
+                              {" "}
 
                               {String(
                                 finding.confidence
@@ -865,393 +1001,6 @@ function Dashboard() {
 
           </div>
 
-
-          {/* =================================================
-              THREAT INTELLIGENCE
-          ================================================= */}
-
-          <div
-            className="card-dark clickable-section"
-            onClick={() =>
-              navigate(
-                "/threat-intelligence"
-              )
-            }
-          >
-
-            <div className="section-header">
-
-              <div>
-
-                <h3>
-                  Threat Intelligence
-                </h3>
-
-
-                <small>
-                  Indicator reputation and
-                  enrichment results
-                </small>
-
-              </div>
-
-
-              <span>
-
-                {threatIntel.length} result
-                {threatIntel.length !== 1
-                  ? "s"
-                  : ""}
-
-              </span>
-
-            </div>
-
-
-            <div className="case-detail-grid">
-
-              <div>
-
-                <span>
-                  Malicious
-                </span>
-
-                <strong>
-                  {maliciousThreatIntel.length}
-                </strong>
-
-              </div>
-
-
-              <div>
-
-                <span>
-                  Total Results
-                </span>
-
-                <strong>
-                  {threatIntel.length}
-                </strong>
-
-              </div>
-
-
-              <div>
-
-                <span>
-                  Indicators
-                </span>
-
-                <strong>
-                  {indicators.length}
-                </strong>
-
-              </div>
-
-            </div>
-
-
-            {threatIntel.length === 0 ? (
-
-              <p className="page-description">
-                No threat intelligence results
-                recorded.
-              </p>
-
-            ) : (
-
-              <div className="findings-list">
-
-                {threatIntel.map(
-                  (result) => (
-
-                    <div
-                      className="finding dashboard-item-clickable"
-                      key={result.id}
-
-                      onClick={(event) => {
-
-                        event.stopPropagation();
-
-                        navigate(
-                          `/threat-intelligence/${result.id}`
-                        );
-
-                      }}
-
-                      role="button"
-
-                      tabIndex={0}
-
-                      onKeyDown={(event) => {
-
-                        if (
-                          event.key === "Enter" ||
-                          event.key === " "
-                        ) {
-
-                          event.preventDefault();
-
-                          event.stopPropagation();
-
-                          navigate(
-                            `/threat-intelligence/${result.id}`
-                          );
-
-                        }
-
-                      }}
-
-                      title="Open threat intelligence details"
-                    >
-
-                      <div className="finding-indicator">
-                        !
-                      </div>
-
-
-                      <div>
-
-                        <h5>
-                          {getThreatIndicator(
-                            result
-                          )}
-                        </h5>
-
-
-                        <p>
-
-                          Type:{" "}
-
-                          {getThreatIndicatorType(
-                            result
-                          )}
-
-                        </p>
-
-
-                        {result.notes && (
-
-                          <p>
-                            {result.notes}
-                          </p>
-
-                        )}
-
-
-                        <div className="finding-tags">
-
-                          <span className="tag">
-
-                            {String(
-                              result.verdict ||
-                              "unknown"
-                            ).toUpperCase()}
-
-                          </span>
-
-
-                          <span className="tag">
-
-                            Score:{" "}
-                            {result.score ??
-                              "N/A"}
-
-                          </span>
-
-
-                          <span className="tag">
-
-                            {String(
-                              result.confidence ||
-                              "unknown"
-                            ).toUpperCase()}
-
-                          </span>
-
-                        </div>
-
-                      </div>
-
-
-                      <div className="dashboard-item-arrow">
-                        →
-                      </div>
-
-                    </div>
-
-                  )
-                )}
-
-              </div>
-
-            )}
-
-          </div>
-
-
-          {/* =================================================
-              CONTAINMENT
-          ================================================= */}
-
-          <div
-            className="card-dark clickable-section"
-            onClick={() =>
-              navigate(
-                "/containment-actions"
-              )
-            }
-          >
-
-            <div className="section-header">
-
-              <div>
-
-                <h3>
-                  Containment Actions
-                </h3>
-
-
-                <small>
-                  Security response actions
-                </small>
-
-              </div>
-
-
-              <span>
-
-                {completedActions.length}
-                {" "}completed
-
-              </span>
-
-            </div>
-
-
-            {containmentActions.length === 0 ? (
-
-              <p className="page-description">
-                No containment actions recorded.
-              </p>
-
-            ) : (
-
-              containmentActions.map(
-                (action) => (
-
-                  <div
-                    className="containment dashboard-item-clickable"
-                    key={action.id}
-
-                    onClick={(event) => {
-
-                      event.stopPropagation();
-
-                      navigate(
-                        "/containment-actions"
-                      );
-
-                    }}
-
-                    role="button"
-
-                    tabIndex={0}
-
-                    onKeyDown={(event) => {
-
-                      if (
-                        event.key === "Enter" ||
-                        event.key === " "
-                      ) {
-
-                        event.preventDefault();
-
-                        event.stopPropagation();
-
-                        navigate(
-                          "/containment-actions"
-                        );
-
-                      }
-
-                    }}
-
-                    title="Open containment actions"
-                  >
-
-                    <div className="containment-icon">
-                      ✓
-                    </div>
-
-
-                    <div>
-
-                      <h5>
-                        {action.action_type ||
-                          "Containment Action"}
-                      </h5>
-
-
-                      <p>
-                        {action.notes ||
-                          "No additional notes."}
-                      </p>
-
-
-                      {action.target && (
-
-                        <code>
-                          {action.target}
-                        </code>
-
-                      )}
-
-
-                      {action.performed_by && (
-
-                        <>
-
-                          <br />
-
-                          <small>
-
-                            Performed by{" "}
-
-                            {action.performed_by}
-
-                          </small>
-
-                        </>
-
-                      )}
-
-                    </div>
-
-
-                    <div className="completed">
-
-                      {String(
-                        action.status ||
-                        "pending"
-                      ).toUpperCase()}
-
-                    </div>
-
-
-                    <div className="dashboard-item-arrow">
-                      →
-                    </div>
-
-                  </div>
-
-                )
-              )
-
-            )}
-
-          </div>
-
         </div>
 
 
@@ -1263,7 +1012,7 @@ function Dashboard() {
 
 
           {/* =================================================
-              RISK ASSESSMENT
+              SECURITY POSTURE
           ================================================= */}
 
           <div className="card-dark">
@@ -1273,12 +1022,12 @@ function Dashboard() {
               <div>
 
                 <h3>
-                  Risk Assessment
+                  Security Posture
                 </h3>
 
 
                 <small>
-                  Current investigation risk
+                  Current investigation overview
                 </small>
 
               </div>
@@ -1290,11 +1039,11 @@ function Dashboard() {
 
               <div className="score">
 
-                {riskLevel === "CRITICAL"
+                {criticalCases.length > 0
                   ? "90"
-                  : riskLevel === "HIGH"
+                  : highCases.length > 0
                   ? "75"
-                  : riskLevel === "MEDIUM"
+                  : openCases.length > 0
                   ? "50"
                   : "25"}
 
@@ -1302,7 +1051,7 @@ function Dashboard() {
 
 
               <div className="score-label">
-                RISK SCORE
+                CURRENT RISK SCORE
               </div>
 
             </div>
@@ -1313,11 +1062,11 @@ function Dashboard() {
               <div>
 
                 <span>
-                  Severity
+                  Total Cases
                 </span>
 
                 <strong>
-                  {riskLevel}
+                  {totalCases}
                 </strong>
 
               </div>
@@ -1326,7 +1075,173 @@ function Dashboard() {
               <div>
 
                 <span>
-                  Findings
+                  Active Cases
+                </span>
+
+                <strong>
+                  {openCases.length}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Critical Findings
+                </span>
+
+                <strong>
+                  {criticalFindings.length}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  High Findings
+                </span>
+
+                <strong>
+                  {highFindings.length}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* =================================================
+              CASE SEVERITY OVERVIEW
+          ================================================= */}
+
+          <div className="card-dark">
+
+            <div className="section-header">
+
+              <div>
+
+                <h3>
+                  Case Severity Overview
+                </h3>
+
+
+                <small>
+                  Distribution of investigations
+                  by severity
+                </small>
+
+              </div>
+
+            </div>
+
+
+            <div className="risk-breakdown">
+
+              <div>
+
+                <span>
+                  Critical
+                </span>
+
+                <strong>
+                  {criticalCases.length}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  High
+                </span>
+
+                <strong>
+                  {highCases.length}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Open
+                </span>
+
+                <strong>
+                  {openCases.length}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Closed
+                </span>
+
+                <strong>
+                  {closedCases.length}
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <button
+              type="button"
+              className="dashboard-action-button dashboard-full-button"
+              onClick={() =>
+                navigate("/cases")
+              }
+            >
+
+              View Investigations
+
+            </button>
+
+          </div>
+
+
+          {/* =================================================
+              FINDINGS SUMMARY
+          ================================================= */}
+
+          <div className="card-dark">
+
+            <div className="section-header">
+
+              <div>
+
+                <h3>
+                  Findings Summary
+                </h3>
+
+
+                <small>
+                  Security issues identified
+                  across all investigations
+                </small>
+
+              </div>
+
+            </div>
+
+
+            <div className="risk-breakdown">
+
+              <div>
+
+                <span>
+                  Total
                 </span>
 
                 <strong>
@@ -1339,11 +1254,11 @@ function Dashboard() {
               <div>
 
                 <span>
-                  Malicious Intel
+                  Critical
                 </span>
 
                 <strong>
-                  {maliciousThreatIntel.length}
+                  {criticalFindings.length}
                 </strong>
 
               </div>
@@ -1352,349 +1267,42 @@ function Dashboard() {
               <div>
 
                 <span>
-                  Completed Actions
+                  High
                 </span>
 
                 <strong>
-                  {completedActions.length}
+                  {highFindings.length}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Medium
+                </span>
+
+                <strong>
+                  {mediumFindings.length}
                 </strong>
 
               </div>
 
             </div>
 
-          </div>
 
+            <button
+              type="button"
+              className="dashboard-action-button dashboard-full-button"
+              onClick={() =>
+                navigate("/findings")
+              }
+            >
 
-          {/* =================================================
-              AFFECTED USERS
-          ================================================= */}
+              View All Findings
 
-          <div className="card-dark">
-
-            <div className="section-header">
-
-              <div>
-
-                <h3>
-                  Affected Users
-                </h3>
-
-
-                <small>
-                  Users associated with
-                  this investigation
-                </small>
-
-              </div>
-
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                }}
-              >
-
-                <span>
-                  {affectedUsers.length}
-                </span>
-
-
-                <button
-                  type="button"
-                  className="dashboard-action-button"
-                  onClick={() =>
-                    navigate(
-                      "/affected-users"
-                    )
-                  }
-                >
-                  Manage
-                </button>
-
-              </div>
-
-            </div>
-
-
-            {affectedUsers.length === 0 ? (
-
-              <p className="page-description">
-
-                No affected users recorded.
-
-              </p>
-
-            ) : (
-
-              <div className="findings-list">
-
-                {affectedUsers.map(
-                  (user) => (
-
-                    <div
-                      className="finding dashboard-item-clickable"
-                      key={user.id}
-
-                      onClick={() =>
-                        navigate(
-                          "/affected-users"
-                        )
-                      }
-
-                      role="button"
-
-                      tabIndex={0}
-
-                      onKeyDown={(event) => {
-
-                        if (
-                          event.key === "Enter" ||
-                          event.key === " "
-                        ) {
-
-                          event.preventDefault();
-
-                          navigate(
-                            "/affected-users"
-                          );
-
-                        }
-
-                      }}
-
-                      title="Manage affected users"
-                    >
-
-                      <div className="finding-indicator">
-                        !
-                      </div>
-
-
-                      <div>
-
-                        <h5>
-
-                          {user.display_name ||
-                            user.user_email ||
-                            "Affected User"}
-
-                        </h5>
-
-
-                        <p>
-
-                          {user.user_email ||
-                            "No email available."}
-
-                        </p>
-
-
-                        {user.department && (
-
-                          <p>
-                            {user.department}
-                          </p>
-
-                        )}
-
-
-                        <div className="finding-tags">
-
-                          <span className="tag">
-
-                            {String(
-                              user.impact_status ||
-                              "targeted"
-                            ).toUpperCase()}
-
-                          </span>
-
-                        </div>
-
-                      </div>
-
-
-                      <div className="dashboard-item-arrow">
-                        →
-                      </div>
-
-                    </div>
-
-                  )
-                )}
-
-              </div>
-
-            )}
-
-          </div>
-
-
-          {/* =================================================
-              MITRE ATT&CK
-          ================================================= */}
-
-          <div
-            className="card-dark clickable-section"
-            onClick={() =>
-              navigate("/mitre")
-            }
-          >
-
-            <div className="section-header">
-
-              <div>
-
-                <h3>
-                  MITRE ATT&CK
-                </h3>
-
-
-                <small>
-                  Attack technique mappings
-                </small>
-
-              </div>
-
-
-              <span>
-
-                {mitreMappings.length} mapping
-
-                {mitreMappings.length !== 1
-                  ? "s"
-                  : ""}
-
-              </span>
-
-            </div>
-
-
-            {mitreMappings.length === 0 ? (
-
-              <p className="page-description">
-
-                No MITRE ATT&CK mappings
-                recorded.
-
-              </p>
-
-            ) : (
-
-              <div className="mitre-grid">
-
-                {mitreMappings.map(
-                  (mapping) => (
-
-                    <div
-                      className="mitre-card dashboard-item-clickable"
-                      key={mapping.id}
-
-                      onClick={(event) => {
-
-                        event.stopPropagation();
-
-                        navigate(
-                          `/mitre/${mapping.id}`
-                        );
-
-                      }}
-
-                      role="button"
-
-                      tabIndex={0}
-
-                      onKeyDown={(event) => {
-
-                        if (
-                          event.key === "Enter" ||
-                          event.key === " "
-                        ) {
-
-                          event.preventDefault();
-
-                          event.stopPropagation();
-
-                          navigate(
-                            `/mitre/${mapping.id}`
-                          );
-
-                        }
-
-                      }}
-
-                      title="Open MITRE mapping details"
-                    >
-
-                      <div className="technique-id">
-
-                        {mapping.technique_id ||
-                          "Unknown"}
-
-                      </div>
-
-
-                      <h4>
-
-                        {mapping.technique_name ||
-                          "Unknown Technique"}
-
-                      </h4>
-
-
-                      <div className="tactic">
-
-                        {mapping.tactic ||
-                          "Tactic not specified"}
-
-                      </div>
-
-
-                      <p>
-
-                        {mapping.description ||
-                          "No description available."}
-
-                      </p>
-
-
-                      <div className="finding-tags">
-
-                        <span className="tag">
-
-                          {mapping.technique_id}
-
-                        </span>
-
-
-                        {mapping.tactic && (
-
-                          <span className="tag">
-
-                            {mapping.tactic}
-
-                          </span>
-
-                        )}
-
-                      </div>
-
-
-                      <div className="dashboard-item-arrow">
-                        →
-                      </div>
-
-                    </div>
-
-                  )
-                )}
-
-              </div>
-
-            )}
+            </button>
 
           </div>
 
@@ -1715,7 +1323,13 @@ function Dashboard() {
 
 
         <span>
-          Case {caseData.case_number}
+          {totalCases}
+          {" "}
+          Investigation
+          {totalCases !== 1
+            ? "s"
+            : ""}
+
         </span>
 
       </footer>
